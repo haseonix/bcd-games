@@ -16,8 +16,9 @@ concurrency:
 
 jobs:
   build:
-    # madeira-bcd: runs only in the owner's repository; a fork's run is skipped.
-    if: github.repository == 'thebcd69/madeira-bcd'
+    # The owner keeps the private OTA signing path; the BCD fork publishes only
+    # the identity-scrubbed unsigned alpha IPA.
+    if: github.repository == 'thebcd69/madeira-bcd' || github.repository == 'haseonix/bcd-games'
     runs-on: macos-15
     # contents: write only so the token can see DRAFT releases, which is where
     # the Metal Shader Converter installer is kept (drafts are not public).
@@ -2600,12 +2601,44 @@ jobs:
       - name: Package Madeira and Madeira2 unsigned IPAs
         run: python3 tools/ota-variants.py package build-out/Madeira.xcarchive/Products/Applications/Madeira.app build-out ${{ steps.bn.outputs.n }}
 
+      # madeira-bcd FORK-ONLY: only the scrubbed IPA is an artifact. ALPHA_NEEDLES
+      # is a private Actions secret containing one identifying string per line.
+      - name: Make sanitized unsigned BCD IPA
+        if: github.repository == 'haseonix/bcd-games'
+        shell: bash
+        env:
+          ALPHA_NEEDLES: ${{ secrets.ALPHA_NEEDLES }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ALPHA_NEEDLES" ]; then
+            echo "::error::Configure the ALPHA_NEEDLES Actions secret before building a public IPA artifact"
+            exit 1
+          fi
+          umask 077
+          needles="$RUNNER_TEMP/alpha-needles.txt"
+          trap 'rm -f "$needles"' EXIT
+          printf '%s\n' "$ALPHA_NEEDLES" > "$needles"
+          python3 tools/make-alpha-ipa.py \
+            build-out/Madeira-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa \
+            build-out/BCD-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa \
+            --needles "$needles"
+
+      - name: Upload sanitized unsigned BCD IPA
+        if: github.repository == 'haseonix/bcd-games'
+        uses: actions/upload-artifact@v4
+        with:
+          name: BCD-0.1.${{ steps.bn.outputs.n }}-unsigned
+          path: build-out/BCD-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa
+          if-no-files-found: error
+          retention-days: 7
+
       # Over-the-air install: sign with the owner's certificate (kept in the
       # owner's PRIVATE bucket, never in the repository) and put both signed IPAs
       # plus installation pages (7-day pre-signed links) in the same bucket.
       # A signing/upload failure is caught by the private-bucket gate below.
       - name: Sign for OTA install (private bucket)
         id: ota
+        if: github.repository == 'thebcd69/madeira-bcd'
         continue-on-error: true
         env:
           B2_KEY_ID: ${{ secrets.B2_KEY_ID }}
@@ -2622,13 +2655,13 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: bash tools/sign-and-publish-ota.sh build-out/Madeira-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa ${{ steps.bn.outputs.n }} build-out/Madeira2-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa
 
-      # Owner's decision (2026-10-02): no IPA artifact on GitHub at all. The
+      # Owner-only: no IPA artifact on GitHub for the private OTA build.
       # repository and its Actions are public, so an artifact is downloadable by
       # anyone; the only copy of a build is the signed IPA in the owner's
       # private R2 bucket (the OTA step above). If that step did not succeed,
       # the build fails here instead of keeping the IPA somewhere public.
       - name: Check the IPA reached the private bucket
-        if: steps.ota.outcome != 'success'
+        if: github.repository == 'thebcd69/madeira-bcd' && steps.ota.outcome != 'success'
         run: |
           echo "::error::OTA signing/upload did not succeed: this build's IPA was not kept anywhere (no GitHub artifact by design)"
           exit 1

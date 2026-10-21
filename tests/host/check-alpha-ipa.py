@@ -58,7 +58,20 @@ check("the tool is marked FORK-ONLY", "FORK-ONLY" in src[:400])
 check("its needles live outside the repository", 'os.path.expanduser("~/madeira-local/state/alpha-needles.txt")' in src)
 CI = R / ".github/workflows/build-ipa.yml"
 if CI.exists():
-    check("CI runs this check", "run: python3 tests/host/check-alpha-ipa.py" in CI.read_text())
+    workflow = CI.read_text()
+    check("CI runs this check", "run: python3 tests/host/check-alpha-ipa.py" in workflow)
+    check("the macOS build is enabled only for the owner and this fork",
+          "if: github.repository == 'thebcd69/madeira-bcd' || github.repository == 'haseonix/bcd-games'" in workflow)
+    check("the fork build fails closed unless its private needles secret is set",
+          "ALPHA_NEEDLES: ${{ secrets.ALPHA_NEEDLES }}" in workflow
+          and "Configure the ALPHA_NEEDLES Actions secret" in workflow
+          and "python3 tools/make-alpha-ipa.py" in workflow)
+    check("only the sanitized fork IPA is uploaded, while private OTA signing stays owner-only",
+          workflow.index("- name: Make sanitized unsigned BCD IPA")
+          < workflow.index("- name: Upload sanitized unsigned BCD IPA")
+          and "if: github.repository == 'haseonix/bcd-games'\n        uses: actions/upload-artifact@v4" in workflow
+          and "path: build-out/BCD-0.1.${{ steps.bn.outputs.n }}-unsigned.ipa" in workflow
+          and "if: github.repository == 'thebcd69/madeira-bcd'\n        continue-on-error: true" in workflow)
 
 with tempfile.TemporaryDirectory() as tmp:
     t = Path(tmp)

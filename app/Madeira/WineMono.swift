@@ -24,18 +24,18 @@ import SwiftUI
 
 /// What build/wine-mono/pin.sh pins (check-wine-mono.py holds the two to the same values).
 enum WineMonoPin {
-    static let version = "11.0.0"
-    static let url = URL(string: "https://dl.winehq.org/wine/wine-mono/11.0.0/wine-mono-11.0.0-x86.tar.xz")!
-    static let tarSHA256 = "0cd723aa28897f7d7d2702eed6c72e4262255980e212bc2b3c94bfa234abe5fd"
+    static let version = "11.3.0"
+    static let url = URL(string: "https://dl.winehq.org/wine/wine-mono/11.3.0/wine-mono-11.3.0-x86.tar.xz")!
+    static let tarSHA256 = "54a1b0111c3fe4b785eae688af94d27e64995707ad648b6fee8000381b80d298"
     /// The tarball's size and its unpacked tar stream's, for progress.
-    static let tarBytes: Int64 = 41_643_568
-    static let tarStreamBytes: Int64 = 239_319_040
+    static let tarBytes: Int64 = 39_412_620
+    static let tarStreamBytes: Int64 = 231_864_320
     /// lib/mono/4.5/mscorlib.dll before and after the ml1281 patch.
-    static let mscorlibSHA256 = "ea40cb9dcad1bd96221ab9a826dd0cce298e57d75f06087b8c7b69319c0e6137"
-    static let mscorlibPatchedSHA256 = "cfc4fb50c0e4f93d6e2c5fd827e2d7b3f215d3b183df024db68d6784c5388bc6"
+    static let mscorlibSHA256 = "b715602dfd62e0eec01c8f2167fb6afee859ea7e6513eed2c7b8aeafc6da33d9"
+    static let mscorlibPatchedSHA256 = "5affb26c82c6499d46074d904f130a1a1c8de8b774372ebdac6fc03720b10105"
     /// ml1281 (bundle.sh): GC.Collect(int, GCCollectionMode, bool, bool)'s `mode == Optimized`
     /// branch (ldloc.0; ldc.i4.4; or; stloc.0 at IL_003c) becomes ret; nop; nop; nop.
-    static let patchOffset = 0x53B08
+    static let patchOffset = 0x53BA4
     static let patchContext: [UInt8] = [0x16, 0x0A, 0x03, 0x18, 0x33, 0x04, 0x06, 0x1A, 0x60, 0x0A,
                                         0x05, 0x2C, 0x04, 0x06, 0x1E, 0x60, 0x0A, 0x04, 0x2C, 0x06]   // offset - 6 ..< offset + 14
     static let patchBytes: [UInt8] = [0x2A, 0x00, 0x00, 0x00]

@@ -231,11 +231,11 @@ extension BCDSettingsBackends {
 }
 
 @MainActor final class BCDPreviewDotNet: BCDDotNetBackend {
-    @Published private(set) var state = BCDMonoState.installed(version: "11.0.0")
+    @Published private(set) var state = BCDMonoState.installed(version: "11.3.0")
     @Published private(set) var error: String?
-    let version = "11.0.0"
-    let downloadBytes: Int64 = 41_643_568
-    var installedBytes: Int64? { if case .installed = state { return 137_000_000 } else { return nil } }
+    let version = "11.3.0"
+    let downloadBytes: Int64 = 39_412_620
+    var installedBytes: Int64? { if case .installed = state { return 127_202_289 } else { return nil } }
     func install() { state = .installed(version: version) }
     func remove() { state = .missing }
     func refresh() {}

@@ -153,6 +153,12 @@ and the scripts it runs under `build/` and `tools/`, step by step. Every release
 `BCD-source.tar.xz`, the complete source of that release: this repository and all its
 submodules at the release's pins.
 
+In `haseonix/bcd-games`, manually dispatching that workflow builds a sanitized unsigned BCD IPA
+on GitHub's macOS runner. Before dispatching, configure the repository Actions secret
+`ALPHA_NEEDLES` with one owner-identifying string per line; the build fails rather than publish
+an IPA if the secret is missing. The artifact is retained for seven days. The owner's separate
+repository keeps its existing private signing and OTA publication path.
+
 ## License
 
 BCD is free software under the GNU General Public License, version 3 ([LICENSE](LICENSE)),

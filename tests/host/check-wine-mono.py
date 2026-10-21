@@ -65,7 +65,7 @@ check('URL="https://dl.winehq.org/wine/wine-mono/$VER"' in fetch
       and 'https://dl.winehq.org/wine/wine-mono/%s/wine-mono-%s-x86.tar.xz' % (version, version) in swift,
       'the URL is the one fetch.sh downloads')
 bundle_sh = (root / 'build/wine-mono/bundle.sh').read_text()
-check('off = 0x53B08' in bundle_sh and 'static let patchOffset = 0x53B08' in swift
+check('off = 0x53BA4' in bundle_sh and 'static let patchOffset = 0x53BA4' in swift
       and '"160A03183304061A600A052C04061E600A042C06"' in bundle_sh and 'bytes.fromhex("2A000000")' in bundle_sh,
       'the mscorlib patch is bundle.sh\'s (offset, context, bytes)')
 
