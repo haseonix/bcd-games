@@ -116,6 +116,7 @@ jobs:
       # and fields, nothing personal in the body, the person's words untouched, the limits, the
       # section's place after Logs, and the pull tool never printing the key.
       - name: Check Settings › Feedback
+        if: github.repository == 'thebcd69/madeira-bcd'
         run: python3 tests/host/check-feedback.py --require-swift
 
       # A newer BCD, said at most once a day (BCDUpdateCheck.swift, BCDUpdateNotice.swift): the source's shape
