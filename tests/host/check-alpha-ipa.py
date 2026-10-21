@@ -65,7 +65,9 @@ if CI.exists():
     check("the fork build fails closed unless its private needles secret is set",
           "ALPHA_NEEDLES: ${{ secrets.ALPHA_NEEDLES }}" in workflow
           and "Configure the ALPHA_NEEDLES Actions secret" in workflow
-          and "python3 tools/make-alpha-ipa.py" in workflow)
+          and "python3 tools/make-alpha-ipa.py" in workflow
+          and workflow.index("- name: Verify alpha IPA identity needles")
+          < workflow.index("- name: Toolchain versions"))
     check("only the sanitized fork IPA is uploaded, while private OTA signing stays owner-only",
           workflow.index("- name: Make sanitized unsigned BCD IPA")
           < workflow.index("- name: Upload sanitized unsigned BCD IPA")

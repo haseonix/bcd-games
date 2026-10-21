@@ -32,6 +32,16 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Verify alpha IPA identity needles
+        if: github.repository == 'haseonix/bcd-games'
+        env:
+          ALPHA_NEEDLES: ${{ secrets.ALPHA_NEEDLES }}
+        run: |
+          if [ -z "$ALPHA_NEEDLES" ]; then
+            echo "::error::Configure the ALPHA_NEEDLES Actions secret before building a public IPA artifact"
+            exit 1
+          fi
+
       # ContentView.swift uses glassEffect(.regular, in:), which needs the
       # iOS 26 SDK. The runner defaults to Xcode 16.4 (iOS 18.5), so pick the
       # newest Xcode installed rather than whatever xcode-select points at.
@@ -2610,10 +2620,6 @@ jobs:
           ALPHA_NEEDLES: ${{ secrets.ALPHA_NEEDLES }}
         run: |
           set -euo pipefail
-          if [ -z "$ALPHA_NEEDLES" ]; then
-            echo "::error::Configure the ALPHA_NEEDLES Actions secret before building a public IPA artifact"
-            exit 1
-          fi
           umask 077
           needles="$RUNNER_TEMP/alpha-needles.txt"
           trap 'rm -f "$needles"' EXIT
