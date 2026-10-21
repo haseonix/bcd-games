@@ -48,8 +48,10 @@ def check(what, cond, detail=""):
 
 core = (R / "app/Madeira/LogUploadCore.swift").read_text()
 app = (R / "app/Madeira/LogUpload.swift").read_text()
-worker = (R / "bcd-logs/worker/worker.js").read_text()
-toml = (R / "bcd-logs/worker/wrangler.toml").read_text()
+worker_path = R / "bcd-logs/worker/worker.js"
+worker = worker_path.read_text() if worker_path.is_file() else None
+toml_path = R / "bcd-logs/worker/wrangler.toml"
+toml = toml_path.read_text() if toml_path.is_file() else None
 
 spec = importlib.util.spec_from_file_location("fixture", R / "tools/autotune-fixture.py")
 fx = importlib.util.module_from_spec(spec)
@@ -63,7 +65,10 @@ check("LogUploadCore's rules are SCRUB's, in its order",
       swift_rules)
 check("the app sends to the deployed intake with the intake header",
       'URL(string: "https://bcd.bcd-logs.workers.dev/v1/logs")' in app
-      and 'static let intake = "madeira-bcd/2"' in app and 'export const INTAKE = "madeira-bcd/2";' in worker)
+      and 'static let intake = "madeira-bcd/2"' in app
+      and (worker is None or 'export const INTAKE = "madeira-bcd/2";' in worker))
+if worker is None:
+    print("SKIP the private log-intake Worker source checks: bcd-logs/worker is not in this checkout")
 up = app[app.index("session.uploadTask(with: req, fromFile: gz)"):]
 check("the compressed copy is deleted as soon as the upload ends, sent or not",
       up.index("try? FileManager.default.removeItem(at: gz)") < up.index("if let error"))
@@ -88,22 +93,34 @@ check("build 562's automatic setting and session marker are cleared",
 pbx = (R / "app/Madeira.xcodeproj/project.pbxproj").read_text()
 for f in ("LogUpload.swift", "LogUploadCore.swift"):
     check(f"the Xcode project builds {f}", pbx.count(f"/* {f} in Sources */") == 2 and pbx.count(f"path = {f};") == 1)
-for f in ("app/Madeira/LogUpload.swift", "app/Madeira/LogUploadCore.swift", "bcd-logs/worker/worker.js",
-          "bcd-logs/worker/wrangler.toml", "bcd-logs/worker/worker.test.mjs", "tools/pull-logs.py"):
+for f in ("app/Madeira/LogUpload.swift", "app/Madeira/LogUploadCore.swift"):
     check(f"{f} is marked FORK-ONLY", "FORK-ONLY" in (R / f).read_text()[:800])
-check("the Worker's R2 binding is its own bucket, with an hourly trim",
-      'bucket_name = "bcd-logs"' in toml and 'crons = ["17 * * * *"]' in toml and "macosvm" not in toml)
+pull_tool = R / "tools/pull-logs.py"
+if pull_tool.is_file():
+    check("tools/pull-logs.py is marked FORK-ONLY", "FORK-ONLY" in pull_tool.read_text()[:800])
+else:
+    print("SKIP log-pull CLI check: tools/pull-logs.py is not in this checkout")
+if worker is not None and toml is not None:
+    for f in ("bcd-logs/worker/worker.js", "bcd-logs/worker/wrangler.toml", "bcd-logs/worker/worker.test.mjs"):
+        check(f"{f} is marked FORK-ONLY", "FORK-ONLY" in (R / f).read_text()[:800])
+    check("the Worker's R2 binding is its own bucket, with an hourly trim",
+          'bucket_name = "bcd-logs"' in toml and 'crons = ["17 * * * *"]' in toml and "macosvm" not in toml)
+else:
+    print("SKIP Worker license and bucket checks: private Worker source is not in this checkout")
 CI = R / ".github/workflows/build-ipa.yml"
 if CI.exists():
     check("CI runs this check", "run: python3 tests/host/check-log-upload.py --require-swift" in CI.read_text())
 
 # ---- the Worker under node ---------------------------------------------------------------
 node = shutil.which("node") or str(Path.home() / "madeira-local/tools/node/bin/node")
-if Path(node).exists():
-    r = subprocess.run([node, "--test", str(R / "bcd-logs/worker/worker.test.mjs")], capture_output=True, text=True)
+worker_test = R / "bcd-logs/worker/worker.test.mjs"
+if worker_test.is_file() and Path(node).exists():
+    r = subprocess.run([node, "--test", str(worker_test)], capture_output=True, text=True)
     check("the intake Worker's tests pass under node", r.returncode == 0, (r.stdout + r.stderr)[-2000:])
-else:
+elif worker_test.is_file():
     print("SKIP the Worker's node tests: no node")
+else:
+    print("SKIP the Worker's node tests: private Worker source is not in this checkout")
 
 # ---- scrub and gzip, Swift against Python ---------------------------------------------
 corpus = [
