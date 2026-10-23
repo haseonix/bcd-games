@@ -66,9 +66,10 @@ struct BCDDigest: Hashable, Codable, CustomStringConvertible {
     }
 }
 
-/// How a chunk travels: as it is, or a zlib stream (GOG). Epic adds its chunk container.
+/// How a chunk travels: as it is, a zlib stream (GOG), or an Epic chunk file (a header, then the
+/// bytes stored or as a zlib stream: BCDChunkFileDecoder).
 enum BCDChunkCodec: String, Codable {
-    case stored, zlib
+    case stored, zlib, epic
 }
 
 /// One piece the store serves, fetched once however many files use it.

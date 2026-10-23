@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "fault-guard-rate-redeliv"
+ ],
+ "next": [
+  "env.MADEIRA_FAULT_GUARD_RATE = 1"
+ ],
+ "note": "Round 591 (ajan10/motor): ROUNDS ended alive by the same guard (460 a second, 56 fps).",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

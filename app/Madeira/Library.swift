@@ -647,10 +647,20 @@ final class LibraryModel: ObservableObject {
     /// madeira-bcd (round 579, BCD Dock): the library itself ended the session because the game's last process ended
     /// with an error status and nothing of it was left (watchDockGameEnd); nothing is asked again.
     private var endedByDockGame = false
+    /// madeira-bcd (round 580, BCD Dock: the launch failed and no game ran): when watchDockFailedLaunch first saw the host's failed
+    /// launch with nothing of the game running; nil while that does not hold.
+    private var dockFailedAt: Date?
+    /// The host's failure in words, once the library itself ended the session for it (exitReport shows it).
+    private var endedByDockFailure: String?
     /// What watchDockGameEnd logged last, so each state is logged once.
     private var dockEndNote = ""
     private func exitReport() -> String? {
         guard !quitRequested, MadeiraConfig.flag("MADEIRA_EXIT_REPORT") else { return nil }
+        // madeira-bcd (round 580): the Dock host reported the launch failed and nothing ran; the library ended the session (watchDockFailedLaunch).
+        if let words = endedByDockFailure {
+            LogStore.shared.log("[exit-report] the Dock host reported the launch failed (the session-end watch)")
+            return words
+        }
         var status: UInt32 = 0
         guard wine_crash_exit_status(&status) != 0 else {
             // madeira-bcd (round 577): a plain nonzero exit code of a session the library ended itself
@@ -659,6 +669,14 @@ final class LibraryModel: ObservableObject {
             return words
         }
         LogStore.shared.log("[exit-report] status=0x\(String(status, radix: 16))")
+        // madeira-bcd (round 580, Stellar Blade demo DBKP8Z): the game's file asked for a wider executable window, this run
+        // could not make it (StikJITHelper.exeWindowWidenFailedMB), and the program ended with c0000018: it did not fit.
+        // iOS lays the app's memory out anew at every start, so the same game starts after BCD is closed and opened again.
+        // Text only; nothing is held back.
+        if status == 0xC0000018, let mb = StikJITHelper.exeWindowWidenFailedMB {
+            LogStore.shared.log("[exit-report] the executable window could not be widened to \(mb) MB in this run")
+            return "The game quit with Windows error 0xC0000018 (conflicting addresses). This run of BCD could not widen the memory its program starts in to the \(mb) MB the game's settings ask for, because iOS had put something else there. Quit BCD (swipe it away in the app switcher), open it again and start the game."
+        }
         let kind = status == 0xC0000005 ? " (access violation)" : status == 0xC0000017 ? " (not enough memory)" : ""
         return "The game quit with Windows error 0x\(String(status, radix: 16, uppercase: true))\(kind). To report the problem, export the diagnostic log."
     }
@@ -1015,7 +1033,7 @@ final class LibraryModel: ObservableObject {
         wine_exit_status_reset()
         quitRequested = false
         endedByWatch = nil; endWatchNote = ""
-        endedByDockGame = false; dockEndNote = ""
+        endedByDockGame = false; dockEndNote = ""; dockFailedAt = nil; endedByDockFailure = nil
         // madeira-bcd: auto-tune's session marker (AutoTune.swift); off, nothing.
         if AutoTune.enabled { AutoTune.sessionBegan(entry, remember: remember, dockWithoutEntry: dock != nil && !remember) }
         LibraryController.shared.configure(enabled: true, ownsInput: false)
@@ -1140,18 +1158,56 @@ final class LibraryModel: ObservableObject {
         }
         switch verdict {
         case .none:
-            break
+            watchDockFailedLaunch(table)
         case .wait(let status, let file, let why):
             let note = "\(file) \(status) \(why)"
             if dockEndNote != note {
                 dockEndNote = note
                 LogStore.shared.log("[dock-game-end] \(file) ended with status 0x\(String(status, radix: 16)); the session goes on for now (\(why))")
             }
+            watchDockFailedLaunch(table)
         case .end(let status, let file, let lived):
             endedByDockGame = true
             LogStore.shared.log("[dock-game-end] \(file) ended with status 0x\(String(status, radix: 16)) after \(Int(lived)) s, the host finished and nothing of the game runs: ending the session")
             DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock_game_ended(Int32(bitPattern: status)) }
         }
+    }
+    /// madeira-bcd (round 580, BCD Dock: the launch failed and no game ran): the host finished with a failure and Valve's
+    /// client never ran the game (Spec Ops: The Line and Risen 2, Steam's per-account executable, `probe-result=49`), so no
+    /// program of the game ever exists for watchDockGameEnd's rule above, and the session sat on its desktop until the user
+    /// closed BCD (271 s in the longest log). When nothing of the game runs and the failure has stood for
+    /// `DockGameEndRules.failedLaunchGrace` seconds, the session ends and the library shows the host's reason in words (the
+    /// starting screen showed it already). Only a failed launch: a host that finished well, a game that ran, and a
+    /// program of the game that runs are not touched. Off with env.MADEIRA_DOCK_GAME_END = 0 (the guard of the caller).
+    private func watchDockFailedLaunch(_ table: DockProcessTable) {
+        var words: String?
+        let failed = DockGameEndRules.failedLaunch(table, places: .standard) {
+            let report = MainActor.assumeIsolated { MadeiraDock.pollReport() }
+            words = report.failure
+            return DockGameEndRules.DockHostResult(result: report.result, gameRan: report.fields["launch-game-running"] == "1")
+        }
+        guard let failed, failed.blocked == nil else {
+            dockFailedAt = nil
+            if let failed, let why = failed.blocked {
+                let note = "launch-failed \(failed.result) \(why)"
+                if dockEndNote != note {
+                    dockEndNote = note
+                    LogStore.shared.log("[dock-game-end] the host reported the launch failed (code \(failed.result)); the session goes on for now (\(why))")
+                }
+            }
+            return
+        }
+        let since = dockFailedAt ?? Date()
+        if dockFailedAt == nil {
+            dockFailedAt = since
+            LogStore.shared.log("[dock-game-end] the host reported the launch failed (code \(failed.result)) and no game process runs; the session ends in \(Int(DockGameEndRules.failedLaunchGrace)) s unless one starts")
+        }
+        guard Date().timeIntervalSince(since) >= DockGameEndRules.failedLaunchGrace else { return }
+        endedByDockGame = true
+        endedByDockFailure = words ?? "BCD Dock ended before any game window showed up (code \(failed.result)). Export the diagnostic log to see why."
+        LogStore.shared.log("[dock-game-end] the host reported the launch failed (code \(failed.result)) and no game process ran: ending the session")
+        // The engine's end work records the number as the session's exit status (auto-tune reads a failed session from it).
+        DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock_game_ended(Int32(failed.result)) }
     }
     /// `reason`: what stopped the launch, when the caller knows (the JIT pool's failure).
     /// `offerJIT`: the launch failed because no debugger is attached, so the alert

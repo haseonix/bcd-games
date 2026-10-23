@@ -1,0 +1,15 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "x64-image-nocopy",
+  "pool-split-exhausted"
+ ],
+ "next": [
+  "env.MADEIRA_X64_IMAGE_NOCOPY = 1"
+ ],
+ "note": "BeamNG.drive (Steam 284160 through BCD Dock), build 579, iPhone16,2 (Send Log 01DSNK; 8JCCFM, iPad16,3, the same stop): with env.MADEIRA_X64_MACHINE = 1 the launcher starts Bin64/BeamNG.drive.x64.exe and its 265 MiB libcef.dll finds no room in the JIT pool: [jit-pool] EXHAUSTED (image 0x71e0330000+0x1092c000) (a DLL, under pool-split-exhausted's 300 MiB bar), load_dll libcef.dll status=c0000017. Both x64-image-nocopy (priority 10) and pool-split-exhausted (11) match; NOCOPY comes first and is what lets libcef.dll load (0DXQ7T, K7QJF3: mapped without a pool copy). On the device the game's history had pool-split = 1 kept and NOCOPY already tried, hence 'next nothing' in the header; the replay here has no history.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

@@ -28,11 +28,6 @@ final class LogStore: ObservableObject {
             return size > 0
         }
     }
-    private let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm:ss.SSS"
-        return f
-    }()
 
     // Tail-file reader (background)
     private var tail: LogTail?
@@ -168,10 +163,8 @@ final class LogStore: ObservableObject {
         let fm = FileManager.default
         let dir = logFileURL.deletingLastPathComponent().appendingPathComponent("logs")
         try? fm.createDirectory(atPath: dir.path, withIntermediateDirectories: true, attributes: nil)
-        let stamp = DateFormatter()
-        stamp.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let safe = program.map { "/\\:*?\"<>|".contains($0) ? "_" : $0 }
-        let url = dir.appendingPathComponent(String(safe) + "-" + stamp.string(from: Date()) + ".txt")
+        let url = dir.appendingPathComponent(String(safe) + "-" + BCDFormat.fileStamp(Date()) + ".txt")
         do {
             try fm.linkItem(at: logFileURL, to: url)
             log("Session log: logs/\(url.lastPathComponent)")
@@ -361,7 +354,7 @@ final class LogStore: ObservableObject {
     /// land in the file alongside Wine/FEX output, picked up by the tail
     /// reader).
     private func appendToFile(_ message: String, level: LogEntry.Level = .info) {
-        let line = "[\(dateFormatter.string(from: Date()))] [\(level.rawValue)] \(message)\n"
+        let line = "[\(BCDFormat.logClock(Date()))] [\(level.rawValue)] \(message)\n"
         // Once Wine has pointed stderr at this same file (O_APPEND,
         // WineProcessBridge), write through it. Device logs kept not
         // one line from here after Wine started, while every stderr line

@@ -120,6 +120,16 @@ struct BCDMenuAsk {
                                      run: { [weak store] in Self.perform(action, game, store?.actions) }))
         }
         if let main = plan.main { add(main.action, main.title, main.symbol) }
+        // Install on a game with owned DLC: the question about it lives on the game's page, so the card opens the page for such a
+        // game (and for one whose DLC lookup still runs) instead of installing it alone. Showing the card starts the lookup.
+        if let main = plan.main, case .install = main.action, case .notInstalled = game.state, !items.isEmpty {
+            BCDGameDetailSource.backend?.opened(game)
+            items[0].run = { [weak self, weak store] in
+                let now = BCDGameDetailSource.backend?.details(for: game, settings: false) ?? BCDGameDetails()
+                if now.dlcOffer != nil || now.dlcCheck == .checking { self?.openPage?(game); return }
+                Self.perform(main.action, game, store?.actions)
+            }
+        }
         if let update = plan.others.first(where: { $0.action == .update }) { add(.update, update.title, update.symbol) }
         items.append(BCDMenuItem(id: "page", title: "Game page", symbol: "info.circle",
                                  run: { [weak self] in self?.openPage?(game) }))

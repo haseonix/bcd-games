@@ -52,12 +52,35 @@ OVERLAY = {
                         "data live; does not recycle executable ranges or change GPU capabilities. Restart the "
                         "session after changing it.",
                 "sources": ["madeira-d3d12/src/pe/madeira_d3d12.c"]},
+    "env.MADEIRA_GDI_SHARED_SECTION": {"category": "Windows, display & input",
+                "title": "GDI table 32-bit programs can reach", "kind": "text", "default": "",
+                "note": "Empty: the GDI handle table is a section every 32-bit program can map in its own memory "
+                        "window when the session is armed for 32-bit code as it starts (a 32-bit game), and always "
+                        "in BCD Dock and in the library's Desktop (build 580). 1 forces it: for a 64-bit launcher "
+                        "or a game started in a Wine desktop that later starts a 32-bit program, whose gdi32 "
+                        "otherwise faults on its first GDI handle (logged as [gdi-shared] 32-bit program in a "
+                        "session whose GDI table is private). 0 keeps the private table, in the Dock and the "
+                        "Desktop too. Read once, when the session's first program starts.",
+                "sources": ["wine/dlls/win32u/gdiobj.c", "app/Madeira/ContentView.swift",
+                            "build/ntdll-unix/virtual_ios.c"]},
     "env.LC_ALL": {"category": "Wine core (ntdll)", "title": "Wine's locale for this game",
                 "kind": "text", "default": "",
                 "note": "Empty: Wine takes the user locale from the phone's language (Turkish phone: tr-TR, code pages "
                         "1254/857). en_US.UTF-8 gives the game an English system and user locale. Ratchet & Clank: "
                         "Rift Apart threw an unhandled C++ exception right after loading the Turkish OEM code page "
                         "(builds 550 and 553, R6025) and runs with it. Read at session start (init_locale).",
+                "sources": ["build/ntdll-unix/env_ios.c"]},
+    "env.MADEIRA_NLS_EXTRA": {"category": "Wine core (ntdll)", "title": "Extra code page tables",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: a code page table BCD does not load for every game (Wine's own: 932 Japanese, 936 Simplified "
+                        "Chinese, 949 Korean, 950 Traditional Chinese, 874 Thai, 1250, 1251 and 1253 to 1258) is read from the app's "
+                        "nls/extra folder when this game asks for it; without the line such a request fails, as it always did (GetCPInfo "
+                        "and MultiByteToWideChar return an error for that code page). For a game that converts text in one of those "
+                        "pages: Sword and Fairy 3 asked for 936, read the missing table and ended 0.8 s after the start (build 580). "
+                        "Programs that ask for these pages and run without them (Steam's own client asks for 932 in every session of "
+                        "BCD Dock) are not changed unless the game's file has the line. "
+                        "Read at every request, so it ends with the session. Logged as [nls-extra]; [nls-missing] names a code "
+                        "page whose table was not found. Auto-tune adds it after a crash in a game that asked for 932, 936, 949, 950 or 874.",
                 "sources": ["build/ntdll-unix/env_ios.c"]},
     "env.MADEIRA_APP_DLL_SHADOW": {"category": "Wine core (ntdll)", "title": "Ignore these DLLs in the game's folder",
                 "kind": "text", "default": "",
@@ -200,6 +223,22 @@ OVERLAY = {
                 "note": "On by default. MFC comes from the same Microsoft VC++ package as the C++ runtime and is "
                         "linked into the game's system32; games that import it (Horizon Zero Dawn) stop at once "
                         "without it. Wine has no MFC of its own. 0 leaves it out. Read at session start."},
+    "env.MADEIRA_MFC_DOCK": {"category": "Wine libraries", "title": "Microsoft MFC in a BCD Dock game",
+                "kind": "bool", "default": "0",
+                "note": "Default off. A game BCD Dock starts (an x64 program in an aarch64 session) looks for MFC in "
+                        "C:\\windows\\sysx64, where none is: Horizon Zero Dawn and Age of Empires II HD stop at once with "
+                        "c0000135 (\"import_dll Library mfc140.dll ... not found\"). 1: mfc140.dll and mfc140u.dll "
+                        "from the downloaded VC++ runtime are linked there, and nothing else of it. Does nothing in a "
+                        "direct start (ARM64EC), which has MFC already; MADEIRA_MFC=0 keeps it out here too. Logged "
+                        "as MADEIRA_MFC_DOCK. Read at session start, from the game's own lines."},
+    "env.MADEIRA_DOCK_SCRIPT_REGISTRY": {"category": "Steam & Dock", "title": "Apply the install script's registry values",
+                "kind": "bool", "default": "0",
+                "note": "Default off. 1: before a BCD Dock start, the \"Registry\" values of the game's Steam install "
+                        "script (installscript.vdf; the install folder above all, %INSTALLDIR% filled in) are written "
+                        "into BCD's Windows registry where the key or value is missing, as Steam on Windows does. "
+                        "Fallout: New Vegas' launcher says \"does not appear to be installed\" without its \"Installed "
+                        "Path\". Values already there are never changed; logged as [dock-script-registry], one line "
+                        "each. Read at a Dock start, from the game's own lines."},
     "fullscreen-window": {"category": "Direct3D 12", "title": "Full screen moves the game's window over the whole screen",
                 "kind": "bool", "default": "0",
                 "note": "Default off. 1: when a Direct3D 12 game switches to full screen, its window is moved to the "
@@ -958,7 +997,8 @@ OVERLAY = {
                 "sources": ["build/ntdll-unix/server_ios.c"],
                 "note": "1: the session has the ARM64 Visual C++ 2015-2022 redistributable's \"Installed\" marker, "
                         "HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\arm64 (also under Wow6432Node), "
-                        "with version 14.42.34433.0; a version such as 14.44.35211 writes that one. The keys are "
+                        "with version 14.44.35211.0, or the VC++ runtime's own version when that is newer; a version such as "
+                        "14.50.35717 writes that one. The keys are "
                         "volatile (not saved with the prefix) and a key the prefix already has is left alone. For Unreal "
                         "Engine's bootstrap program (Denshattack_Proto.exe, FFRS.exe), an x64 program that sees an ARM64 "
                         "machine and stops with \"Microsoft Visual C++ 2015-2022 Redistributable (arm64)\" (exit "
@@ -973,10 +1013,20 @@ OVERLAY = {
                         "\"Device error at frame N\" a [fault-enc] line names the faulted, affected and unknown encoders. "
                         "For D3D9/10/11 games that hang or fault the GPU (GTA V Legacy at Story Mode, build 546). A "
                         "diagnostic with some GPU cost; off (default): unchanged. Set it in the game's own file."},
+    "env.MADEIRA_WG_64BIT": {"category": "Media", "title": "BCD's media decoders for a 64-bit game",
+                "kind": "bool", "default": "0",
+                "sources": ["build/ntdll-unix/virtual_ios.c", "build/ntdll-unix/winegstreamer_unixlib_ios.c",
+                            "build/ntdll-unix/winegstreamer_wmv_ios.c", "build/ntdll-unix/winedmo_unixlib_ios.c"],
+                "note": "Default off. 1: winegstreamer.dll in this (64-bit) game runs on BCD's own unix side, which "
+                        "decodes WMA and, with the DLLs of env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod, "
+                        "Windows Media Video (wmv1, wmv2, wmv3, VC-1) from an ASF file: Resident Evil 2's cutscenes, "
+                        "which ended the game at its first one (build 579). 32-bit games have it already; without "
+                        "the line a 64-bit game keeps the stub table (every media call answers STATUS_NOT_SUPPORTED). "
+                        "Set it in the game's own file; read at session start. Logged as [wmv] and [winedmo] lines."},
     "env.MADEIRA_OPTIN_DLLS": {"category": "Wine libraries", "title": "Give the game more of Wine's DLLs",
                 "kind": "text", "default": "",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh",
-                            "tools/patch-wine-setupapi-devinst-lock.py"],
+                            "tools/patch-wine-setupapi-devinst-lock.py", "tools/patch-wine-mfasfsrcsnk-winedmo.py"],
                 "note": "A comma-separated list (dxva2, evr, xpsprint, sfc, sfc_os, tbs, twinapi.appcore, setupapi): each named DLL, which BCD ships as "
                         "<name>-optin.dll and never for every game, runs as <name>.dll for this game. For a program that "
                         "imports one and exits at once with c0000135 (\"Library dxva2.dll ... not found\"; Fort Solis, "
@@ -984,9 +1034,15 @@ OVERLAY = {
                         "setupapi is the one name BCD already ships for every game: setupapi-optin.dll is the same DLL "
                         "with a lock round its list of device nodes, for a game whose controller library and main thread "
                         "list devices at the same moment (Dying Light crashed in setupapi.dll on build 576); without the "
-                        "line the shipped setupapi.dll runs. An earlier session's links are removed when a name is gone. "
-                        "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint and "
-                        "setupapi after their failures."},
+                        "line the shipped setupapi.dll runs. mfasfsrcsnk, wmvdecod and wmadmod are Wine's ASF byte stream handler "
+                        "and the WMV and WMA decoders behind it, for a program that plays Windows Media Video through "
+                        "Media Foundation (Resident Evil 2's cutscenes: c0000135 for mfasfsrcsnk.dll); they need "
+                        "env.MADEIRA_WG_64BIT = 1 as well, which gives a 64-bit game BCD's decoders. "
+                        "oledlg, fwpuclnt and sensapi are three small system DLLs the 64-bit set lacked (the 32-bit set has them): a program "
+                        "that imports oledlg.dll (Digimon Story Cyber Sleuth), fwpuclnt.dll (FINAL FANTASY XV) or SensApi.dll (Borderlands 3's voice "
+                        "library, whose missing import raised UE4's delay-load exception) ended at once with c0000135. An earlier session's links are removed when a name is gone. "
+                        "Set it in the game's own file; read at session start. Auto-tune adds dxva2, xpsprint, oledlg, fwpuclnt, sensapi, "
+                        "setupapi and (with env.MADEIRA_WG_64BIT = 1) mfasfsrcsnk,wmvdecod,wmadmod after their failures."},
     "env.MADEIRA_WINTYPES": {"category": "Wine libraries", "title": "Give the game Wine's wintypes.dll",
                 "kind": "bool", "default": "0",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/build-wine-extra-dlls.sh"],
@@ -1047,6 +1103,14 @@ OVERLAY = {
                         "and the range fits the 32 GB gap. A range too small ends in an out-of-memory error once the heap "
                         "outgrows it. Set it in the game's own file; read when the game starts. Auto-tune adds it after "
                         "that failure."},
+    "env._JAVA_OPTIONS": {"category": "Memory & JIT pool", "title": "Options of a Java game's runtime (JVM)",
+                "kind": "text", "default": "",
+                "sources": ["build/tools/autotune_rules.py"],
+                "note": "Read by the game's own Java runtime, not by BCD (after the command line, so it wins). -XX:-UseZGC turns "
+                        "ZGC off: that collector reserves its heap at a fixed base of 4 TiB and up, which BCD's 512 GB address "
+                        "map does not have, so Project Zomboid's JVM exits at start after 12,230 refused reservations; the "
+                        "default collector reserves its heap low. Set it in the game's own file; read when the game starts. "
+                        "Auto-tune adds it after that failure."},
     "env.MADEIRA_FIBER_TRACE": {"category": "Debugging / logs", "title": "Log the fiber calls (kernelbase)",
                 "kind": "bool", "default": "0",
                 "sources": ["app/Madeira/WineProcessBridge.m", "tools/patch-wine-kernelbase-fibertrace.py"],
@@ -1224,6 +1288,35 @@ OVERLAY = {
                         "Mono, died on an empty thread slot; not proven to be this). Every slot cleared in another program "
                         "while it held a value is logged as [tls-cross-clear], with or without this line. Read once per session.",
                 "sources": ["build/ntdll-unix/ios_tls_clear.h", "build/ntdll-unix/virtual_ios.c"]},
+    # ajan10/motor (build 591): read in build/ntdll-unix (signal_arm64_ios.c, virtual_ios.c); auto-tune's rules fault-guard-rate-redeliv,
+    # fault-guard-rate-segv, user-va-cap-reserve-256gb and anon-cas-flush add them.
+    "env.MADEIRA_FAULT_GUARD_RATE": {"category": "Exceptions & threads", "title": "Fault-storm guards end only a real storm",
+                "kind": "bool", "default": "0",
+                "note": "Default off. BCD ends a game that faults at one instruction 2000 times in a row (and skips an instruction that "
+                        "faults 5 times in a row, handing the game a made-up value). A game that throws managed exceptions through "
+                        "null-check traps (Unity Mono: SpiderHeck, ROUNDS, PlateUp!) reaches that count slowly while it keeps drawing "
+                        "frames and was ended alive. 1: a run of 2000 counts only when it is dense (inside half a second) or the "
+                        "presenter makes no progress, and the 5-repeat guard counts per thread and only when the repeats lie within "
+                        "5 ms; a fast, real storm ends exactly as before. Logged as [redeliv] MADEIRA_FAULT_GUARD_RATE and "
+                        "[segv-loop]. Read once per session.",
+                "sources": ["build/ntdll-unix/signal_arm64_ios.c"]},
+    "env.MADEIRA_USER_VA_GB": {"category": "Memory & JIT pool", "title": "Address space the game is told it has (GiB)",
+                "kind": "int", "default": "0",
+                "note": "Default 0 (off): a 64-bit game is told its user address space is the 512 GB this device maps "
+                        "(GlobalMemoryStatusEx ullTotalVirtual 524,287 MB). N: it is told N GiB (4 to 4096; never more than the real "
+                        "figure). Only the figure the game reads changes, not where memory is placed. For a game that sizes one "
+                        "reservation from it and quits when it cannot get it (FINAL FANTASY TACTICS asks for 256 GiB + 64 MiB: 32 "
+                        "is the line to try). Not for the Steam client, browser engines or 32-bit programs. Logged as [user-va]. "
+                        "Read once per session.",
+                "sources": ["build/ntdll-unix/virtual_ios.c"]},
+    "env.MADEIRA_ANON_CAS_FLUSH": {"category": "Exceptions & threads", "title": "Atomic code patches go through the emulator",
+                "kind": "bool", "default": "0",
+                "note": "Default off: a compare-and-swap the game does on its own executable memory (a .NET runtime patching a stub it "
+                        "has already run) is completed by BCD itself. 1: it is handed to the emulator instead, which discards its "
+                        "translation of that page and does the compare-and-swap, as before build 580. For Jetboard Joust (MonoGame on "
+                        "CoreCLR): one such CAS, then the main thread calls one routine 11 million times a second and never presents. "
+                        "Slower (two exceptions per CAS). Logged as [anon-cas] build591. Read once per session.",
+                "sources": ["build/ntdll-unix/signal_arm64_ios.c"]},
     "dxmt": {"title": "DXMT options (a=b;c=d)",
              "note": "Exported as DXMT_CONFIG with the options joined by ';', a library game's own dxmt options after these: "
                      "e.g. d3d11.mipClampBC=1;d3d11.preferredMaxFrameRate=30. DXMT reads at most 259 characters of it, "

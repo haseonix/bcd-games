@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `dlc`, and the DLC request a download carries
+// (`run`). A game nothing was chosen for, with no DLC installed, downloads as before.
 //
 // The library and download model is adapted from the account model built
 // around Jfishin's Madeira Steam client (used with the author's permission,
@@ -69,9 +71,9 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
         return hours < 10 ? String(format: "%.1f hrs played", hours) : "\(Int(hours.rounded())) hrs played"
     }
 
-    func lastPlayedText(formatter: DateFormatter = SteamPlaytime.dayFormatter) -> String? {
+    func lastPlayedText(now: Date = Date()) -> String? {
         guard lastPlayed > 0 else { return nil }
-        return "Last played " + formatter.string(from: Date(timeIntervalSince1970: TimeInterval(lastPlayed)))
+        return "Last played " + BCDFormat.dayWord(Date(timeIntervalSince1970: TimeInterval(lastPlayed)), now: now)
     }
 
     /// "12.5 hrs played · Last played Yesterday"
@@ -79,12 +81,6 @@ struct SteamPlaytime: Codable, Equatable, Sendable {
         let parts = [played, lastPlayedText()].compactMap { $0 }
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
-
-    static let dayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium; formatter.timeStyle = .none; formatter.doesRelativeDateFormatting = true
-        return formatter
-    }()
 
     /// CPlayer_GetOwnedGames_Response: games = 2 { appid = 1, playtime_forever = 4, rtime_last_played = 11 }.
     static func parse(_ data: Data) throws -> [Int: SteamPlaytime] {
@@ -214,6 +210,10 @@ final class SteamOwnedLibrary: ObservableObject {
                                                 reopen: { [session] in session.resume() })
     private lazy var fetcher = SteamLibraryFetcher(session: session)
     private lazy var downloader = DepotDownloader(session: session)
+    /// BCD's DLC support (BCDSteamDLC/): the owned DLC of a game, the player's choice, and the DLC part of each download.
+    private(set) lazy var dlc = SteamDLCService(fetcher: fetcher, choicesFile: Self.supportFolder.appendingPathComponent("steam-dlc.json"),
+                                                canConnect: { [unowned self] in Self.enabled && self.signedIn && !self.inSession },
+                                                startDownload: { [unowned self] appID in self.install(appID) })
     private var started = false
     /// Which account the cached list belongs to: a SHA-256 of the account name,
     /// so the cache file holds no name.
@@ -413,7 +413,7 @@ final class SteamOwnedLibrary: ObservableObject {
         let name = SteamGamesModel.shared.games.first { $0.id == appID }?.name ?? ""
         let safe = String(name.map { "/\\:*?\"<>|".contains($0) ? "-" : $0 }.prefix(80))
             .trimmingCharacters(in: .whitespacesAndNewlines.union(CharacterSet(charactersIn: ".")))
-        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let stamp = BCDFormat.utcFolderStamp(Date())
         return cloudBackupsFolder.appendingPathComponent(safe.isEmpty ? "\(appID)" : "\(safe) (\(appID))", isDirectory: true)
             .appendingPathComponent(stamp, isDirectory: true)
     }
@@ -1024,6 +1024,9 @@ final class SteamOwnedLibrary: ObservableObject {
         pause(appID)
         downloads[appID] = nil
         guard !installed, let game = game(appID) else { return }
+        // BCD DLC (owner, 2026-10-22: "DLC cevabını hatırlamasın, her seferinde sorsun"): a cancelled first install keeps no
+        // DLC answer; the next Install asks again.
+        dlc.choices.forget(appID)
         let apps = Self.steamApps
         Task { @MainActor in
             await running?.value
@@ -1048,6 +1051,8 @@ final class SteamOwnedLibrary: ObservableObject {
         LibraryModel.shared.removeSteam(appID: game.id)
         // A reinstall evaluates the game's one-time installs again.
         DockInstallers.setRunsNext(game.id, true, prefix: MadeiraDock.prefix)
+        // BCD DLC (owner, 2026-10-22): an uninstalled game keeps no DLC answer; a reinstall asks again.
+        dlc.choices.forget(game.id)
         let apps = Self.steamApps, id = game.id, folder = game.installDir
         Task.detached(priority: .utility) {
             SteamInstallFiles.delete(appID: id, folderName: folder, steamApps: apps)
@@ -1075,8 +1080,16 @@ final class SteamOwnedLibrary: ObservableObject {
                 throw SteamError.appInfoNotFound(UInt32(appID))
             }
             try FileManager.default.createDirectory(at: SteamInstallPaths.common(drive: Self.drive), withIntermediateDirectories: true)
+            // madeira-bcd (2026-10-22): env.MADEIRA_STEAM_CHUNK_SHA1 = 1 refuses a chunk whose SHA-1 differs from the manifest's;
+            // off (the default), such a chunk is only logged (ChunkDigestCheck in DepotDownloader.swift).
+            ChunkDigestCheck.shared.enforce = SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false)
+            // env.MADEIRA_STEAM_CDN_FALLBACK = 0: no fallback to the directory's other hosts when it gives no usable HTTPS
+            // server on Valve's domains (DepotDownloader.selectContentHosts); on by default.
+            downloader.directoryFallback = SteamSignIn.flag("MADEIRA_STEAM_CDN_FALLBACK", default: true)
+            let dlcRequest = await dlc.request(for: info, steamApps: Self.steamApps)
             let folder = try await downloader.install(info, steamApps: Self.steamApps,
-                                                      ownedDepots: { [weak self] in try? await self?.fetcher.ownedDepotIDs() }) { [weak self] progress in
+                                                      ownedDepots: { [weak self] in try? await self?.fetcher.ownedDepotIDs() },
+                                                      dlc: dlcRequest) { [weak self] progress in
                 self?.downloads[appID]?.progress = progress
                 SteamDownloadBackground.shared.progress(progress)
             }

@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `install(... dlc:)` takes the depots of the DLC the
+// player chose and records them; without DLC (`SteamDLCRequest.none`, the default) it is the install it was.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Substantially
 // rewritten by 125hz for the owned library and downloads (docs/STEAM_LIBRARY.md).
+// Modified by BCD (thebcd69), 2026-10-22: every downloaded chunk is checked against the SHA-1 the manifest names it by
+// (ChunkDigestCheck; the idea and first code are vancez's, bcd-games pull request #11). A mismatch is logged; the chunk is
+// refused and fetched again only when the library turns refusal on (SteamOwnedLibrary reads that switch).
+// Modified by BCD (thebcd69), 2026-10-22: when Valve's directory gives no usable HTTPS server on Valve's domains, the
+// directory's other hosts are tried before the last-resort one (selectContentHosts; from vancez's bcd-games pull request
+// #11, reworked as a fallback): HTTPS hosts first, then the plain-HTTP hosts Info.plist allows, whose chunks are always
+// checked against the manifest's SHA-1. Manifests come over HTTPS. A download with an HTTPS server is what it was.
 
 import Foundation
 import zlib
@@ -67,6 +76,10 @@ final class DepotDownloader {
     /// to fetch from, as `https://host` or `http://host:port` URLs.
     var contentHosts: ((_ appID: UInt32) async throws -> [String])?
 
+    /// Whether the directory's other hosts are tried when it gives no usable HTTPS server on Valve's domains
+    /// (selectContentHosts). Set by SteamOwnedLibrary from its switch before each download; on by default.
+    var directoryFallback = true
+
     init(session: SteamCMSession) {
         self.session = session
     }
@@ -78,11 +91,17 @@ final class DepotDownloader {
     /// the calling task is cancelled; completed chunks stay journaled.
     func install(_ app: SteamAppInfo, steamApps: URL,
                  ownedDepots: @escaping () async -> Set<UInt32>? = { nil },
+                 dlc: SteamDLCRequest = .none,
                  progress report: @escaping (SteamDownloadProgress) -> Void) async throws -> URL {
-        let depots = app.installDepots()
+        // BCD DLC (BCDSteamDLC/): taking DLC away needs no download at all.
+        if dlc.removalOnly { return try await removeDLCOnly(app, steamApps: steamApps, request: dlc) }
+        // DLC the game lists no depot for brings its own (from the DLC app's product info): one more depot of this install.
+        let app = app.addingDLCDepots(dlc.extraDepots)
+        let depots = app.installDepots(including: dlc.selected)
         guard !depots.isEmpty else { throw SteamError.depotNotFound(app.appID) }
         // Before the key requests, so a refused depot still has its selection logged.
         SteamLog.event("[steam-depot] selection app=\(app.appID) build=\(app.buildID) \(app.depotSelectionSummary())")
+        if dlc.hasWork || dlc.owned > 0 { SteamLog.event(SteamDLC.summaryLine(app: app.appID, request: dlc, depots: depots)) }
 
         let folderName = SteamInstallFiles.safeFolderName(app.installDir.isEmpty ? "app_\(app.appID)" : app.installDir)
         let installURL = steamApps.appendingPathComponent("common", isDirectory: true)
@@ -102,18 +121,30 @@ final class DepotDownloader {
 
         // 1. Keys, manifests and per-host authorization for every depot.
         let health = ContentHostHealth()
+        ChunkDigestCheck.shared.begin()
         let pool = Array(hosts.prefix(hostPoolSize))
         var plans: [DepotPlan] = []
         var licenseSkipped: [UInt32] = []
+        // BCD DLC: the app each DLC depot's key was issued under, and the DLC apps Steam refused a key for.
+        var dlcKeyApps: [UInt32: UInt32] = [:]
+        var dlcRefused = Set<UInt32>()
         // The logged-on account, for the install record. Read while the session
         // is connected: it idles out during a long download.
         var accountID: UInt64 = 0
         for depot in depots {
             try Task.checkCancellation()
             guard let gid = depot.publicManifestID else { continue }
+            // BCD DLC: a DLC depot Steam gives no key for is left out; it never fails the game's install.
+            if let dlcID = depot.dlcAppID {
+                guard let issued = try await dlcDepotKey(depotID: depot.depotID, appID: app.appID, dlcAppID: dlcID) else {
+                    dlcRefused.insert(dlcID)
+                    continue
+                }
+                dlcKeyApps[depot.depotID] = issued.appID
+            }
             let key: Data
             do {
-                key = try await depotKey(depotID: depot.depotID, appID: app.appID)
+                key = try await depotKey(depotID: depot.depotID, appID: dlcKeyApps[depot.depotID] ?? app.appID)
             } catch SteamError.depotKeyNotFound(let refused) {
                 // A depot Steam refuses AND the account's licenses do not
                 // include is content this account does not own (another
@@ -126,7 +157,7 @@ final class DepotDownloader {
                 throw SteamError.depotKeyNotFound(refused)
             }
             if session.steamID != 0 { accountID = session.steamID }
-            let contentAppID = !app.freeToDownload ? (depot.fromApp ?? app.appID) : app.appID
+            let contentAppID = dlcKeyApps[depot.depotID] ?? (!app.freeToDownload ? (depot.fromApp ?? app.appID) : app.appID)
             let manifest = try await fetchManifest(depotID: depot.depotID, appID: contentAppID,
                                                    manifestGID: gid, key: key, hosts: hosts)
             var auth: [String: String] = [:]
@@ -215,16 +246,25 @@ final class DepotDownloader {
         // 4. Install record. Sizes come from the manifests; no tree walk.
         state.phase = .finishing
         report(state)
-        let installed = plans.map { plan in
+        // BCD DLC: DLC the player took away goes now that the depots that stay are fetched; a DLC that could not be
+        // removed stays installed and recorded.
+        var carried = dlc.carried
+        var notRemoved = Set<UInt32>()
+        if !dlc.removed.isEmpty {
+            let left = try await pruneDLC(app: app, installURL: installURL, request: dlc, kept: plans.map(\.manifest), hosts: hosts)
+            carried += left
+            notRemoved = Set(left.compactMap(\.dlcAppID))
+        }
+        let installed = SteamDLCRecord.tag(plans.map { plan in
             AppManifestWriter.InstalledDepot(depotID: Int(plan.depotID), manifestGID: plan.manifestGID,
                                              size: Int64(plan.manifest.totalUncompressedSize))
-        }
+        }, dlcByDepot: SteamDLC.dlcByDepot(depots))
         // Depots taken from another app are that app's content. Valve's client
         // refuses a launch until the owner app has its own record, so both
         // records are written the way the client writes them.
         var owners: [UInt32: UInt32] = [:]
         for depot in depots { if let from = depot.fromApp, from != app.appID { owners[depot.depotID] = from } }
-        let own = installed.filter { owners[UInt32($0.depotID)] == nil }
+        let own = SteamDLCRecord.installedDepots(installed.filter { owners[UInt32($0.depotID)] == nil }, carried: carried)
         let shared = installed.filter { owners[UInt32($0.depotID)] != nil }
         // Files Valve's client must customize per user before they run, as
         // Windows-style install-relative paths for the record's CheckGuid block.
@@ -235,7 +275,7 @@ final class DepotDownloader {
         if !custom.isEmpty { SteamLog.event("[steam-record] custom-executables app=\(app.appID) custom=\(custom.count)") }
         try AppManifestWriter.writeManifest(
             appID: app.appID, name: app.name, installDir: folderName, buildID: app.buildID,
-            steamID: accountID, sizeOnDisk: prepared.totalUncompressed,
+            steamID: accountID, sizeOnDisk: prepared.totalUncompressed + carried.reduce(UInt64(0)) { $0 &+ UInt64(max(0, $1.size ?? 0)) },
             steamAppsPath: steamApps.path, installedDepots: own,
             sharedDepots: shared.map { ($0.depotID, Int(owners[UInt32($0.depotID)]!)) },
             customExecutables: custom)
@@ -262,7 +302,11 @@ final class DepotDownloader {
             SteamLog.event("[steam-shared-record] app=\(app.appID) shared=\(shared.count) owners-written=\(written) owners-skipped=\(skipped)")
         }
         try? FileManager.default.removeItem(at: journalDir)
-        SteamLog.event("[steam-depot] install complete app=\(app.appID) bytes=\(prepared.totalUncompressed) seconds=\(Int(Date().timeIntervalSince(started)))")
+        if dlc.hasWork {
+            for line in SteamDLC.resultLines(app: app.appID, request: dlc, depots: depots, planned: Set(plans.map(\.depotID)),
+                                             refused: dlcRefused, notRemoved: notRemoved) { SteamLog.event(line) }
+        }
+        SteamLog.event("[steam-depot] install complete app=\(app.appID) bytes=\(prepared.totalUncompressed) seconds=\(Int(Date().timeIntervalSince(started))) \(ChunkDigestCheck.shared.summary())")
         return installURL
     }
 
@@ -445,6 +489,10 @@ final class DepotDownloader {
                                                              expectedCRC: chunk.crc,
                                                              expectedSize: Int(chunk.uncompressedSize))
                 guard data.count == Int(chunk.uncompressedSize) else { throw SteamError.checksumMismatch }
+                // The chunk's own SHA-1 (ChunkDigestCheck): logged when it differs; refused only with the switch on.
+                guard ChunkDigestCheck.shared.accept(data, sha: chunk.sha, depot: plan.depotID, host: host) else {
+                    throw SteamError.checksumMismatch
+                }
                 try write(data, to: path, offset: chunk.offset)
                 plan.health.recordSuccess(host)
                 return
@@ -493,11 +541,14 @@ final class DepotDownloader {
 
     // MARK: - Manifest
 
-    private func fetchManifest(depotID: UInt32, appID: UInt32, manifestGID: UInt64,
+    func fetchManifest(depotID: UInt32, appID: UInt32, manifestGID: UInt64,
                                key: Data, hosts: [String]) async throws -> DepotManifest {
         let requestCode = try await manifestRequestCode(depotID: depotID, appID: appID, manifestGID: manifestGID)
         var lastError: Error = SteamError.manifestFetchFailed("None of the content servers sent it.")
-        for host in hosts.prefix(6) {
+        // The manifest carries the SHA-1s chunks are checked against, so it comes over HTTPS whenever an HTTPS server is
+        // in the list (the last-resort host always is one); plain-HTTP hosts serve chunks only.
+        let secure = hosts.filter { $0.hasPrefix("https://") }
+        for host in (secure.isEmpty ? hosts : secure).prefix(6) {
             try Task.checkCancellation()
             let auth = await cdnAuthFragment(depotID: depotID, appID: appID, host: host)
             let code = requestCode == 0 ? "" : "/\(requestCode)"
@@ -594,7 +645,7 @@ final class DepotDownloader {
 
     // MARK: - Depot Key
 
-    private func depotKey(depotID: UInt32, appID: UInt32) async throws -> Data {
+    func depotKey(depotID: UInt32, appID: UInt32, logRefusal: Bool = true) async throws -> Data {
         if let cached = depotKeys[depotID] { return cached }
         try await session.ensureConnected()
 
@@ -613,7 +664,8 @@ final class DepotDownloader {
         // Steam only issues keys for depots this account owns.
         guard EResult(rawValue: UInt32(keyResponse.eresult))?.isSuccess == true,
               keyResponse.depotEncryptionKey.count == 32 else {
-            SteamLog.event("[steam-depot] depot-key refused app=\(appID) depot=\(depotID) eresult=\(keyResponse.eresult)")
+            // BCD DLC: the first of a DLC depot's two tries (under the game's App ID) logs its own line instead (BCDSteamDLCDownload).
+            if logRefusal { SteamLog.event("[steam-depot] depot-key refused app=\(appID) depot=\(depotID) eresult=\(keyResponse.eresult)") }
             throw SteamError.depotKeyNotFound(depotID)
         }
 
@@ -672,7 +724,7 @@ final class DepotDownloader {
         return .usable
     }
 
-    private func contentServers(appID: UInt32) async throws -> [String] {
+    func contentServers(appID: UInt32) async throws -> [String] {
         var hosts: [String] = []
         do {
             guard let url = URL(string: "https://api.steampowered.com/IContentServerDirectoryService/GetServersForSteamPipe/v1/?cell_id=\(session.cellID)&max_servers=20") else {
@@ -687,23 +739,9 @@ final class DepotDownloader {
                   let servers = resp["servers"] as? [[String: Any]] else {
                 throw SteamError.chunkDownloadFailed("Content directory returned unexpected data")
             }
-            // In the directory's order. The directory marks some CDN servers
-            // https_support "unavailable"; requesting them over HTTPS fails the
-            // TLS handshake (NSURLError -1200). Such servers, proxy-only entries
-            // and servers restricted to other apps are skipped.
-            var skippedHTTP = 0, skippedOther = 0
-            for server in servers {
-                let host = (server["vhost"] as? String) ?? (server["host"] as? String) ?? ""
-                guard Self.usableContentHost(host) else { skippedOther += 1; continue }
-                switch Self.serverEligibility(server, appID: appID) {
-                case .usable: break
-                case .noHTTPS: skippedHTTP += 1; continue
-                case .other: skippedOther += 1; continue
-                }
-                let entry = "https://\(host)"
-                if !hosts.contains(entry) { hosts.append(entry) }
-            }
-            SteamLog.event("[steam-cdn] offered=\(servers.count) usable=\(hosts.count) skipped-no-https=\(skippedHTTP) skipped-other=\(skippedOther)")
+            let pick = Self.selectContentHosts(servers, appID: appID, plainHTTP: Self.plainHTTPHosts, fallback: directoryFallback)
+            hosts = pick.hosts
+            SteamLog.event(pick.line)
         } catch is CancellationError {
             throw CancellationError()
         } catch {
@@ -713,6 +751,75 @@ final class DepotDownloader {
         if !hosts.contains(fallback) { hosts.append(fallback) }
         return hosts
     }
+
+    /// The directory's servers in its order, as fetch URLs, and the `[steam-cdn]` line. Valve's HTTPS servers, exactly as
+    /// before: a server with https_support "unavailable" (no TLS listener), a proxy-only entry or one restricted to other
+    /// apps is skipped, and so is a host outside Valve's domains. Only when that leaves NO server (vancez's region, bcd-games
+    /// pull request #11: three third-party, plain-HTTP hosts and nothing else) and `fallback` is on, the directory's other
+    /// hosts come first instead of the last-resort one alone: its HTTPS hosts on any domain, then its "unavailable" hosts
+    /// over plain HTTP if Info.plist allows them (`plainHTTP`). The line keeps its fields; `fallback=` is added when used.
+    nonisolated static func selectContentHosts(_ servers: [[String: Any]], appID: UInt32, plainHTTP: Set<String>,
+                                               fallback: Bool) -> (hosts: [String], line: String) {
+        var hosts: [String] = [], spareSecure: [String] = [], sparePlain: [String] = []
+        var skippedHTTP = 0, skippedOther = 0
+        for server in servers {
+            let host = (server["vhost"] as? String) ?? (server["host"] as? String) ?? ""
+            let eligibility = serverEligibility(server, appID: appID)
+            if usableContentHost(host) {
+                switch eligibility {
+                case .usable:
+                    let entry = "https://\(host)"
+                    if !hosts.contains(entry) { hosts.append(entry) }
+                    continue
+                case .noHTTPS: skippedHTTP += 1
+                case .other: skippedOther += 1
+                }
+            } else {
+                skippedOther += 1
+            }
+            // A spare, for the fallback only.
+            guard bareContentHost(host) else { SteamLog.trace("[steam-cdn] spare refused host=\(host) reason=not-a-host-name"); continue }
+            switch eligibility {
+            case .usable:
+                let entry = "https://\(host)"
+                if !spareSecure.contains(entry) { spareSecure.append(entry) }
+            case .noHTTPS where (server["https_support"] as? String)?.lowercased() == "unavailable":
+                if plainHTTP.contains(host.lowercased()) {
+                    let entry = "http://\(host)"
+                    if !sparePlain.contains(entry) { sparePlain.append(entry) }
+                } else {
+                    SteamLog.trace("[steam-cdn] spare refused host=\(host) reason=no-ats-exception")
+                }
+            default:
+                SteamLog.trace("[steam-cdn] spare refused host=\(host) reason=proxy-other-app-or-unknown-https")
+            }
+        }
+        var line = "[steam-cdn] offered=\(servers.count) usable=\(hosts.count) skipped-no-https=\(skippedHTTP) skipped-other=\(skippedOther)"
+        if hosts.isEmpty, fallback, !(spareSecure.isEmpty && sparePlain.isEmpty) {
+            hosts = spareSecure + sparePlain
+            line += " fallback=\(hosts.count) (https=\(spareSecure.count) http=\(sparePlain.count))"
+        } else if hosts.isEmpty, !(spareSecure.isEmpty && sparePlain.isEmpty) {
+            line += " fallback=off"
+        }
+        return (hosts, line)
+    }
+
+    /// A directory entry that is a host name and nothing else (no scheme, port, path, wildcard, space or local cache),
+    /// on any domain: the fallback's test. Valve's directory also names third-party hosts.
+    nonisolated static func bareContentHost(_ host: String) -> Bool {
+        host.contains(".") && !host.contains(" ") && !host.contains("/") && !host.contains("*") &&
+            !host.contains("lancache") && !host.contains(":")
+    }
+
+    /// The hosts Info.plist lets the app fetch over plain HTTP (NSExceptionAllowsInsecureHTTPLoads), exact names: the
+    /// fallback uses a plain-HTTP host only when App Transport Security will let the request through.
+    nonisolated static let plainHTTPHosts: Set<String> = {
+        guard let ats = Bundle.main.object(forInfoDictionaryKey: "NSAppTransportSecurity") as? [String: Any],
+              let domains = ats["NSExceptionDomains"] as? [String: Any] else { return [] }
+        return Set(domains.compactMap { host, rule in
+            (rule as? [String: Any])?["NSExceptionAllowsInsecureHTTPLoads"] as? Bool == true ? host.lowercased() : nil
+        })
+    }()
 
     nonisolated static func usableContentHost(_ host: String) -> Bool {
         guard host.contains("."), !host.contains(" "), !host.contains("/"), !host.contains("*"),
@@ -762,6 +869,61 @@ final class DepotDownloader {
 /// Per-install content-server health. Chunks start on different servers
 /// (spreading load) and servers that keep failing move to the back of every
 /// chunk's rotation, instead of each chunk rediscovering a bad server.
+/// madeira-bcd (2026-10-22): the SHA-1 of each downloaded chunk against the one the manifest names it by (a chunk's ID is
+/// the SHA-1 of its content, which chunkAlreadyPresent already relies on for updates and resumes). The idea and first code
+/// are vancez's (bcd-games pull request #11). By default a mismatch is only counted and logged, and the chunk is written as
+/// before; with refusal on (`enforce`, set by SteamOwnedLibrary from its switch before each download) it is refused like a
+/// bad checksum, so it is fetched again from another server. One install at a time: `begin` resets the counts, the
+/// install's last line carries `summary`.
+final class ChunkDigestCheck: @unchecked Sendable {
+    static let shared = ChunkDigestCheck()
+    private let lock = NSLock()
+    private var checked = 0, mismatched = 0, logged = 0
+    private var refusing = false
+
+    /// Whether a mismatching chunk is refused (off: it is written and logged, as downloads always did).
+    var enforce: Bool {
+        get { lock.lock(); defer { lock.unlock() }; return refusing }
+        set { lock.lock(); refusing = newValue; lock.unlock() }
+    }
+
+    func begin() {
+        lock.lock(); checked = 0; mismatched = 0; logged = 0; lock.unlock()
+    }
+
+    /// SHA-1 of a decoded chunk.
+    nonisolated static func sha1(_ data: Data) -> Data {
+        var digest = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+        data.withUnsafeBytes { raw in _ = CC_SHA1(raw.baseAddress, CC_LONG(raw.count), &digest) }
+        return Data(digest)
+    }
+
+    /// Whether the chunk may be written: it matches, or (the default) it does not and the log is told.
+    func accept(_ data: Data, sha: Data, depot: UInt32, host: String) -> Bool {
+        guard sha.count == Int(CC_SHA1_DIGEST_LENGTH) else { return true }   // no digest in the manifest: nothing to compare
+        let same = Self.sha1(data) == sha
+        lock.lock()
+        checked += 1
+        var line: String?
+        if !same {
+            mismatched += 1
+            if logged < 5 {
+                logged += 1
+                line = "[steam-depot] chunk-sha mismatch depot=\(depot) chunk=\(sha.prefix(4).map { String(format: "%02x", $0) }.joined()) host=\(host) \(refusing || host.hasPrefix("http://") ? "refused" : "kept")"
+            }
+        }
+        let refuse = !same && (refusing || host.hasPrefix("http://"))   // plain HTTP: always refused (the fallback's rule)
+        lock.unlock()
+        if let line { SteamLog.event(line) }
+        return !refuse
+    }
+
+    func summary() -> String {
+        lock.lock(); defer { lock.unlock() }
+        return "chunk-sha checked=\(checked) mismatched=\(mismatched)\(refusing ? " enforced" : "")"
+    }
+}
+
 final class ContentHostHealth: @unchecked Sendable {
     private let lock = NSLock()
     private var failures: [String: Int] = [:]

@@ -210,6 +210,62 @@ struct AutoTuneGlueChecks {
         AutoTune.sessionBegan(game, remember: false, dockWithoutEntry: true)
         expect(!FileManager.default.fileExists(atPath: AutoTune.markerURL!.path), "a Dock start without an entry gets no marker")
 
+        // Round 591: a program that is no game is never tuned (PJE6FT's .NET installer was filed under a game, 4W9GX4's Steam helper under "Steam").
+        func entry(_ path: String) -> LibraryEntry { LibraryEntry(windowsPath: path, title: "x", desktop: nil, gameConfigText: nil) }
+        expect(AutoTune.isNoGame(#"C:\Program Files (x86)\Steam\steamapps\shadercache\fossilize-replay64.exe"#)
+               && AutoTune.isNoGame(#"C:\Program Files (x86)\Steam\bin\cef\cef.win64\steamwebhelper.exe"#)
+               && AutoTune.isNoGame(#"C:\LEGO_MARVEL_Super_Heroes\LEGO MARVEL Super Heroes\~Common Redist\NDP48-x86-x64-AllOS-ENU.exe"#)
+               && AutoTune.isNoGame(#"C:\Games\Foo\_CommonRedist\vcredist\2015\vc_redist.x64.exe"#)
+               && AutoTune.isNoGame(#"C:\Games\Foo\DirectX\dxsetup.exe"#)
+               && AutoTune.isNoGame("C:/Games/Foo/redist/anything.exe"),
+               "a Steam helper and the redistributable installers are no game")
+        expect(!AutoTune.isNoGame(#"C:\Program Files (x86)\Steam\steamapps\common\Hades\Hades.exe"#)
+               && !AutoTune.isNoGame(#"C:\Games\Redistricting Simulator\game.exe"#)
+               && !AutoTune.isNoGame(#"C:\Program Files (x86)\Steam\steamapps\common\Foo"#)
+               && !AutoTune.isNoGame(#"C:\Games\Foo\Setup.exe"#),
+               "a game, a folder that only starts with the same letters, a folder entry and an unknown setup are tuned as before")
+        setenv("MADEIRA_CFG_GAME", "/helper.cfg", 1)
+        AutoTune.exportLayer(for: entry(#"C:\Program Files (x86)\Steam\steamapps\shadercache\fossilize-replay64.exe"#))
+        AutoTune.sessionBegan(entry(#"C:\Program Files (x86)\Steam\steamapps\shadercache\fossilize-replay64.exe"#), remember: true, dockWithoutEntry: false)
+        expect(String(cString: getenv("MADEIRA_CFG_GAME")) == "/helper.cfg" && !FileManager.default.fileExists(atPath: AutoTune.markerURL!.path),
+               "a Steam helper gets no launch file and no marker")
+
+        // Round 591: the recommended list's lines in the game's file are not the user's while the file is what BCD wrote from the list; a
+        // line auto-tune kept that raises one of them wins over it in the launch file (the game's file itself is not touched).
+        let listGame = LibraryEntry(windowsPath: "C:\\Games\\Listed\\Listed.exe", title: "Listed", desktop: nil, gameConfigText: nil)
+        let listFile = GameProfile(windowsPath: listGame.windowsPath)
+        listFile.text = "# BCD's recommended settings for Listed.\nvram-mb = 4096\nswap-mb = 3072\npool-split = 1\n"
+        expect(AutoTune.listValues(listGame).isEmpty && AutoTune.userKeys(listGame) == ["vram-mb", "swap-mb", "pool-split"],
+               "no record of a list for the game: all its keys are the user's, as before")
+        setenv("AUTOTUNE_TEST_FOLLOWS_LIST", "1", 1)
+        expect(AutoTune.listValues(listGame) == ["vram-mb": "4096", "swap-mb": "3072", "pool-split": "1"] && AutoTune.userKeys(listGame).isEmpty,
+               "a file that is exactly the list's: its lines are the list's")
+        let withOwn = LibraryEntry(windowsPath: listGame.windowsPath, title: "Listed", desktop: nil, gameConfigText: "pool-split = 0\n")
+        expect(AutoTune.userKeys(withOwn) == ["pool-split"] && AutoTune.listValues(withOwn)["pool-split"] == nil && AutoTune.listValues(withOwn)["swap-mb"] == "3072",
+               "a key the entry's own lines also set is the user's")
+        var kept = AutoTuneState()
+        kept.status = "found"; kept.kept = ["swap-mb = 6144", "swap-mode = 2", "swap-min-mb = 1"]
+        AutoTune.save(kept, listGame.windowsPath)
+        AutoTune.exportLayer(for: listGame)
+        var layered = (try? String(contentsOf: launch, encoding: .utf8)) ?? ""
+        expect(layered.contains("swap-mb = 6144\n") && !layered.contains("swap-mb = 3072") && layered.contains("vram-mb = 4096\n") && layered.contains("pool-split = 1\n")
+               && layered.contains("swap-mode = 2\n") && layered.contains("# BCD's recommended settings for Listed."),
+               "the launch file carries 6144 in place of the list's 3072 and the rest of the list's file")
+        expect(listFile.text.contains("swap-mb = 3072"), "the game's file itself still says 3072")
+        kept.kept = ["swap-mb = 2048"]
+        AutoTune.save(kept, listGame.windowsPath)
+        AutoTune.exportLayer(for: listGame)
+        layered = (try? String(contentsOf: launch, encoding: .utf8)) ?? ""
+        if let low = layered.range(of: "swap-mb = 2048"), let list = layered.range(of: "swap-mb = 3072") {
+            expect(low.lowerBound < list.lowerBound, "a lower number never replaces the list's: the file's line comes later and wins")
+        } else { expect(false, "both swap-mb lines are in the launch file") }
+        setenv("AUTOTUNE_TEST_FOLLOWS_LIST", "0", 1)
+        expect(AutoTune.listValues(listGame).isEmpty && AutoTune.userKeys(listGame) == ["vram-mb", "swap-mb", "pool-split"],
+               "a file the player changed: every key is the user's again")
+        unsetenv("AUTOTUNE_TEST_FOLLOWS_LIST")
+        AutoTune.reset(listGame.windowsPath)
+        listFile.text = ""
+
         // A session whose log never shows the candidate (it did not reach the game) counts for nothing.
         let notApplied = AutoTune.state(game.windowsPath)
         AutoTune.sessionBegan(game, remember: true, dockWithoutEntry: false)

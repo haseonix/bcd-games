@@ -8,13 +8,14 @@ import SwiftUI
 import UIKit
 
 /// Settings › Accounts on sample data, for the preview app. Variants (-BCDTab
-/// settings-accounts-<variant>): none (Steam and GOG signed in), "out" (both signed out),
+/// settings-accounts-<variant>): none (Steam, Epic Games and GOG signed in), "out" (all signed out),
 /// "signin", "qr", "guard", "error".
 /// It never contacts Steam, and it ignores the password it is handed.
 @MainActor final class BCDPreviewAccountsBackend: BCDAccountsBackend {
     @Published private(set) var steam: BCDSteamAccount
     @Published private(set) var signInProgress = BCDSteamSignIn()
     @Published private(set) var gogAccount: BCDAccount
+    @Published private(set) var epicAccount: BCDAccount
     private var pendingName: String?
 
     init(variant: String) {
@@ -22,6 +23,7 @@ import UIKit
         steam = BCDSteamAccount(available: true, accountName: signedOut ? nil : "player", personaName: nil, avatar: nil,
                                 cloudAvailable: true, cloudOn: true, setupAvailable: true)
         gogAccount = BCDAccount(store: .gog, name: signedOut ? nil : "gogplayer", available: true)
+        epicAccount = BCDAccount(store: .epic, name: signedOut ? nil : "epicplayer", available: true)
         switch variant {
         case "guard":
             signInProgress = BCDSteamSignIn(busy: false, steamGuard: BCDSteamGuard(code: .steamApp, canApprove: true))
@@ -64,6 +66,8 @@ import UIKit
     func runSetup() {}
     func signInGOG() { gogAccount.name = "gogplayer" }
     func signOutGOG() { gogAccount.name = nil }
+    func signInEpic() { epicAccount.name = "epicplayer" }
+    func signOutEpic() { epicAccount.name = nil }
 
     /// A QR code that says only that it is a sample.
     static let sampleCode: UIImage? = {

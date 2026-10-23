@@ -1,0 +1,15 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "asf-wmv-media-source"
+ ],
+ "next": [
+  "env.MADEIRA_WG_64BIT = 1",
+  "env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod"
+ ],
+ "note": "Resident Evil 2 (Steam 883710, re2.exe), build 579, iPad16,3 (M4, 8 GB, iPadOS 27, LiveContainer; Discord, 2026-10-21): the game plays a WMV cutscene through a Media Foundation source reader; the ASF byte stream handler's DLL, mfasfsrcsnk.dll, is not in the prefix (c0000135, 'couldn't load in-process dll'), the generic handler fails ('stream_handler_BeginCreateObject Unimplemented flags 0x11') and the game reads NULL (re2.exe+0x25c9861, c0000005). env.MADEIRA_WG_64BIT = 1 and env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod (build 580) give the game Wine's ASF source and decoders and BCD's media decoders for a 64-bit game. Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 5,
+ "status": "trying"
+}

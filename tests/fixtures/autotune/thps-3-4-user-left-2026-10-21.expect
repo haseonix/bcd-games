@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "Tony Hawk's Pro Skater 3 + 4 (a library entry), build 578, iPad17,3 (Send Log NZECAK): 24 s of play, 3254 MB, then '[hwinput] keyboard focus: elsewhere (pointer left the game view)' and the log ends; no crash evidence (the access violation at address 0x30 was handled), no rule matched. 'Inconclusive' rather than 'exited-early' for the same reason as final-fantasy-tactics-user-left.",
+ "outcome": "inconclusive",
+ "stage": 3,
+ "status": "baseline"
+}

@@ -1,0 +1,16 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "asf-wmv-media-source",
+  "dock-game-died-session-open"
+ ],
+ "next": [
+  "env.MADEIRA_WG_64BIT = 1",
+  "env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod"
+ ],
+ "note": "Resident Evil 7 biohazard (Steam 418370, re7.exe), build 576, iPhone18,1 (11.7 GB, iOS 27.0.1; Send Log 5MXS1S, 2026-10-21): the same chain as Resident Evil 2 (build 579): the ASF byte stream handler's DLL mfasfsrcsnk.dll is missing (c0000135), the generic handler fails (BeginCreateObject flags 0x11) and re7.exe reads NULL 13 s into the game (re7.exe+0x2a6cf01, mov rcx,[rsi+8], c0000005). The same two lines (build 580). Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

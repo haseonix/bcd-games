@@ -259,8 +259,14 @@ enum MadeiraDock {
                 case 10: return "Steam is still busy with this game, updating or running it. Wait a moment, then try again."
                 case -4: return "Steam couldn't prepare this game's executable because the Windows service manager it needs didn't start."
                 case -5: return "Steam couldn't prepare this game's executable: its Windows service isn't installed in BCD's Windows setup."
-                default: return "Steam couldn't get this game's executable ready for your account (code \(fields["ceg-result"] ?? "?"))."
+                default: return "Steam's copy protection couldn't start the game: Steam couldn't get this game's executable ready for your account (code \(fields["ceg-result"] ?? "?"))."
                 }
+            }
+            // The host sets the Steam client's discovery entries in the Windows registry (HKCU Software\Valve\Steam\ActiveProcess and
+            // HKLM Software\Valve\Steam) before it asks Steam to start the game; 42 is its answer when one of those cannot be
+            // opened or written (madeira-dock src/launch.c). Steam was never asked, so no game ran (Firewatch GSDQM2, CEEP3E).
+            if result == 42 {
+                return "BCD Dock couldn't open or write the Steam client entries it needs in BCD's Windows registry, so it never asked Steam to start this game (code 42). Export the log, then try again."
             }
             if result == 45 || result == 48, fields["launch-option-missing"] != nil || fields["launch-option-invalid"] != nil {
                 return "Steam won't accept this game's launch option. Refresh the Steam library, then try again."

@@ -40,6 +40,17 @@ extension BCDStore {
                 BCDGame(id: "wc2", title: "Warcraft II: Battle.net Edition", store: .local, state: .updateAvailable(bytes: 120_000_000),
                         size: 400_000_000, lastPlayed: now - 50 * h, minutesPlayed: 95, thirtyTwoBit: true, added: 1),
                 BCDGame(id: "epic.deathsdoor", title: "Death's Door", store: .epic, state: .notInstalled, size: 4_100_000_000),
+                // Epic's installs (milestone 1): an installed game, one downloading, and the four kinds BCD says a word about
+                // before Install (a made-up title each; the words are BCDEpicRules').
+                BCDGame(id: "epic.lantern", title: "Hollow Lantern", store: .epic, state: .ready, size: 3_800_000_000,
+                        lastPlayed: now - 6 * h, minutesPlayed: 75, added: 8),
+                BCDGame(id: "epic.salt", title: "Salt Harbor", store: .epic, state: .downloading(progress: 0.42), size: 4_000_000_000),
+                BCDGame(id: "epic.rally", title: "Rally Arena Online", store: .epic, state: .notInstalled),
+                BCDGame(id: "epic.citadel", title: "Citadel Keeper", store: .epic, state: .notInstalled),
+                BCDGame(id: "epic.courier", title: "Night Courier", store: .epic, state: .notInstalled),
+                BCDGame(id: "epic.harbor", title: "Harbor Tales", store: .epic, state: .notInstalled),
+                // Milestone 2: GTA V on Epic, whose BattlEye guards only the online mode (an explicit exception, BCDEpicRules.antiCheatExceptions).
+                BCDGame(id: "epic.gtav", title: "Grand Theft Auto V", store: .epic, state: .notInstalled),   // size unknown until the page's look, as for every Epic game
                 BCDGame(id: "gog.moonscars", title: "Moonscars", store: .gog, state: .notInstalled, size: 2_200_000_000),
                 BCDGame(id: "271590", title: "Grand Theft Auto V Legacy", store: .steam, state: .ready, size: 98_000_000_000,
                         lastPlayed: now - 140 * h, minutesPlayed: 600, recommended: true, added: 6),
@@ -49,12 +60,14 @@ extension BCDStore {
                 BCDGame(id: "gog.witcher", title: "The Witcher: Enhanced Edition", store: .gog, state: .ready, size: 15_000_000_000,
                         lastPlayed: now - 400 * h, minutesPlayed: 45, added: 2),
             ]
-            let steamApp = ["432940": 432940, "367520": 367520, "620": 620, "epic.deathsdoor": 894020, "gog.moonscars": 1374970,
+            let steamApp = ["432940": 432940, "367520": 367520, "620": 620, "epic.deathsdoor": 894020, "epic.gtav": 271590, "gog.moonscars": 1374970,
                             "271590": 271590, "1715130": 1715130, "2420110": 2420110, "1895880": 1895880, "gog.witcher": 20900]
             store.games = store.games.map { game in steamApp[game.id].map { withArt(game, steam: $0) } ?? game }
             store.downloads = [
                 BCDDownload(id: "432940", title: "Breakneck", store: .steam, doneBytes: 816_000_000, totalBytes: 2_400_000_000,
                             bytesPerSecond: 23_600_000),
+                BCDDownload(id: "epic.salt", title: "Salt Harbor", store: .epic, doneBytes: 1_680_000_000, totalBytes: 4_000_000_000,
+                            bytesPerSecond: 31_000_000),
                 // A paused and a failed one, so the Downloads tab shows each kind of row's buttons.
                 BCDDownload(id: "1715130", title: "Crysis Remastered", store: .steam, doneBytes: 6_300_000_000,
                             totalBytes: 21_000_000_000, bytesPerSecond: 0, paused: true),

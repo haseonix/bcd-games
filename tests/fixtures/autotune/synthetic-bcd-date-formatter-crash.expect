@@ -1,0 +1,16 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true,
+  "userSaid": "closed-by-itself"
+ },
+ "matched": [
+  "bcd-date-formatter-crash",
+  "swap-8gb-memory-kill"
+ ],
+ "next": [],
+ "note": "synthetic: the backtrace of BCD's own interface dying in ICU's date formatter, as A7V9T2 (BCDGamePageLive.day) and DFSTWB (BCDMenuModel.showCard) printed it on build 576, with the game left out and a footprint line that would make it read as a memory kill; the tester answers that the app closed by itself. Fixed in 580: no date text of the app is made by ICU",
+ "outcome": "killed",
+ "stage": 1,
+ "status": "known"
+}

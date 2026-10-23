@@ -17,6 +17,16 @@ Checks, on the real region of thread_ios.c compiled on the host against stand-in
     why it is empty; no write call exists in the region; at most two reports per process;
   - in thread_ios.c the hook is inside NtRaiseException's WINE_IOS block, before send_debug_event, for a first-chance
     exception only, and the workflow runs this check.
+
+Build 580: a 64-bit (ARM64EC) process handles OutputDebugString inside the PE ntdll, so none of the Rockstar launcher
+logs (RGM16D, 0YZKW6) carried the report. ios_steam_api_dbg_hook (same region) is called by unixcall_wine_dbg_write
+(tools/patch-ntdll-unix-dbg-write-hook.py, debug.c) with every line the PE ntdll writes, after the write. Checked here:
+  - it reacts to the PE ntdll's own line about steam_api's message and to nothing else (other lines, other functions,
+    the 32-bit path's "[steam-api]" lines, short and long lines, the message in another function's line);
+  - the report it runs is the same text, raw on stderr (no ERR_ prefix), at most twice per session together with the
+    32-bit path, and the hook cannot re-enter itself;
+  - the patch script applies once to the pinned Wine source (when checked out: set MADEIRA_WINE_SRC to use another
+    checkout), keeps the write and its return value, and the hook sits after the write.
 """
 from pathlib import Path
 import re, subprocess, sys, tempfile
@@ -48,12 +58,48 @@ check("the report is capped at two per process", "if (InterlockedIncrement( &tol
 check("the account id is only reported as zero / not zero",
       '"HKCU ActiveProcess ActiveUser", 1, NULL' in region and 'v ? "not zero" : "zero"' in region)
 check("the workflow runs this check", "python3 tests/host/check-steam-api-diag.py" in workflow)
+hook_src = region[region.index("void ios_steam_api_dbg_hook("):]
+check("the hook only reads the bytes it is handed, writes nothing, and cannot re-enter",
+      not re.search(r"NtSetValueKey|NtCreateKey|NtDeleteKey|write\(|NtWriteVirtualMemory|NtTerminate", hook_src)
+      and "if (len < 100 || len > 400 || ios_sd_raw) return;" in hook_src and hook_src.index("ios_sd_raw = 1;") < hook_src.index("ios_steam_api_diag();") < hook_src.index("ios_sd_raw = 0;"))
+check("the 32-bit path (NtRaiseException) keeps its ERR_ lines: raw output only while the hook runs",
+      "#define SD_ERR( ... ) do { if (ios_sd_raw) dprintf( 2, __VA_ARGS__ ); else ERR_(seh)( __VA_ARGS__ ); } while (0)" in region
+      and "ERR_(seh)( \"[steam-api]" not in region)
+check("the patch script is in the workflow, before ntdll-unix is built",
+      "python3 tools/patch-ntdll-unix-dbg-write-hook.py wine/dlls/ntdll/unix/debug.c" in workflow
+      and workflow.index("python3 tools/patch-ntdll-unix-dbg-write-hook.py") < workflow.index("name: Build ntdll-unix"))
+import os, shutil
+wine_dbg = Path(os.environ.get("MADEIRA_WINE_SRC", str(root / "wine"))) / "dlls/ntdll/unix/debug.c"
+if wine_dbg.is_file():
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t) / "debug.c"
+        shutil.copy(wine_dbg, d)
+        pp = root / "tools/patch-ntdll-unix-dbg-write-hook.py"
+        already = "madeira-bcd: ios_steam_api_dbg_hook" in d.read_text()   # the workflow patched the tree before this run
+        r1 = subprocess.run([sys.executable, str(pp), str(d)], capture_output=True, text=True)
+        r2 = subprocess.run([sys.executable, str(pp), str(d)], capture_output=True, text=True)
+        check("the patch applies once to the Wine source and is idempotent" + (" (the tree was patched already)" if already else ""),
+              r1.returncode == 0 and r2.returncode == 0 and "already patched" in r2.stdout
+              and (("already patched" in r1.stdout) if already else ("applied" in r1.stdout)))
+        text = d.read_text()
+        fn = text[text.index("NTSTATUS unixcall_wine_dbg_write( void *args )"):]
+        fn = fn[:fn.index("\n}\n")]
+        check("the write comes first and its return value is returned; the hook is called after it, for WINE_IOS only",
+              fn.index("int ret = write( 2, params->str, params->len );") < fn.index("ios_steam_api_dbg_hook( params->str, params->len );")
+              < fn.index("return ret;") and "#ifdef WINE_IOS" in fn and "#else\n    return write( 2, params->str, params->len );\n#endif" in fn)
+        bad = d.parent / "bad.c"
+        bad.write_text(wine_dbg.read_text().replace("unixcall_wine_dbg_write", "something_else").replace("madeira-bcd: ios_steam_api_dbg_hook", "x"))
+        r3 = subprocess.run([sys.executable, str(pp), str(bad)], capture_output=True, text=True)
+        check("a moved anchor fails by name", r3.returncode != 0 and "anchor" in (r3.stdout + r3.stderr))
+else:
+    print("SKIP: no wine sources (check out the submodule, or set MADEIRA_WINE_SRC)")
 
 harness = r'''
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 typedef int NTSTATUS; typedef unsigned int ULONG, ACCESS_MASK; typedef unsigned short WCHAR, USHORT;
 typedef long LONG; typedef unsigned long long SIZE_T, ULONG_PTR; typedef void *HANDLE; typedef int BOOL;
 typedef struct { USHORT Length, MaximumLength; WCHAR *Buffer; } UNICODE_STRING;
@@ -167,6 +213,69 @@ int main(int argc, char **argv)
         printf(" short=%d", ios_steam_api_message(&rec));
         rec.ExceptionInformation[0] = 201;
         printf(" long=%d\n", ios_steam_api_message(&rec));
+        /* build 591: the older wording of the legacy SteamStub games (GTA: Vice City D938HM / V85VDT; 74Z00F's 64-bit variant) */
+        printf("old32=%d old64=%d pipe=%d running_failed=%d old_without_fail=%d old_wide=%d\n",
+               message("[S_API FAIL] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient.dll.\n", DBG_PRINTEXCEPTION_C, 2),
+               message("[S_API FAIL] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient64.dll..", DBG_PRINTEXCEPTION_C, 2),
+               message("[S_API FAIL] SteamAPI_Init() failed; create pipe failed. And a few more words so that the string is long enough to pass.", DBG_PRINTEXCEPTION_C, 2),
+               message("[S_API FAIL] SteamAPI_Init() failed; SteamAPI_IsSteamRunning() failed.. And a few more words so that the string is long.", DBG_PRINTEXCEPTION_C, 2),
+               message("[S_API] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient.dll.\n", DBG_PRINTEXCEPTION_C, 2),
+               message("[S_API FAIL] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient.dll.\n", 0x4001000a, 2));
+        return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "hook"))
+    {
+        /* the PE ntdll's own line, as RGM16D L12416 prints it */
+        static const char line[] = "00d8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API] SteamAPI_Init(): SteamAPI_IsSteamRunning() did not locate a running instance of Steam..\"\n";
+        static const char other_fn[] = "00d8:err:seh:call_seh_handlers [exc] ml812   OutputDebugStringA: \"[S_API] SteamAPI_Init(): SteamAPI_IsSteamRunning() did not locate a running instance of Steam..\"\n";
+        static const char other_text[] = "00d8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"src\\public\\tier1\\interface.h (271) : Assertion Failed: Failed to load SDL3.dll and a little more text.\"\n";
+        static const char loaded_line[] = "00d8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API] SteamAPI_Init(): Loaded 'C:\\Program Files (x86)\\Steam\\steamclient64.dll' OK..\"\n";
+        static const char steam32[] = "00d4:err:seh:ios_sd_value [steam-api] steam_api found no running Steam; process 00d4 sees:\n";
+        static const char old_line[] = "0044:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API FAIL] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient64.dll..\"\n";
+        static const char pipe_line[] = "008c:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API FAIL] SteamAPI_Init() failed; create pipe failed. and a few more words of padding\"\n";
+        static const char fail_only[] = "0044:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API FAIL] SteamAPI_Init() failed; SteamAPI_IsSteamRunning() failed.. and a few more words\"\n";
+        char longline[600];
+        dup2(1, 2);                                          /* raw reports go to stderr: read them from stdout */
+        scenario_full = 1;
+        ios_steam_api_dbg_hook(other_fn, (unsigned)strlen(other_fn));
+        ios_steam_api_dbg_hook(other_text, (unsigned)strlen(other_text));
+        ios_steam_api_dbg_hook(loaded_line, (unsigned)strlen(loaded_line));
+        ios_steam_api_dbg_hook(steam32, (unsigned)strlen(steam32));
+        ios_steam_api_dbg_hook(pipe_line, (unsigned)strlen(pipe_line));       /* [S_API FAIL] but another cause */
+        ios_steam_api_dbg_hook(fail_only, (unsigned)strlen(fail_only));
+        ios_steam_api_dbg_hook("short\n", 6);
+        ios_steam_api_dbg_hook(line, 99);                    /* cut before the text: too short or no text */
+        memset(longline, 'x', sizeof longline); memcpy(longline, line, strlen(line));
+        ios_steam_api_dbg_hook(longline, 500);               /* over 400 bytes */
+        printf("--- nothing above this line\n"); fflush(stdout);
+        ios_steam_api_dbg_hook(line, (unsigned)strlen(line));      /* report 1 */
+        ios_steam_api_dbg_hook(line, (unsigned)strlen(line));      /* report 2 */
+        ios_steam_api_dbg_hook(line, (unsigned)strlen(line));      /* nothing: two per session */
+        fflush(stdout); printf("--- end\n");
+        return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "hook-old"))
+    {
+        static const char old_line[] = "0044:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API FAIL] SteamAPI_Init() failed; unable to locate a running instance of Steam, or a local steamclient64.dll..\"\n";
+        dup2(1, 2);
+        scenario_full = 1;
+        ios_steam_api_dbg_hook(old_line, (unsigned)strlen(old_line));
+        ios_steam_api_dbg_hook(old_line, (unsigned)strlen(old_line));
+        ios_steam_api_dbg_hook(old_line, (unsigned)strlen(old_line));     /* nothing: two per session */
+        fflush(stdout); printf("--- end\n");
+        return 0;
+    }
+    if (argc > 1 && !strcmp(argv[1], "hook-mix"))
+    {
+        /* the 32-bit path's first report counts against the same two */
+        static const char line[] = "00d8:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringA: \"[S_API] SteamAPI_Init(): SteamAPI_IsSteamRunning() did not locate a running instance of Steam..\"\n";
+        dup2(1, 2);
+        scenario_full = 1;
+        ios_steam_api_diag();                                /* the 32-bit path: ERR_ lines on stdout */
+        fflush(stdout);
+        ios_steam_api_dbg_hook(line, (unsigned)strlen(line));
+        ios_steam_api_dbg_hook(line, (unsigned)strlen(line));
+        fflush(stdout); printf("--- end\n");
         return 0;
     }
     scenario_full = argc > 1 && !strcmp(argv[1], "full");
@@ -189,6 +298,12 @@ with tempfile.TemporaryDirectory() as t:
         check("the test accepts steam_api's text and nothing else: " + m.strip(),
               m.splitlines()[0] == "steam=1 loaded=0 other=0 code=0 params=0" and
               m.splitlines()[1] == "null=0 bad_pointer=0 short=0 long=0")
+        check("the older wording ([S_API FAIL] ... unable to locate a running instance of Steam) is accepted for the 32-bit and 64-bit "
+              "steamclient names, and nothing near it is: " + m.splitlines()[2],
+              m.splitlines()[2] == "old32=1 old64=1 pipe=0 running_failed=0 old_without_fail=0 old_wide=0")
+        out = run("hook-old")
+        check("the PE ntdll's line with the older wording makes two raw reports, not three",
+              out.split("--- end")[0].count("[steam-api] steam_api found no running Steam; process 00d4 sees:") == 2)
         out = run("full")
         lines = [l for l in out.splitlines() if l.startswith("[steam-api]")]
         check("two reports, not three", sum(1 for l in lines if "found no running Steam" in l) == 2)
@@ -203,6 +318,17 @@ with tempfile.TemporaryDirectory() as t:
         check("a missing value or key, and the objects, are reported by name",
               "HKLM(32) Steam InstallPath: no value" in one and "HKLM(64) Steam InstallPath: key not opened" in one and
               "STEAM_DIPC_CONSUME: opens" in one and "STEAM_DIPC_PRODUCE: not opened" in one)
+        out = run("hook")
+        before, after = out.split("--- nothing above this line\n")
+        check("the hook ignores every line that is not the PE ntdll's message (other function, other text, the loaded message, the 32-bit "
+              "report's own lines, short and long lines)", "[steam-api]" not in before and before.strip() == "")
+        rep = after.split("--- end")[0]
+        check("the PE ntdll's line makes two raw reports, not three (no err:seh prefix, same text as the 32-bit path)",
+              rep.count("[steam-api] steam_api found no running Steam; process 00d4 sees:") == 2 and "err:seh" not in rep
+              and "HKCU ActiveProcess pid: DWORD 52" in rep and "STEAM_DIPC_CONSUME: opens" in rep
+              and "123456789" not in rep and "ActiveUser: DWORD, not zero" in rep)
+        out = run("hook-mix")
+        check("the 32-bit path and the hook share the two reports", out.split("--- end")[0].count("found no running Steam") == 2)
         out = run("empty")
         one = out.split("found no running Steam", 2)[1]
         check("an empty registry: every key says it is not opened, no process line, objects not found",

@@ -143,11 +143,12 @@ check("LibraryController.shared.configure(enabled: true, ownsInput: true)" in bl
 
 # ---- play ----------------------------------------------------------------------------------
 start = block(store, "private func start(_ game: BCDGame)")
-# Three starts, all through the connected Play: a GOG game's entry (BCDLiveStoreGOG's hook, which
-# returns nil for every other game), a game from Files or the desktop, and a Steam game.
-check(start.count("launch(entry)") == 3 and "guard let launch else { return }" in start
-      and "if let entry = gogPlayEntry(game) { launch(entry); return }" in start,
-      "Play: the live store starts a game only through the connected Play (GOG, local, Steam)")
+# Four starts, all through the connected Play: a GOG game's entry (BCDLiveStoreGOG's hook, which returns nil for
+# every other game), an Epic game's entry (BCDLiveStoreEpic's, the same), a game from Files or the desktop, and a Steam game.
+check(start.count("launch(entry)") == 4 and "guard let launch else { return }" in start
+      and "if let entry = gogPlayEntry(game) { launch(entry); return }" in start
+      and "if let entry = epicPlayEntry(game) { launch(entry); return }" in start,
+      "Play: the live store starts a game only through the connected Play (GOG, Epic, local, Steam)")
 # Wave 3 (2026-10-19): the classic Game details page, which asked this check too, is deleted; the check moved
 # unchanged to SteamGames.swift (SteamPlayCheck.blocker) and BCD's Play is the only caller.
 check("library.steamEntry(installed, title: title)" in start

@@ -944,7 +944,7 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                 }
                 ForEach(backend.recent) { log in
                     BCDSettingsActionRow(id: BCDSettingsID.control(.logs, "send.\(log.name)"), title: BCDSettingsText.logName(log.name),
-                                         note: "\(log.date.formatted(date: .abbreviated, time: .shortened)) · \(BCDFormat.bytes(log.bytes))",
+                                         note: "\(BCDFormat.dateTime(log.date)) · \(BCDFormat.bytes(log.bytes))",
                                          symbol: "paperplane", enabled: !backend.sending) { confirmSend(log) }
                 }
                 if let status = backend.sendStatus {
@@ -957,7 +957,7 @@ struct BCDLogsSettings<Backend: BCDLogsBackend>: View {
                 BCDSettingsGroup(title: "Sent", footer: "Choose a code to copy it.") {
                     ForEach(backend.sent.prefix(5)) { item in
                         BCDSettingsActionRow(id: BCDSettingsID.control(.logs, "sent.\(item.code)"), title: item.code,
-                                             note: "\(BCDSettingsText.logName(item.name)) · \(item.date.formatted(date: .abbreviated, time: .shortened))",
+                                             note: "\(BCDSettingsText.logName(item.name)) · \(BCDFormat.dateTime(item.date))",
                                              detail: copied == item.code ? "Copied" : nil, symbol: "doc.on.doc") {
                             backend.copy(item.code)
                             copied = item.code

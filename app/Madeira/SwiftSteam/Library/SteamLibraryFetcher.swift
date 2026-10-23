@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): the account's App IDs and the DLC lookup (`ownedAppIDs`, `dlcReport`).
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
@@ -42,6 +43,11 @@ class SteamLibraryFetcher {
         // Step 5: app info (name, depots, platform support, ...).
         let appInfos = try await fetchAppInfo(appIDs: Array(appIDs), tokens: appTokens)
         SteamLog.trace("Got info for \(appInfos.count) apps")
+
+        // The App IDs the licenses hold and the DLC names, kept for the game page's DLC section (BCDSteamDLC/).
+        ownedAppsCache = appIDs
+        ownedAppsAccount = session.steamID
+        for info in appInfos where info.type == .dlc { dlcNames[info.appID] = info.name }
 
         // Playable types only: games, demos and applications. This leaves out
         // DLC, soundtracks and tools (redistributables, runtimes, SDKs, servers).
@@ -144,6 +150,69 @@ class SteamLibraryFetcher {
             }
         }
         return app
+    }
+
+    // MARK: - DLC (BCDSteamDLC/)
+
+    /// The App IDs the account's licenses hold (games, DLC, tools), from the same package info the library reads.
+    /// Cached per session; `fetchOwnedApps` fills it as it goes.
+    private var ownedAppsCache: Set<UInt32>?
+    /// The account the cache belongs to (a sign-in with another account starts it again).
+    private var ownedAppsAccount: UInt64 = 0
+    /// DLC names by App ID (each DLC app's own product info), cached per session.
+    private var dlcNames: [UInt32: String] = [:]
+    /// The depots a DLC app declares in its own product info (an empty list: it declares none), by DLC App ID, cached per
+    /// session. Only for DLC the game itself lists no Windows depot for.
+    private var dlcOwnDepotCache: [UInt32: [SteamAppInfo.DepotInfo]] = [:]
+
+    func ownedAppIDs() async throws -> Set<UInt32> {
+        try await session.ensureConnected()
+        if let cached = ownedAppsCache, ownedAppsAccount == session.steamID { return cached }
+        let packageIDs = try await fetchLicenseList()
+        let tokens = try await fetchPICSAccessTokens(packageIDs: packageIDs)
+        let apps = try await fetchAppIDsFromPackages(packageIDs: packageIDs, tokens: tokens)
+        ownedAppsCache = apps
+        ownedAppsAccount = session.steamID
+        return apps
+    }
+
+    /// The product info of DLC apps, for their names and for the depots they declare themselves. Only what is not cached yet.
+    /// `ids` with no product info are remembered as declaring none.
+    private func loadDLCInfo(_ ids: [UInt32]) async throws {
+        let wanted = ids.filter { dlcNames[$0] == nil || dlcOwnDepotCache[$0] == nil }
+        guard !wanted.isEmpty else { return }
+        let tokens = try await fetchPICSAccessTokens(appIDs: wanted)
+        for info in try await fetchAppInfo(appIDs: wanted, tokens: tokens) {
+            dlcNames[info.appID] = info.name
+            dlcOwnDepotCache[info.appID] = info.dlcOwnDepots()
+        }
+        for id in wanted where dlcOwnDepotCache[id] == nil { dlcOwnDepotCache[id] = [] }
+    }
+
+    /// The depots the DLC apps in `ids` declare in their own product info (what the game does not list for them), for a
+    /// download that takes such DLC. One product-info request for those not read yet.
+    func dlcOwnDepots(for ids: [UInt32]) async throws -> [SteamAppInfo.DepotInfo] {
+        guard !ids.isEmpty else { return [] }
+        try await session.ensureConnected()
+        try await loadDLCInfo(ids)
+        return ids.sorted().flatMap { dlcOwnDepotCache[$0] ?? [] }
+    }
+
+    /// What an app's page says about its DLC: the DLC it lists that the account owns, with their names and depots (the game's
+    /// own list, and for DLC it lists no depot for, the DLC's own product info).
+    /// One product-info request for the app, one for the names and own depots of owned DLC not seen yet, and the license scan
+    /// once a session. Metadata only: every later content request still goes to Valve.
+    func dlcReport(appID: UInt32) async throws -> SteamDLCReport? {
+        guard let app = try await fetchAppInfo(appID: appID) else { return nil }
+        let owned = try await ownedAppIDs()
+        let ownedDLC = Set(app.dlcApps.filter { owned.contains($0) })
+        let lacking = SteamDLC.needingOwnInfo(app: app, candidates: ownedDLC)
+        try await loadDLCInfo(Array(ownedDLC.filter { dlcNames[$0] == nil }) + lacking)
+        let own = lacking.flatMap { dlcOwnDepotCache[$0] ?? [] }
+        var report = SteamDLC.report(for: app.addingDLCDepots(own), ownedApps: owned, names: dlcNames)
+        let fromOwn = Set(own.compactMap(\.dlcAppID))
+        report.viaOwnInfo = report.owned.filter { fromOwn.contains($0.appID) }.count
+        return report
     }
 
     // MARK: - License List

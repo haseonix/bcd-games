@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Windows games on iPhone and iPad.</b><br>
-  A fast, controller-friendly launcher with Steam and GOG built in.<br>
+  A fast, controller-friendly launcher with Steam, GOG and Epic Games built in.<br>
   <sub>Alpha: early development, before beta. Many games run, many do not yet.</sub>
 </p>
 
@@ -68,10 +68,16 @@ LiveContainer. If something breaks inside LiveContainer, try BCD outside it befo
   - the controller works everywhere: every screen, the in-game menu, the touch-controls editor;
   - a lightweight in-game menu, performance overlay and on-screen touch controls.
 - **Steam:** sign in (password with Steam Guard, or a QR code), your owned library,
-  downloads and updates, file checks, Steam Cloud saves. Downloads keep going in the
-  background on iOS 26.
-- **GOG** (new, early): sign in, download and play your GOG games, with no launcher
-  running inside Windows. The Epic Games Store is next.
+  downloads and updates, file checks, Steam Cloud saves, and the DLC you own: choose it
+  before the install, add or remove it later on the game's page. Downloads keep going in
+  the background on iOS 26.
+- **Epic Games Store** (new, early): sign in, install your Epic games and start them signed
+  in to your Epic account. BCD says before the install when a game cannot run (Easy
+  Anti-Cheat, another company's launcher).
+  If the first sign-in stops at a step on Epic's side (for example accepting a new privacy
+  policy), sign in at epicgames.com in a browser, finish the step, then sign in to BCD again.
+- **GOG** (early): sign in, download and play your GOG games, with no launcher running
+  inside Windows.
 - **BCD Dock:** Valve's Steam client starts the games that need Steam, without its window.
   Those games run through Valve's own client, signed in with your account.
 - **Graphics:** Direct3D 9, 10 and 11 through DXMT; Direct3D 12 through BCD's runtime and
@@ -95,10 +101,36 @@ through BCD Dock:
 - Horizon Zero Dawn and Horizon Forbidden West
 - Red Dead Redemption 2, including the Rockstar Launcher
 - GTA V, Legacy and Enhanced
+- Grand Theft Auto IV: The Complete Edition
+- Counter-Strike 2
 - Crysis Remastered, Crysis 2 Remastered and Crysis 3 Remastered
 
 Also running: Warcraft II: Battle.net Edition. Work in progress: Ratchet & Clank: Rift Apart
 (around 20 FPS, with visual glitches).
+
+### Seen running in testers' logs and reports
+
+These games reached gameplay and were played for several minutes without a crash in the logs
+testers sent with Send Log, or were reported running on the BCD Discord with the device and
+frame rate. None of them was played from start to finish, and results depend on the device,
+the iOS version and the settings.
+
+- Celeste
+- Cleared Hot
+- Dark Souls II: Scholar of the First Sin
+- Dead Space (2008)
+- DELTARUNE
+- Doom 3
+- Fallout: New Vegas
+- Far Cry 3
+- Final Fantasy VII Remake Intergrade (M5 iPad Pro: low settings, 900p, 30 FPS)
+- Kingdom Hearts III (M5 iPad Pro: highest settings, mostly 60 FPS)
+- Marie's Room
+- METAL GEAR SOLID: Peace Walker - Master Collection Version
+- Metro 2033 Redux (iPhone 17 Pro: 60 FPS with tessellation off)
+- Moonlighter
+- Timberborn
+- Tomb Raider (2013)
 
 How well a game runs varies a lot; many games do not start yet.
 
@@ -115,7 +147,7 @@ How well a game runs varies a lot; many games do not start yet.
   - iOS 18, and iOS 26 on older chips: StikDebug, with its "Always Run Scripts" setting on.
 - **A way to install the IPA:** SideStore or AltStore (a free Apple ID works), LiveContainer,
   or your own signing. More memory for big games: GetMoreRam adds Increased Memory Limit
-  and extended virtual addressing to BCD's App ID.
+  to BCD's App ID.
 - **Room:** each game needs its full install size on the device.
 
 ## Install
@@ -172,10 +204,11 @@ screen, keeps their copyright lines, and marks changed files as modified.
 Third-party components and their licences: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 There is no warranty.
 
-Steam is a trademark of Valve Corporation. Windows, DirectX, Direct3D and Visual C++ are
+Steam is a trademark of Valve Corporation. Epic Games and the Epic Games Store are trademarks
+of Epic Games, Inc. GOG is a trademark of GOG sp. z o.o. Windows, DirectX, Direct3D and Visual C++ are
 trademarks of the Microsoft group of companies. Apple, iPhone, iPad, iOS, iPadOS and Metal
 are trademarks of Apple Inc. BCD is an independent project, not affiliated with or endorsed
-by Valve, Microsoft, Apple or the authors of Madeira. Game titles named here belong to their
+by Valve, Epic Games, GOG, Microsoft, Apple or the authors of Madeira. Game titles named here belong to their
 respective owners; BCD is not affiliated with or endorsed by them.
 
 ## Credits
@@ -197,6 +230,8 @@ respective owners; BCD is not affiliated with or endorsed by them.
   stay off the mouse, and a crash-guard fix
 - **TheHadesc** ([TheHadesc](https://github.com/TheHadesc)): Madeira Dock starts for more
   games, and a touch gamepad that survives the in-game keyboard
+- **vancez** ([vancez](https://github.com/vancez)): Steam download checksums, and the idea for
+  the download-server fallback in regions without HTTPS servers
 
 **The projects underneath:** [Wine](https://www.winehq.org), [FEX-Emu](https://github.com/FEX-Emu/FEX),
 [DXMT](https://github.com/3Shain/dxmt) by Feifan He (3Shain) with the Direct3D 9 frontend by

@@ -58,14 +58,16 @@ struct BCDSteamSignInSheet: View {
 /// it out of the preview app). Everything goes through what the app already had:
 /// SteamSignInModel (password and Steam Guard, or the QR code; SwiftSteam/SteamSignIn.swift)
 /// for signing in and out, SteamCloudSetting (SteamGames.swift) for Steam Cloud saves and
-/// OnboardingModel for setup. GOG goes through BCDLiveStore's GOG hooks (gogAccount, signIn(.gog),
-/// signOut(.gog); BCDGOG/BCDLiveStoreGOG.swift), so this file names only what they publish. The
+/// OnboardingModel for setup. GOG and Epic Games go through BCDLiveStore's hooks (gogAccount, signIn(.gog),
+/// signOut(.gog); BCDGOG/BCDLiveStoreGOG.swift; epicAccount, signIn(.epic), signOut(.epic);
+/// BCDEpic/BCDLiveStoreEpic.swift), so this file names only what they publish. The
 /// password is handed to SteamSignInModel.signIn as it arrives and is neither kept nor logged here. Steam's profile name and picture are not
 /// fetched by the app (SteamSession never fills its persona name), so they stay empty.
 @MainActor final class BCDAccountsLive: BCDAccountsBackend {
     @Published private(set) var steam = BCDSteamAccount()
     @Published private(set) var signInProgress = BCDSteamSignIn()
     @Published private(set) var gogAccount = BCDAccount(store: .gog, name: nil, available: false)
+    @Published private(set) var epicAccount = BCDAccount(store: .epic, name: nil, available: false)
     private var watching: Set<AnyCancellable> = []
 
     init() {
@@ -74,6 +76,7 @@ struct BCDSteamSignInSheet: View {
             SteamCloudSetting.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
             NotificationCenter.default.publisher(for: SteamSignIn.didChange).map { _ in () }.eraseToAnyPublisher(),
             BCDGOG.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
+            BCDEpic.shared.objectWillChange.map { _ in () }.eraseToAnyPublisher(),
         ]
         // objectWillChange fires before the value changes: read on the next turn of the main queue.
         Publishers.MergeMany(changes).receive(on: DispatchQueue.main)
@@ -99,6 +102,8 @@ struct BCDSteamSignInSheet: View {
         if progress != signInProgress { signInProgress = progress }
         let gog = BCDLiveStore.shared.gogAccount()
         if gog != gogAccount { gogAccount = gog }
+        let epic = BCDLiveStore.shared.epicAccount()
+        if epic != epicAccount { epicAccount = epic }
     }
 
     private static func steamGuard(_ prompt: SteamGuardPrompt) -> BCDSteamGuard {
@@ -126,4 +131,8 @@ struct BCDSteamSignInSheet: View {
     /// GOG's own sign-in page and its sign-out, through the store's GOG hooks (gogAccountAction).
     func signInGOG() { BCDLiveStore.shared.signIn(.gog) }
     func signOutGOG() { BCDLiveStore.shared.signOut(.gog) }
+
+    /// Epic's own sign-in page and its sign-out, through the store's Epic hooks (epicAccountAction).
+    func signInEpic() { BCDLiveStore.shared.signIn(.epic) }
+    func signOutEpic() { BCDLiveStore.shared.signOut(.epic) }
 }

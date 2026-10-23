@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "fault-guard-rate-segv"
+ ],
+ "next": [
+  "env.MADEIRA_FAULT_GUARD_RATE = 1"
+ ],
+ "note": "Round 591 (ajan10/motor): PlateUp! - the BSD path's SEGV LOOP FATAL (global counter, x0 = 0xDEAD0001) handed the game a made-up pointer.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

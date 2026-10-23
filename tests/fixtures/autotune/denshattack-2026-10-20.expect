@@ -4,12 +4,13 @@
  ],
  "end": {},
  "matched": [
-  "vcrt-arm64-marker"
+  "vcrt-arm64-marker",
+  "vcrt-arm64-marker-current"
  ],
  "next": [
   "env.MADEIRA_VCRT_ARM64_KEY = 1"
  ],
- "note": "Denshattack (Steam 2524850), build 574, iPhone18,1 (Send Log MKT2TW; the same dialog in BEB3XY build 565 and, for FINAL FANTASY RESONANCE's demo, 4AW8BN and Q5KWDW build 573): Unreal's bootstrap program Denshattack_Proto.exe, an x64 exe on an ARM64 machine, asks for Microsoft Visual C++ 2015-2022 Redistributable (arm64) and exits 0x2329. env.MADEIRA_VCRT_ARM64_KEY = 1 writes the volatile Runtimes arm64 marker (build 576); not yet tried on a device",
+ "note": "Denshattack (Steam 2524850), build 574, iPhone18,1 (Send Log MKT2TW; the same dialog in BEB3XY build 565 and, for FINAL FANTASY RESONANCE's demo, 4AW8BN and Q5KWDW build 573): Unreal's bootstrap program Denshattack_Proto.exe, an x64 exe on an ARM64 machine, asks for Microsoft Visual C++ 2015-2022 Redistributable (arm64) and exits 0x2329. env.MADEIRA_VCRT_ARM64_KEY = 1 writes the volatile Runtimes arm64 marker (build 576); not yet tried on a device From build 592 the second rule vcrt-arm64-marker-current (env.MADEIRA_VCRT_ARM64_KEY = 14.44.35211.0, bcd-games issue #13) matches too; the first comes first, the second serves a game whose search already tried the first on an older build.",
  "outcome": "crashed",
  "stage": 3,
  "status": "trying"

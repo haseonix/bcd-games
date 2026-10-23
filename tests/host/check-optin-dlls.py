@@ -18,6 +18,7 @@ optionally today (Chromium loads dxva2 for video), so each is opt-in, as wer-opt
     import failure (fixtures fort-solis-*, animal-well-*).
 """
 from pathlib import Path
+import os
 import re
 import sys
 
@@ -100,6 +101,50 @@ recs = json.loads((root / 'recommended/recommendations.json').read_text())
 # twinapi.appcore DLL and the auto-tune rule are engine-level and stay. No list may name twinapi.appcore before build 579.
 named = [r['id'] for r in recs['rules'] if 'twinapi.appcore' in json.dumps(r)]
 check("no list names twinapi.appcore (Hellblade II's only log was a copy; the DLL and the rule stay engine-level)", named == [])
+
+# oledlg, fwpuclnt and sensapi (2026-10-23, testers' logs of build 580): Digimon Story Cyber Sleuth's exe imports oledlg.dll (PGET5A),
+# FINAL FANTASY XV's ffxv_s.exe fwpuclnt.dll (DM9SAF, CDC7AK), Borderlands 3's vivoxsdk.dll SensApi.dll (VFM84T); each ended with
+# c0000135. The 32-bit set has all three; the 64-bit one had none. Same mechanism as the DLLs above, one rule each.
+NEW3 = {'oledlg': ('oledlg.dll', 'digimon-story-cyber-sleuth-2026-10-22'), 'fwpuclnt': ('fwpuclnt.dll', 'ffxv-demo-2026-10-22'),
+        'sensapi': ('SensApi.dll', 'borderlands-3-2026-10-22')}
+check('OPTIN_WANT also lists oledlg, fwpuclnt and sensapi', set(NEW3) <= set(names))
+check('none of the three is in the list shipped under its own name', not any(re.search(r'\b%s\b' % n, want) for n in NEW3))
+wine = Path(os.environ.get('WINE_SRC') or (root / 'wine'))
+shipdir = root / 'app/Madeira/arm64ec-windows'
+check('no oledlg.dll, fwpuclnt.dll or sensapi.dll ships in the 64-bit set (the script skips a DLL that ships)',
+      not any((shipdir / (n + '.dll')).exists() or (shipdir / (n.upper() + '.dll')).exists() for n in NEW3))
+if (wine / 'dlls/oledlg/Makefile.in').exists():
+    for n in NEW3:
+        mk = (wine / 'dlls' / n / 'Makefile.in').read_text()
+        imports = re.search(r'^IMPORTS\s*=\s*(.*)$', mk, re.M)
+        imports = imports.group(1).split() if imports else []
+        check('Wine builds %s.dll from dlls/%s; its imports %s all ship in the 64-bit set (or are import-only libraries)' % (n, n, imports),
+              re.search(r'^MODULE\s*=\s*%s\.dll$' % n, mk, re.M) and
+              all((shipdir / (i + '.dll')).exists() or i in ('uuid', 'dxguid', 'strmiids') for i in imports))
+else:
+    print('note SKIPPED: no Wine sources here (set WINE_SRC); the three DLLs\' Makefile.in files are not read')
+policy = (root / 'app/Madeira/GameRecommendationsList.swift').read_text()
+check('RecommendationsPolicy lets a downloaded list name oledlg, fwpuclnt and sensapi',
+      '["oledlg", "fwpuclnt", "sensapi"].contains($0)' in policy and 'wmadmod, or oledlg, fwpuclnt, sensapi' in policy)
+check('the catalog note names the three DLLs', 'oledlg, fwpuclnt and sensapi are three small system DLLs' in gen)
+import importlib.util
+spec = importlib.util.spec_from_file_location('autotune_rules', root / 'build/tools/autotune_rules.py')
+atr = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(atr)
+by_id = {r['id']: r for r in atr.RULES}
+for n, (spelled, fixture) in NEW3.items():
+    r = by_id.get('%s-dll-optin' % n)
+    check('auto-tune has %s-dll-optin: one line, no retry of the unchanged start, not again once linked' % n,
+          r and r['lines'] == ['env.MADEIRA_OPTIN_DLLS = %s' % n] and r.get('noRetry') is True and r['priority'] == 10 and
+          r['none'] == [{'has': ['MADEIRA_OPTIN_DLLS: %s.dll -> %s-optin.dll' % (n, n)]}])
+    sigs = r['any'] if r else []
+    check('its signal matches the name as the tester\'s log spelled it (%s) and the usual upper-case spellings' % spelled,
+          any(sg['has'][0] == 'err:module:import_dll Library ' + spelled for sg in sigs) and
+          any(sg['has'][0] == 'err:module:import_dll Library %s.DLL' % n.upper() for sg in sigs))
+    fx = (root / 'tests/fixtures/autotune' / (fixture + '.log')).read_text(errors='replace').split('\n')
+    check('fixture %s has the import failure line the rule reads' % fixture,
+          any('err:module:import_dll Library ' + spelled in l and 'not found' in l for l in fx))
+    check('its fixture proves the rule', '"%s-dll-optin"' % n in (root / 'tests/fixtures/autotune' / (fixture + '.expect')).read_text())
 wf = (root / '.github/workflows/build-ipa.yml').read_text()
 check('CI runs this check', 'python3 tests/host/check-optin-dlls.py' in wf)
 print('PASS: opt-in DLLs' if ok else 'FAILED: opt-in DLLs')

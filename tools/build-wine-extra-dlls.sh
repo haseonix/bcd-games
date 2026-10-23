@@ -11,6 +11,9 @@
 # wer-optin.dll, Wine's own wer.dll for the one game that imports it (see WER below), and
 # wintypes-optin.dll, Wine's own wintypes.dll for the games that import it (see WTY below), and
 # setupapi-optin.dll, the shipped setupapi.dll with a lock round its device node table (see SDL below).
+# Also (2026-10-22, Resident Evil 2) winedmo.dll, the demuxer DLL nothing shipped imports, and the opt-in
+# mfasfsrcsnk-optin.dll, wmvdecod-optin.dll and wmadmod-optin.dll: Wine's ASF byte stream handler (built with
+# tools/patch-wine-mfasfsrcsnk-winedmo.py) and the WMV and WMA decoder MFTs behind it (see OPTIN_WANT below).
 # A DLL upstream already ships is never replaced. Run from the repository
 # root; needs llvm-mingw on PATH (or MINGW) and the native wine tools.
 #   usage: build-wine-extra-dlls.sh [native tools dir]
@@ -29,7 +32,7 @@ WANT="msvcr70 msvcr71 msvcr80 msvcr90 msvcr100 msvcr110 msvcrt20 msvcrt40 msvcir
       d3d10 d3d10_1 avifil32 msvfw32 dinput
       wbemprox wbemdisp wmiutils
       riched20 riched32 msftedit gdiplus mlang usp10 cabinet sspicli msxml3 msxml6
-      msasn1 wldp hnetcfg msctf xmllite netprofm d2d1 wmvcore winegstreamer srvcli
+      msasn1 wldp hnetcfg msctf xmllite netprofm d2d1 wmvcore winegstreamer srvcli winedmo
       xaudio2_0 xaudio2_1 xaudio2_2 xaudio2_3 xaudio2_4 xaudio2_5 xaudio2_6 xaudio2_7 xaudio2_8 xaudio2_9
       x3daudio1_0 x3daudio1_1 x3daudio1_2 x3daudio1_3 x3daudio1_4 x3daudio1_5 x3daudio1_6 x3daudio1_7
       xapofx1_1 xapofx1_2 xapofx1_3 xapofx1_4 xapofx1_5
@@ -131,8 +134,20 @@ fi
 # to sfc_os.dll); twinapi.appcore: Senua's Saga: Hellblade II's XCurl.dll and Microsoft.Xbox.Services.GDK.C.Thunks.dll
 # import api-ms-win-core-psm-appnotify-l1-1-0.dll, which Wine's apiset maps to twinapi.appcore.dll, and the program ended
 # with c0000135 (tester's log XJ7Z6Y, build 576; Wine's DLL has RegisterAppStateChangeNotification and its three
-# neighbours, each a stub that returns ERROR_CALL_NOT_IMPLEMENTED). MADEIRA_OPTIN_BUILD=0 skips them.
-OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore"
+# neighbours, each a stub that returns ERROR_CALL_NOT_IMPLEMENTED); mfasfsrcsnk, wmvdecod and wmadmod: Resident Evil 2
+# plays WMV cutscenes through a Media Foundation source reader and ended at its first one (c0000135 for
+# C:\windows\system32\mfasfsrcsnk.dll, CLSID {41457294-644c-4298-a28a-bd69f2c0cf3b}, tester's log re2-ipadm4-579, build
+# 579): mfasfsrcsnk is Wine's ASF byte stream handler (built with tools/patch-wine-mfasfsrcsnk-winedmo.py, which makes it
+# use the FFmpeg demuxer in winedmo.dll, built above as a plain DLL because nothing shipped imports it), wmvdecod the WMV
+# decoder MFT and wmadmod the WMA decoder MFT the reader finds in the registry; both decoders run on BCD's winegstreamer
+# unix side, which a 64-bit game gets with env.MADEIRA_WG_64BIT = 1 (build/ntdll-unix/winegstreamer_wmv_ios.c).
+# The ByteStreamHandlers entries for .wmv and .asf and the CLSIDs are already in the prefix template. MADEIRA_OPTIN_BUILD=0 skips them.
+# oledlg, fwpuclnt and sensapi (2026-10-23, testers' logs of build 580): Digimon Story Cyber Sleuth's exe imports oledlg.dll
+# (PGET5A), FINAL FANTASY XV's ffxv_s.exe imports fwpuclnt.dll (DM9SAF), Borderlands 3's Vivox SDK (vivoxsdk.dll) imports
+# SensApi.dll (VFM84T); each ended at once with c0000135 (Borderlands 3 with UE4's delay-load exception). The 32-bit set has
+# all three; the 64-bit one had none. oledlg imports ole32, comdlg32, user32 and advapi32, all shipped; fwpuclnt and sensapi
+# import nothing beyond the kernel. A program that loads one of them optionally today keeps running without it, hence opt-in.
+OPTIN_WANT="dxva2 evr xpsprint sfc sfc_os tbs twinapi.appcore mfasfsrcsnk wmvdecod wmadmod oledlg fwpuclnt sensapi"
 OPT=""
 if [ "${MADEIRA_OPTIN_BUILD:-1}" != 0 ]; then
     for d in $OPTIN_WANT; do
@@ -208,10 +223,25 @@ for d in $todo; do
     sed -i.bak -e '/^DELAYIMPORTS[[:space:]]*=/d' -e "s/^\(IMPORTS[[:space:]]*=.*\)\$/\1 $delayed/" "$mk" && rm -f "$mk.bak"
     undelayed="$undelayed $d"
 done
+# mfasfsrcsnk-optin.dll: Wine's ASF byte stream handler, patched to use winedmo (see the script). A patch that does not
+# apply drops the DLL (an unpatched one would hand the game to the generic handler, which cannot read ASF here).
+MFA=""
+case " $OPT " in *" mfasfsrcsnk "*) MFA=mfasfsrcsnk ;; esac
+if [ -n "$MFA" ]; then
+    if python3 "$R/tools/patch-wine-mfasfsrcsnk-winedmo.py" "$R/wine"; then
+        rm -f "$B/dlls/mfasfsrcsnk/arm64ec-windows/mfasfsrcsnk.dll" "$B"/dlls/mfasfsrcsnk/arm64ec-windows/*.o
+    else
+        echo "::warning::mfasfsrcsnk winedmo patch did not apply; mfasfsrcsnk-optin.dll not shipped"
+        targets="${targets/ dlls\/mfasfsrcsnk\/arm64ec-windows\/mfasfsrcsnk.dll/}"
+        OPT="${OPT/ mfasfsrcsnk/}"
+        MFA=""
+    fi
+fi
 [ -n "$targets" ] && make -C "$B" -k -j"$JOBS" $targets > "$B.build.log" 2>&1
 git -C "$R/wine" checkout -- dlls/msvcrt/main.c dlls/xinput1_3/main.c dlls/d2d1/dc_render_target.c \
     dlls/windows.gaming.input/provider.c dlls/windows.gaming.input/main.c
 for d in $undelayed; do git -C "$R/wine" checkout -- "dlls/$d/Makefile.in"; done
+[ -n "$MFA" ] && git -C "$R/wine" checkout -- dlls/mfsrcsnk/media_source.c
 [ -n "$undelayed" ] && echo "::notice::delay imports linked as plain imports:$undelayed"
 # madeira-bcd: ucrtbase-x64math.dll (see UCX above), from the restored tree:
 # msvcrt/main.c no longer carries the data-sync patch, so the DLL differs from a
@@ -454,6 +484,13 @@ PY
         echo "::notice::wintypes-optin.dll (Wine's wintypes.dll, linked as wintypes.dll only with env.MADEIRA_WINTYPES = 1): built; no wintypes.dll is shipped"
     else
         echo "::warning::wintypes-optin.dll did not build; env.MADEIRA_WINTYPES = 1 does nothing"
+    fi
+fi
+if [ -n "$MFA" ]; then
+    f="$B/dlls/mfasfsrcsnk/arm64ec-windows/mfasfsrcsnk.dll"
+    if [ -f "$f" ] && ! python3 "$R/tools/patch-wine-mfasfsrcsnk-winedmo.py" --verify "$f"; then
+        echo "::warning::mfasfsrcsnk.dll failed its check (no winedmo patch); not shipped"
+        rm -f "$f"
     fi
 fi
 for d in $OPT; do

@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "user-va-cap-reserve-256gb"
+ ],
+ "next": [
+  "env.MADEIRA_USER_VA_GB = 32"
+ ],
+ "note": "Round 591 (ajan10/motor): FFT asks for a 256 GiB NOACCESS reserve and quits; env.MADEIRA_USER_VA_GB = 32 is an attempt (not proven).",
+ "outcome": "exited-early",
+ "stage": 2,
+ "status": "trying"
+}

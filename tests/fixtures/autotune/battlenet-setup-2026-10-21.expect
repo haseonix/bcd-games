@@ -1,0 +1,17 @@
+{
+ "dialogs": [],
+ "end": {
+  "presents": 0,
+  "seconds": 56
+ },
+ "matched": [
+  "gdi-table-32bit-child"
+ ],
+ "next": [
+  "env.MADEIRA_GDI_SHARED_SECTION = 1"
+ ],
+ "note": "Battle.net-Setup.exe (32-bit) started from the library's Desktop, build 579, iPhone 17 Pro Max (owner): it died three times in gdi32 (c0000005 reading 0x23f519ee: handle 0x114's Type in the GDI table, whose host address 0x7023f50000 the 32-bit gdi32 truncated), with no window. SYNTHETIC: the session as it was, plus build 580's [gdi-shared] line (build/ntdll-unix/virtual_ios.c) where the session was armed; end facts as a game's session that ended after 56 s without a frame. With env.MADEIRA_GDI_SHARED_SECTION = 1 in the Desktop's Game config the setup window opened (owner's next session, 21:01:40). Build 580 gives the Desktop the section by default; this rule is for games whose 64-bit session starts a 32-bit program.",
+ "outcome": "exited-early",
+ "stage": 3,
+ "status": "trying"
+}

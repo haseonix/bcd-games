@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "GTA: Vice City (Steam 12110, Dock) build 580: the SteamStub game starts steam.exe -applaunch, Valve's bootstrapper updates itself in the Dock install and the host answers 47; the children that died with c0000005 are the bootstrapper's, not the game's, so dock-game-died-session-open and lock-orphan-stamped must not match (V85VDT's header said known)",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "stuck"
+}

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright 2026 Jfishin, 125hz
 // Madeira Converter Exception: see LICENSE-EXCEPTION.md
+// Modified by BCD (thebcd69), 2026-10-22: Steam DLC support (BCDSteamDLC/): `dlcList`, the app's `extended.listofdlc`.
 //
 // Derived from Jfishin's Madeira Steam client, used in Madeira with the
 // author's permission (see docs/STEAM_SIGNIN.md, "Provenance"). Adapted for
@@ -28,6 +29,10 @@ struct SteamAppInfo {
     var libraryHero: String?
     var headerImage: String?
     var parentID: UInt32?
+    /// The DLC apps the app lists (`extended.listofdlc`, comma-separated App IDs). A DLC's depots are the
+    /// base app's depots that name it in `dlcappid`; BCD's DLC support (BCDSteamDLC/) intersects both with
+    /// the account's licenses. Empty for an app with no DLC.
+    var dlcList: [UInt32] = []
     /// Steam's launch configuration (`config.launch`), in Steam's order.
     /// SteamDirectStart and Madeira Dock select an installed Windows entry;
     /// Dock passes its original key to Valve's client.
@@ -263,6 +268,17 @@ struct SteamAppInfo {
             info.headerImage = asset(common["header_image"])
             if let parent = (common["parent"] as? String).flatMap(UInt32.init), parent != 0, parent != info.appID {
                 info.parentID = parent
+            }
+        }
+
+        // Extended section: the DLC the app lists (untrusted text: bounded).
+        if let extended = appInfo["extended"] as? [String: Any], let list = extended["listofdlc"] as? String,
+           list.utf8.count <= 65_536 {
+            var seen = Set<UInt32>()
+            for part in list.split(separator: ",").prefix(4096) {
+                if let id = UInt32(part.trimmingCharacters(in: .whitespaces)), id != 0, id != appID, seen.insert(id).inserted {
+                    info.dlcList.append(id)
+                }
             }
         }
 

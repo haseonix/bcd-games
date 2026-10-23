@@ -199,6 +199,10 @@ require(sources['SteamInstall.swift'].count(f'"{relative_root}/steamapps"') == 1
 downloader = sources['SwiftSteam/Content/DepotDownloader.swift']
 require('SteamLog.event("[steam-depot] install begin' in downloader and 'depot-key refused' in downloader, 'the download logs App IDs and depot IDs')
 require(not re.search(r'LibraryFlags|MADEIRA_STEAM_[A-Z_]+', downloader), 'the downloader has no switches of its own')
+require('ChunkDigestCheck.shared.enforce = SteamSignIn.flag("MADEIRA_STEAM_CHUNK_SHA1", default: false)' in sources['SteamOwnedLibrary.swift'],
+        "the chunk SHA-1 refusal is the library's switch, off by default (a mismatch is only logged)")
+require('downloader.directoryFallback = SteamSignIn.flag("MADEIRA_STEAM_CDN_FALLBACK", default: true)' in sources['SteamOwnedLibrary.swift'],
+        "the content-host fallback is the library's switch, on by default (it only acts when no Valve HTTPS server is usable)")
 dock = (app / 'MadeiraDock.swift').read_text()
 require('static func validate(_ game: DockGame' in dock and 'game.installed' in dock, "Dock's validation reads the install record (StateFlags)")
 
@@ -733,6 +737,13 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
     require(playtime[4242]?.played == "1.5 hrs played" && playtime[5002]?.played == "30 min played" && SteamPlaytime(minutes: 1200, lastPlayed: 0).played == "20 hrs played",
             "playtime text")
     require(playtime[5001]?.played == nil && playtime[5001]?.lastPlayedText() != nil, "a game only last played has no playtime text")
+    // "Last played" comes from numbers (no ICU date formatter): a day word for today and yesterday, the date with its year before.
+    let nowDate = Date(timeIntervalSince1970: 1_700_000_000)
+    require(SteamPlaytime(minutes: 0, lastPlayed: 1_700_000_000).lastPlayedText(now: nowDate) == "Last played Today", "last played today")
+    require(SteamPlaytime(minutes: 0, lastPlayed: 1_700_000_000 - 86_400).lastPlayedText(now: nowDate) == "Last played Yesterday", "last played yesterday")
+    require(playtime[5001]?.lastPlayedText(now: nowDate)?.hasPrefix("Last played ") == true && playtime[5001]?.lastPlayedText(now: nowDate)?.hasSuffix(" Sep 2020") == true,
+            "last played a long time ago names the date")
+    require(SteamPlaytime(minutes: 5, lastPlayed: 0).lastPlayedText() == nil, "never played has no last-played text")
     do { _ = try SteamPlaytime.parse(Data([0x12, 0x7f, 0x01])); require(false, "a truncated playtime record is rejected") }
     catch { require(error is SteamError, "a truncated playtime record is rejected") }
 
@@ -878,6 +889,40 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
             DepotDownloader.serverEligibility(["allowed_app_ids": [5]], appID: 1) == .other &&
             DepotDownloader.serverEligibility(["allowed_app_ids": [1], "https_support": "mandatory"], appID: 1) == .usable &&
             DepotDownloader.serverEligibility([:], appID: 1) == .usable, "content server eligibility")
+    require(ChunkDigestCheck.sha1(Data("abc".utf8)) == hexData("a9993e364706816aba3e25717850c26c9cd0d89d"),
+            "a chunk digest is its content's SHA-1")
+    do {
+        let check = ChunkDigestCheck(), named = ChunkDigestCheck.sha1(Data("abc".utf8))
+        check.begin()
+        require(check.accept(Data("abc".utf8), sha: named, depot: 1, host: "h") && check.accept(Data("abd".utf8), sha: named, depot: 1, host: "h"),
+                "by default a chunk whose SHA-1 differs from the manifest's is still written (only logged), as downloads always did")
+        check.enforce = true
+        require(!check.accept(Data("abd".utf8), sha: named, depot: 1, host: "h") && check.accept(Data("abc".utf8), sha: named, depot: 1, host: "h"),
+                "with the switch on, a chunk whose SHA-1 differs is refused and a matching one written")
+        require(check.accept(Data("abd".utf8), sha: Data(), depot: 1, host: "h"), "a manifest entry without a digest is not judged")
+        require(check.summary() == "chunk-sha checked=4 mismatched=2 enforced", "the install's last line counts the checks")
+    }
+    do {
+        let plain: Set<String> = ["xz.pphimalayanrt.com", "dl.steam.clngaa.com", "st.dl.eccdnx.com"]
+        let usual: [[String: Any]] = [["host": "cache1-fra1.steamcontent.com", "https_support": "mandatory"],
+                                      ["host": "edgenext.cdn.steampipe.steamcontent.com", "https_support": "unavailable"],
+                                      ["host": "lancache.steamcontent.com"]]
+        let a = DepotDownloader.selectContentHosts(usual, appID: 1, plainHTTP: plain.union(["edgenext.cdn.steampipe.steamcontent.com"]), fallback: true)
+        require(a.hosts == ["https://cache1-fra1.steamcontent.com"] && a.line == "[steam-cdn] offered=3 usable=1 skipped-no-https=1 skipped-other=1",
+                "with a Valve HTTPS server the content hosts and their line are what they were (no fallback)")
+        let region: [[String: Any]] = [["host": "xz.pphimalayanrt.com", "https_support": "unavailable"],
+                                       ["host": "secure.example-cdn.cn", "https_support": "optional"],
+                                       ["host": "new.example-cdn.cn", "https_support": "unavailable"]]
+        let b = DepotDownloader.selectContentHosts(region, appID: 1, plainHTTP: plain, fallback: true)
+        require(b.hosts == ["https://secure.example-cdn.cn", "http://xz.pphimalayanrt.com"],
+                "no Valve HTTPS server: the directory's HTTPS hosts first, then only the plain-HTTP hosts Info.plist allows")
+        require(DepotDownloader.selectContentHosts(region, appID: 1, plainHTTP: plain, fallback: false).hosts.isEmpty,
+                "with the fallback switch off nothing but the last-resort host is used, as before")
+        let check = ChunkDigestCheck(), named = ChunkDigestCheck.sha1(Data("abc".utf8))
+        check.begin()
+        require(!check.accept(Data("abd".utf8), sha: named, depot: 1, host: "http://xz.pphimalayanrt.com"),
+                "a plain-HTTP chunk whose SHA-1 differs is always refused")
+    }
     let health = ContentHostHealth()
     for _ in 0..<3 { health.recordFailure("https://bad", reason: "x") }
     require(health.order(["https://bad", "https://good"], seed: 0).first == "https://good", "a server that keeps failing moves to the back of the rotation")
@@ -999,6 +1044,9 @@ func packageBuffer(apps: [UInt32], depots: [UInt32]) -> Data {
 owned_source = sources['SteamOwnedLibrary.swift']
 owned_game = owned_source[owned_source.index('struct SteamOwnedGame:'):owned_source.index('// MARK: - Playtime')]
 playtime_source = owned_source[owned_source.index('// MARK: - Playtime'):owned_source.index('// MARK: - Model')]
+# "Last played" and the cloud-backup folder name use BCD's date helpers (BCDStore.swift, Foundation only; no ICU date formatter).
+store_source = (app / 'BCDStore.swift').read_text()
+dates_source = ('import Foundation\n\nenum BCDFormat {\n' + store_source[store_source.index('    // dates-begin'):store_source.index('    // dates-end')] + '}\n')
 reason = block(owned_source, 'static func reason(_ error: Error) -> String')
 dock_head = dock[dock.index('enum DockPerformancePolicy {'):dock.index('enum MadeiraDock {')]
 dock_body = (dock[dock.index('enum MadeiraDock {'):dock.index('    @MainActor private static var lastReport =')] +
@@ -1047,18 +1095,20 @@ try:
         'final class NWPathMonitor { struct Path { enum Status { case satisfied, unsatisfied, requiresConnection }; '
         'var status = Status.satisfied }; var currentPath = Path(); func start(queue: DispatchQueue) {} }\n#endif\n') + dock_head + dock_body)
     (work / 'owned.swift').write_text('import Foundation\n' + owned_game + playtime_source)
+    (work / 'dates.swift').write_text(dates_source)
     (work / 'downloader.swift').write_text(downloader_host)
     production = [steam / 'Proto/SteamProtoMessages.swift', steam / 'Core/SteamError.swift', steam / 'Core/SteamProtocol.swift',
                   steam / 'Core/SteamMessageCodec.swift', steam / 'Core/SteamCMSession.swift',
                   steam / 'Content/ContentDecryptor.swift', steam / 'Content/DepotManifest.swift',
                   steam / 'Library/SteamAppInfo.swift', steam / 'Library/SteamLibraryFetcher.swift',
-                  steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift']
+                  steam / 'Install/AppManifestWriter.swift', app / 'SteamInstall.swift', app / 'SteamKeyValues.swift',
+                  app / 'BCDSteamDLC/BCDSteamDLC.swift', app / 'BCDSteamDLC/BCDSteamDLCDownload.swift']   # the downloader's DLC steps (Foundation only)
     exe = work / 'check'
     build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-g', '-o', str(exe),
                             '-I', str(shim / 'CommonCrypto'), '-I', str(shim / 'Compression'), '-I', str(shim / 'zlib'),
                             '-import-objc-header', str(work / 'decoders.h'),
                             str(work / 'stubs.swift'), str(work / 'checks.swift'), str(work / 'dock.swift'), str(work / 'owned.swift'),
-                            str(work / 'downloader.swift')] + [str(x) for x in production] + objects +
+                            str(work / 'dates.swift'), str(work / 'downloader.swift')] + [str(x) for x in production] + objects +
                            ['-Xlinker', '-lcrypto', '-Xlinker', '-llzma', '-Xlinker', '-lz'], capture_output=True, text=True)
     require(build.returncode == 0, 'the production Steam library, download and decoder code compile on the host')
     if build.returncode:

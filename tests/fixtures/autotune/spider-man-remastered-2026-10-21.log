@@ -1,0 +1,240 @@
+[14:28:23.059] [INFO] Checking entitlements...
+[14:28:23.059] [INFO] [build] v0.1.579 (579)
+[14:28:23.062] [INFO] [device] model=iPhone19,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11514MB available=8168MB cores=6
+[14:28:23.062] [INFO] [device] address-map=[0x104e94000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[14:28:23.079] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[14:28:27.292] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:28:27.293] [INFO] Requesting JIT with Built-in StikJIT...
+[14:28:37.902] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:28:40.976] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:28:44.187] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:28:56.643] [INFO] [bcd] library launch Marvel's Spider-Man Remastered: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[14:28:56.655] [INFO] [dock-launch] image-retire=1
+[14:28:56.656] [INFO] [dock-launch] image-map-guard=1
+[14:28:56.663] [INFO] [dock-installers] app=1817070 scripts=0 programs=0
+[14:28:56.675] [INFO] Running full Wine sequence...
+[14:28:56.675] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104e94000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[14:28:56.678] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[14:28:56.679] [INFO] Allocating 896MB JIT pool via debugger...
+[14:28:56.679] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[14:28:56.679] [INFO] [jit-debugger] attached=1 at the pool request
+[14:28:56.680] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[14:28:57.191] [INFO] RX pool at 0x148000000
+[14:28:57.205] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.583s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7592 MB + phys_footprint=599 MB = 8192 MB (hw.memsize says 11514 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[gdi-shared] session table 0x7022f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=611 MB (peak 611) internal=609 MB compressed=0 MB external=73 MB reusable=11 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  0.885s rev=ml526
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x120330000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x120330000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x120330000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x120338000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x120338000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x12033c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  0.929s rev=ml526
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 120330000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7027650000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[free-delay] #2 release of 0x7031c00000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7032400000+0xfd0000 held for 2000 ms (3 in flight)
+[footprint] rev=ml358 phys=973 MB (peak 973) internal=971 MB compressed=0 MB external=147 MB reusable=11 MB (cycle=2)
+[footprint] rev=ml358 phys=1014 MB (peak 1014) internal=1012 MB compressed=0 MB external=147 MB reusable=11 MB (cycle=3)
+[footprint] rev=ml358 phys=1018 MB (peak 1018) internal=1017 MB compressed=0 MB external=147 MB reusable=11 MB (cycle=4)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\Spider-Man.exe" t+  8.922s rev=ml526
+[footprint] rev=ml358 phys=1125 MB (peak 1125) internal=1124 MB compressed=0 MB external=147 MB reusable=11 MB (cycle=5)
+[free-delay] #4 release of 0x7032400000+0x100000 held for 2000 ms (1 in flight)
+[copy-verify] cfgmgr32.dll: OK, 4 .text pages executable (copy @0x150698000)
+[alloc-fail] ml814 #2 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00a4 | STAGE=fixed-map err=3 at 0x73fff60000+0x90000
+[steer] #2 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c48810000
+[free-delay] #5 release of 0x7036ba0000+0x400000 held for 2000 ms (2 in flight)
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71f5672000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71f5673000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71f5674000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71f5675000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71f5676000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71f5677000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71f5678000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x71f5679000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f567a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f567b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f567c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f567d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f567e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f567f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f597e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f597f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f5984000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f5985000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f5986000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f5987000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f5988000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f5989000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f598a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f598b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f598c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f598d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f598e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f598f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f7199000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f719a000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f719b000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f719c000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f719d000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f719e000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f719f000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f78c7000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f78c8000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f78c9000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f78ca000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f78cb000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f78cc000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f78cd000 size=0x1000 type=0x3000 protect=0x40 tid=00a4 | STAGE=none err=3 at 0x73ffe40000+0x1ac000
+[steer] #3 size=0x153ff000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c4cc10000
+[steer] #4 size=0x3c0e000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c62010000
+[steer] #5 size=0x4633000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c65c20000
+[steer] #6 size=0x25c9000 reserved_total=339MB armed=va-pressure -> above ceiling 0x7c6a260000
+[steer] #7 size=0x33c00000 reserved_total=1167MB armed=va-pressure -> above ceiling 0x7c6c830000
+[steer] #8 size=0x2a800000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7ca1810000
+[steer] #9 size=0x2010000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7ccc010000
+[steer] #10 size=0x2010000 reserved_total=1847MB armed=va-pressure -> above ceiling 0x7ccec00000
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-handler.exe" t+ 10.534s rev=ml526
+[copy-verify] jsproxy.dll: OK, 1 .text pages executable (copy @0x1529a0000)
+[win-name] #31 hwnd=0x10060 class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe" t+ 10.859s rev=ml526
+[footprint] rev=ml358 phys=1744 MB (peak 1744) internal=1742 MB compressed=0 MB external=257 MB reusable=11 MB (cycle=6)
+[copy-verify] crypt32.dll: OK, 24 .text pages executable (copy @0x1560b8000)
+00f4:err:module:import_dll Library EVR.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe") not found
+00f4:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\crs-video.exe" failed, status c0000135
+00f4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=12535
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=685
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+00a4:err:module:load_dll [dll-missing] rev=ml336 #3 L"drvstore.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00a4:err:module:load_dll [dll-missing] rev=ml336 #4 L"devobj.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[14:29:08.176] [INFO] [dock-game-end] crs-video.exe ended with status 0xc0000135; the session goes on for now (game-still-runs)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.pcl.dll" 0x71ecfa0000+0x29000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\sl.reflex.dll" 0x71e8520000+0x2b000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\D3DCompiler_47.dll" 0x71e8140000+0x404000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[madeira-d3d12] command queue: type 0
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\amd_fidelityfx_dx12.dll" 0x71e7ae0000+0x660000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\libxess.dll" 0x71e3a80000+0x46b6000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[madeira-d3d12] command queue: type 0
+[madeira-d3d12] command queue: type 0
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Marvel's Spider-Man Remastered\\amd_fidelityfx_dx12.dll" 0x71e3420000+0x660000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D A4 Load module amd_fidelityfx_dx12.dll (amd_fidelityfx_dx12.dll-9cbb15541d94e19a): 71E3420000
+[win-name] #35 hwnd=0x1006a class='' text="Default IME" rev=ml853
+[win-name] #42 hwnd=0x1006e class='' text="&Yes" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[footprint] rev=ml1060 fast phys=1963 MB compressed=0 MB
+[copy-verify] windows.gaming.input.dll: OK, 7 .text pages executable (copy @0x1581b4000)
+D A4 Load module windows.gaming.input.dll (windows.gaming.input.dll-3f9af7d1c9166dc1): 71E3380000
+D A4 Load module dinput8.dll (dinput8.dll-fa63f814948e9838): 71E32D0000
+D A4 Load module comctl32.dll (comctl32.dll-8c564d137baf4ee2): 71E3150000
+D A4 Load module xinput9_1_0.dll (xinput9_1_0.dll-356a14f2ff866963): 71E30C0000
+D A4 Load module xinput1_4.dll (xinput1_4.dll-a6149d3778e411c5): 71E2E70000
+[footprint] rev=ml1060 fast phys=2100 MB compressed=0 MB
+[guest-log] #61 tid=00a4 21:29:18:912 (00000164) > [Validate Settings] Attempting to find a display mode with a different refresh rate or not exclusive...
+[guest-log] #62 tid=00a4 21:29:18:912 (00000164) > [Validate Settings] Attempting to find a display mode with a different resolution...
+[guest-log] #63 tid=00a4 21:29:18:912 (00000164) > [Validate Settings] Could not find any display mode...
+[guest-log] #64 tid=00a4 21:29:18:912 (00000164) > [Validate Settings] The requested display mode (ResX:1424 ResY:656 Hz:60 3D:0 Exclusive: false, HDR: false) was not available, finding the best alternative...
+[free-delay] #6 release of 0x70236a0000+0x800000 held for 2000 ms (1 in flight)
+[footprint] rev=ml1060 fast phys=2119 MB compressed=0 MB
+[14:29:27.371] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=72 resident=2431MB dbg=DEBUGGED rev=ml525
+[win-name] #980 hwnd=0x20074 class='' text="Marvel's Spider-Man - Setup" rev=ml853
+[win-name] #981 hwnd=0x20074 class='' text="Marvel's Spider-Man - Setup" rev=ml853
+[win-name] #982 hwnd=0x20074 class='' text="Marvel's Spider-Man - Setup" rev=ml853
+[win-name] #983 hwnd=0x20074 class='' text="Marvel's Spider-Man - Setup" rev=ml853
+[win-name] #984 hwnd=0x20064 class='' text="Marvel's Spider-Man Remastered" rev=ml853
+[footprint] rev=ml1060 fast phys=2148 MB compressed=0 MB
+[win-name] #986 hwnd=0x30072 class='' text="Default IME" rev=ml853
+[swap-diag] #1 layer 0x1261da4c0: drawable 0x0 format 80 -> 1424x656 format 70, set on the iOS main thread (dispatch_sync) ...
+MTLTextureDescriptor has width of zero.
+015c:err:seh:NtRaiseException Unhandled exception code 80000101 flags 1 addr 0x24158afd8
+015c:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x6d6ff4a8) syscalls=0 unix_calls=14135
+[Wine ntdll/server] process_exit_wrapper(1836053672): closing child fd_socket=433
+[Wine ntdll/server] process_exit_wrapper(1836053672)
+00ec:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: "............................................."
+[free-delay] #7 release of 0x70279a0000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #8 release of 0x70292d0000+0x800000 held for 2000 ms (2 in flight)
+00dc:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=14204
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=635
+[Wine ntdll/server] process_exit_wrapper(0)
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x14e346000 NO pool/anon alias | region 0x104e94000+0x2048000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[store-noalias] #2 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x151722000 NO pool/anon alias | region 0x104e94000+0x2048000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[14:29:45.180] [INFO] [dock-report] launch-game-ended=1
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[14:29:57.548] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=26 resident=2260MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=39)
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=40)
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=41)
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=42)
+[14:30:27.710] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=1 iter=328 gen=1 threads=27 resident=2260MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=43)
+[footprint] rev=ml358 phys=1930 MB (peak 2132) internal=1927 MB compressed=0 MB external=300 MB reusable=32 MB (cycle=44)

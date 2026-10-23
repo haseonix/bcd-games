@@ -1,0 +1,152 @@
+[20:23:26.843] [INFO] Checking entitlements...
+[20:23:26.844] [INFO] [build] v0.1.579 (579)
+[20:23:26.845] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 27.2 (Build 24B5099f) ram=7655MB available=6125MB cores=6
+[20:23:26.845] [INFO] [device] address-map=[0x100e6c000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[20:23:26.866] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[20:23:34.214] [INFO] [bcd] library launch BeamNG.drive: avx=0 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[20:23:34.214] [INFO] Requesting JIT with Built-in StikJIT...
+[20:23:36.206] [INFO] [dock-launch] image-retire=1
+[20:23:36.206] [INFO] [dock-launch] image-map-guard=1
+[20:23:36.217] [INFO] [dock-installers] app=284160 scripts=0 programs=0
+[20:23:36.228] [INFO] Running full Wine sequence...
+[20:23:36.228] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100e6c000,0x8000000000) 512GB available=6107MB low-power=0 thermal=nominal
+[20:23:36.232] [INFO] Allocating 1024MB JIT pool (BRK will suspend process)...
+[20:23:36.233] [INFO] Allocating 1024MB JIT pool via debugger...
+[20:23:36.233] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[20:23:36.233] [INFO] [jit-debugger] attached=1 at the pool request
+[20:23:36.236] [ERR] ml1036: no hole fits a 1024MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[20:23:37.136] [INFO] RX pool at 0x11cc1c000
+[20:23:37.155] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.981s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=5534 MB + phys_footprint=609 MB = 6144 MB (hw.memsize says 7655 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x11cc20000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11cc94000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11cdac000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11ce54000)
+[footprint] rev=ml358 phys=613 MB (peak 613) internal=612 MB compressed=0 MB external=82 MB reusable=12 MB (cycle=1)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x11cfd4000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x11d0a8000)
+[gdi-shared] session table 0x70a3f60000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  2.039s rev=ml526
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x11e62a000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x11ea44000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.140s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x11fa8c000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 117820000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x70a8670000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70a8770000+0x200000 held for 2000 ms (2 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x7023000000+0xc000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x123aa9000)
+[swap] ml1077 backed 0x70ad6f0000+0x1010000 (file off 0 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x70ae700000+0x1010000 (file off 16 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=877 MB (peak 877) internal=876 MB compressed=0 MB external=155 MB reusable=12 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 32 of 2048 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 2048 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 2 guarded, 0 MB lost to a full free list
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1051 MB (peak 1051) internal=1049 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=3)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=1100 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=4)
+[footprint] rev=ml358 phys=1101 MB (peak 1101) internal=1100 MB compressed=0 MB external=163 MB reusable=12 MB (cycle=5)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\BeamNG.drive.exe" t+ 11.284s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[free-delay] #3 release of 0x7901c20000+0x200000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x79022d0000+0x100000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x79023d0000+0x100000 held for 2000 ms (3 in flight)
+[free-delay] #6 release of 0x7902d90000+0x120000 held for 2000 ms (4 in flight)
+[free-delay] #7 release of 0x7902eb0000+0x120000 held for 2000 ms (5 in flight)
+[free-delay] #8 release of 0x7902fd0000+0x100000 held for 2000 ms (6 in flight)
+[footprint] rev=ml358 phys=1185 MB (peak 1185) internal=1138 MB compressed=44 MB external=168 MB reusable=7 MB (cycle=6)
+00ac:err:process:IsWow64Process2 [x64-machine] IsWow64Process2(process=FFFFFFFF) machine=014c: native ARM64 reported as AMD64 (env.MADEIRA_X64_MACHINE = 1)
+[swap] ml1077 backed 0x70b7f10000+0xf10000 (file off 16 MB): 15 MB in 1 extents, peak 32 MB, 0 refused
+00ac:err:module:load_dll [dll-missing] rev=ml336 #4 L"C:\\windows\\system32\\nvapi.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #33 hwnd=0x10066 class='' text="Default IME" rev=ml853
+[win-name] #34 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #35 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[win-name] #66 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #67 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #68 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #69 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #70 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[win-name] #71 hwnd=0x10060 class='' text="BeamNG v0.40.1.0 Launcher" rev=ml853
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" t+ 18.558s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x4cd5000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[copy-verify] msvcrt.dll: OK, 29 .text pages executable (copy @0x12c88c000)
+ml985: map_image_view size=0x1092c000 base=0x6fffe52f0000 info_base=0x180000000 map_addr=0x6fffe52f0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[jit-pool] EXHAUSTED (image 0x71e0330000+0x1092c000): want=0x10930000 bump=0x133f4000/0x23000000 tail_resv=0x300c000 freelist=0 — FAILING the load (was: silent BUS loop)
+[jit-pool] EXHAUSTED (image 0x71e0330000+0x1092c000): want=0x10930000 bump=0x133f4000/0x23000000 tail_resv=0x300c000 freelist=0 — FAILING the load (was: silent BUS loop)
+00c0:err:module:load_dll [dll-missing] rev=ml336 #1 L"libcef.dll" status=c0000017 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+ml985: map_image_view size=0x4a3b000 base=0x6ffff11c0000 info_base=0x180000000 map_addr=0x6ffff11c0000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[copy-verify] openxr_loader.dll: OK, 99 .text pages executable (copy @0x1357c2000)
+D C0 Load module d3d9.dll (d3d9.dll-23c2a01a8eade245): 71E9CB0000
+D C0 Load module wined3d.dll (wined3d.dll-e53ebe6d434bb891): 71E9940000
+[va-scan] FAILED window=0x10000..0xffff0001 size=0x160000 align=0x10000 top-down tries=65513 skips=0 | seen=0x10000..0xffff0001 views=0 maxgap=0x160001 tailgap=0x160001 stop=no-views-in-range | firstfail=0xffe90000 errno=12(Cannot allocate memory)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x10000..0xffff0001 for 0x160000 (align 0x10000): the free-range table holds 1 range(s) that fit (first 0x10000), largest free 0xfffe0001 over 1 range(s); reserved area at the start: NO [0x0+0x0 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+D C0 Load module opengl32.dll (opengl32.dll-9fddefc254677b75): 71E97E0000
+D C0 Load module d3d11.dll (d3d11.dll-8ad678a9894b5214): 71E9360000
+D C0 Load module D3DCOMPILER_47.dll (d3dcompiler_47.dll-e081d8ea7b71d6ab): 71E8F30000
+D C0 Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71E8E90000
+00c0:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\BeamNG.drive\\Bin64\\BeamNG.drive.x64.exe" failed, status c0000135
+00c0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=9012
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=542
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000135) syscalls=0 unix_calls=9016
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=9016
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=463
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[20:23:56.230] [INFO] [dock-game-end] beamng.drive.exe ended with status 0xc0000135; the session goes on for now (grace)
+[footprint] rev=ml1060 fast phys=1714 MB compressed=108 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[20:24:02.731] [INFO] [dock-report] launch-game-ended=1
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=103
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=134
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[20:24:06.236] [INFO] [dock-game-end] beamng.drive.exe ended with status 0xc0000135 after 8 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[20:24:06.741] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=24 resident=1646MB dbg=DEBUGGED rev=ml525
+[20:24:08.264] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1544 MB (peak 1714) internal=1436 MB compressed=106 MB external=210 MB reusable=0 MB (cycle=16)
+[footprint] rev=ml358 phys=1545 MB (peak 1714) internal=1437 MB compressed=106 MB external=210 MB reusable=0 MB (cycle=17)
+[footprint] rev=ml358 phys=1544 MB (peak 1714) internal=1437 MB compressed=105 MB external=210 MB reusable=0 MB (cycle=18)
+[footprint] rev=ml358 phys=1544 MB (peak 1714) internal=1437 MB compressed=105 MB external=210 MB reusable=0 MB (cycle=19)
+[footprint] rev=ml358 phys=1545 MB (peak 1714) internal=1437 MB compressed=105 MB external=211 MB reusable=0 MB (cycle=20)
+[footprint] rev=ml358 phys=1546 MB (peak 1714) internal=1437 MB compressed=105 MB external=211 MB reusable=0 MB (cycle=21)

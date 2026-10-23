@@ -992,9 +992,13 @@ with tempfile.TemporaryDirectory(prefix='madeira-dock-installers-') as tmp:
             print('SKIP: Swift compiler unavailable; the compiled installer checks did not run')
         build = None
     else:
+        # DockReset's backup folder name comes from BCD's date helpers (BCDStore.swift, Foundation only; no ICU date formatter).
+        store_source = (app / 'BCDStore.swift').read_text(encoding='utf-8')
+        (tmp / 'dates.swift').write_text('import Foundation\n\nenum BCDFormat {\n' + store_source[
+            store_source.index('    // dates-begin'):store_source.index('    // dates-end')] + '}\n', encoding='utf-8')
         build = subprocess.run([SWIFTC, '-parse-as-library', '-swift-version', '5', '-sanitize=address', '-o', str(exe),
                                 str(tmp / 'stubs.swift'), str(tmp / 'checks.swift'), str(app / 'DockInstallers.swift'),
-                                str(app / 'DockReset.swift')])
+                                str(app / 'DockReset.swift'), str(tmp / 'dates.swift')])
         require(build.returncode == 0, 'production installer Swift compiles on the host')
     if build is not None and build.returncode == 0:
         run = subprocess.run([str(exe), str(tmp / 'fixture.cmd')], env=dict(os.environ, ASAN_OPTIONS='detect_leaks=0'))

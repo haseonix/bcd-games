@@ -1,0 +1,13 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "create-view-assert",
+  "program-exit-off-boot-thread"
+ ],
+ "next": [],
+ "note": "Round 591 (ajan10/motor): create_view's assert ended Fallout 4 (C5Y6PW); fixed in code (build 591), no line. THE FIXTURE LACKS ONE LINE OF THE LOG: '[WineProc] Wine exited with code 0 (caught by longjmp)' (L1404), the exit of the .bat's cmd.exe, which the scanner takes for the game's clean exit (cleanMainExit) and so counts none of the crash evidence after it (outcome 'ran'); the next line says the game still runs. With the line the session is scored 'ran' and no rule can match: see the round 591 report.",
+ "outcome": "crashed",
+ "stage": 4,
+ "status": "known"
+}

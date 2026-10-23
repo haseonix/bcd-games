@@ -1,0 +1,125 @@
+[09:08:07.015] [INFO] Checking entitlements...
+[09:08:07.016] [INFO] [build] v0.1.580 (580)
+[09:08:07.016] [INFO] [device] model=iPhone18,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11695MB available=6637MB cores=6
+[09:08:07.016] [INFO] [device] address-map=[0x104fd4000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[09:08:07.032] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[09:08:30.056] [INFO] [bcd] library launch Albino Lullaby: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off
+[09:08:30.057] [INFO] Requesting JIT with Built-in StikJIT...
+[09:08:31.539] [INFO] [dock-launch] image-retire=1
+[09:08:31.539] [INFO] [dock-launch] image-map-guard=1
+[09:08:31.543] [INFO] [dock-installers] app=355860 scripts=0 programs=0
+[09:08:31.551] [INFO] Running full Wine sequence...
+[09:08:31.551] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104fd4000,0x8000000000) 512GB available=8155MB low-power=0 thermal=fair
+[09:08:31.553] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[09:08:31.553] [INFO] Allocating 896MB JIT pool via debugger...
+[09:08:31.553] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[09:08:31.554] [INFO] [jit-debugger] attached=1 at the pool request
+[09:08:31.555] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 544MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[09:08:32.218] [INFO] RX pool at 0x148000000
+[09:08:32.234] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.718s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[swap] ml1077 backed 0x71ffe00000+0x200000 (whole reservation, ml1257) (file off 0 MB): 2 MB in 1 extents, peak 2 MB, 0 refused
+ml992: os_proc_available_memory=7600 MB + phys_footprint=591 MB = 8192 MB (hw.memsize says 11695 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[swap] ml1077 backed 0x7022970000+0x100000 (whole reservation, ml1257) (file off 2 MB): 3 MB in 2 extents, peak 3 MB, 0 refused
+[gdi-shared] session table 0x7022f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=603 MB (peak 603) internal=602 MB compressed=0 MB external=75 MB reusable=10 MB (cycle=1)
+[swap] ml1077 backed 0x70230d0000+0x100000 (whole reservation, ml1257) (file off 3 MB): 4 MB in 3 extents, peak 4 MB, 0 refused
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[swap] ml1077 backed 0x7023220000+0x870000 (whole reservation, ml1257) (file off 4 MB): 12 MB in 4 extents, peak 12 MB, 0 refused
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #8 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.098s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x149837000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149aa0000)
+[swap] ml1077 backed 0x7026430000+0x100000 (whole reservation, ml1257) (file off 12 MB): 13 MB in 5 extents, peak 13 MB, 0 refused
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.152s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[swap] ml1077 backed 0x70270d0000+0x24c000 (whole reservation, ml1257) (file off 13 MB): 15 MB in 6 extents, peak 15 MB, 0 refused
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 122730000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7027a40000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[steer] #1 size=0x2000000 reserved_total=0MB armed=va-pressure -> above ceiling 0x7c05400000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[swap] ml1077 backed 0x70295a0000+0x120000 (whole reservation, ml1257) (file off 20 MB): 21 MB in 11 extents, peak 21 MB, 0 refused
+[swap] ml1077 backed 0x702a6c0000+0x1010000 (whole reservation, ml1257) (file off 21 MB): 37 MB in 12 extents, peak 37 MB, 0 refused
+[swap] ml1077 backed 0x702b6d0000+0x1010000 (whole reservation, ml1257) (file off 37 MB): 53 MB in 13 extents, peak 53 MB, 0 refused
+[swap] ml1077 backed 0x702c6e0000+0x400000 (whole reservation, ml1257) (file off 53 MB): 57 MB in 14 extents, peak 57 MB, 0 refused
+[free-delay] #2 release of 0x702c6e0000+0x400000 held for 2000 ms (2 in flight)
+[swap] ml1077 backed 0x702cae0000+0x800000 (whole reservation, ml1257) (file off 57 MB): 65 MB in 15 extents, peak 65 MB, 0 refused
+[free-delay] #3 release of 0x702cae0000+0x800000 held for 2000 ms (3 in flight)
+[swap] ml1077 backed 0x702d2e0000+0xfd0000 (whole reservation, ml1257) (file off 65 MB): 81 MB in 16 extents, peak 81 MB, 0 refused
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1022 MB (peak 1022) internal=1021 MB compressed=0 MB external=162 MB reusable=10 MB (cycle=2)
+[swap] ml1077 stats: 50 MB file-backed now (peak 81), 15 extents, file used 81 of 131072 MB, backs 17 releases 2 unbacks 0 refused 0 | coverage broad: disk 19 MB of 6144 cap, reservations 17, holes 34, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[footprint] rev=ml358 phys=1046 MB (peak 1046) internal=1045 MB compressed=0 MB external=163 MB reusable=10 MB (cycle=3)
+[footprint] rev=ml358 phys=1055 MB (peak 1055) internal=1054 MB compressed=0 MB external=163 MB reusable=10 MB (cycle=4)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Albino Lullaby\\AlbinoLullaby.exe" t+  8.717s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7900000000..0x7a00000000 (slot 0) guard=owned
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Albino Lullaby\\AlbinoLullaby\\Binaries\\Win32\\AlbinoLullaby-Win32-Shipping.exe" t+  8.894s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] reserved B=0x7200000000..0x7300000000 (slot 1) guard=borrowed
+[footprint] rev=ml358 phys=1216 MB (peak 1216) internal=1215 MB compressed=0 MB external=175 MB reusable=10 MB (cycle=5)
+[09:08:41.551] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml358 phys=1336 MB (peak 1336) internal=1334 MB compressed=0 MB external=177 MB reusable=10 MB (cycle=6)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x727bebf000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x800000
+[free-delay] #4 release of 0x720f630000+0x400000 held for 2000 ms (1 in flight)
+[free-delay] #5 release of 0x7211020000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #6 release of 0x720bd00000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #7 release of 0x720d500000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #8 release of 0x7023a90000+0x800000 held for 2000 ms (5 in flight)
+00ac:err:module:load_dll [dll-missing] rev=ml336 #21 L"../../../Engine/Binaries/ThirdParty/PhysX/APEX-1.3/Win32/VS2015/APEX_ClothingGPUPROFILE_x86.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #22 L"PhysXUpdateLoader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D D8 Load module jsproxy.dll (jsproxy.dll-cf9d2b9ca204c96b): 7277420000
+00ac:err:module:load_dll [dll-missing] rev=ml336 #23 L"PhysXUpdateLoader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #24 L"PhysXUpdateLoader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #25 L"PhysXUpdateLoader.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #26 L"APEX_ClothingGPUPROFILE_x86.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D 10C Load module dhcpcsvc.dll (dhcpcsvc.dll-dddaa5dc76ec116a): 7277400000
+[win-name] #34 hwnd=0x30058 class='' text="SplashScreenGuard" rev=ml853
+[win-name] #35 hwnd=0x30058 class='' text="SplashScreenGuard" rev=ml853
+D 114 Load module windowscodecs.dll (windowscodecs.dll-5f4ff3b68fa7c7e3): 72772B0000
+D 114 Load module propsys.dll (propsys.dll-2e9d52b8b93f0435): 7277270000
+D AC Load module msctf.dll (msctf.dll-b027487aee813262): 7277230000
+D AC Load module explorerframe.dll (explorerframe.dll-4fe1fda10d8b9469): 7277200000
+[win-name] #40 hwnd=0x10080 class='' text="Default IME" rev=ml853
+[win-name] #41 hwnd=0x2007c class='' text="SplashScreen" rev=ml853
+[win-name] #42 hwnd=0x2007c class='' text="SplashScreen" rev=ml853
+[launch-view] dismissed reason=game-window logs=0

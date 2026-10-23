@@ -141,3 +141,106 @@ enum BCDZlib {
         return try inflate(data, limit: limit)
     }
 }
+
+// MARK: - Chunk files (Epic)
+
+/// An Epic chunk file as it arrives from the network (epic.md §2.3, "Chunk files"): a header, then
+/// the chunk's bytes, stored as they are or as one zlib stream. The header says where the body starts
+/// and how long it is; everything else it holds (the chunk's GUID, its rolling hash, its checksum, its
+/// decoded size) is read and exposed but not trusted: the plan's own checksum of the decoded bytes is
+/// the check, so a header field that means something else than assumed cannot fail a good chunk.
+///
+/// Header, little-endian: magic 0xB1FE3AA2 (u32), header version (u32), header size (u32), body size
+/// (u32), GUID (16 bytes), rolling hash (u64), stored-as (u8: bit 0 zlib, bit 1 encrypted); version 2
+/// adds a SHA-1 (20 bytes) and a hash type (u8); version 3 the decoded size (u32); version 4 a secret GUID
+/// and an authentication tag (32 bytes). Streaming, like BCDInflater: nothing is held but the header.
+final class BCDChunkFileDecoder {
+    struct Header: Equatable {
+        var version: Int
+        var headerSize: Int
+        var bodySize: Int64
+        var guid: [UInt8]
+        var rollingHash: UInt64
+        var storedAs: UInt8
+        var sha1: [UInt8]?
+        var decodedSize: Int64?
+        var compressed: Bool { storedAs & 1 != 0 }
+    }
+
+    static let magic: UInt32 = 0xB1FE_3AA2
+    /// What the header of each version holds at least.
+    private static let minimumHeader = [1: 41, 2: 62, 3: 66, 4: 98]
+    private static let maxHeader = 1024
+
+    private var head: [UInt8] = []
+    private var wanted = 12
+    private var inflater: BCDInflater?
+    private var bodySeen: Int64 = 0
+    private(set) var header: Header?
+    /// Every byte taken, header included.
+    private(set) var received: Int64 = 0
+
+    init() {}
+
+    /// Feeds bytes of the chunk file; the decoded bytes go to `emit` as they come.
+    func feed(_ input: UnsafeRawBufferPointer, emit: (UnsafeRawBufferPointer) throws -> Void) throws {
+        guard input.count > 0 else { return }
+        received += Int64(input.count)
+        var rest = input
+        while header == nil, rest.count > 0 {
+            let take = min(wanted - head.count, rest.count)
+            head.append(contentsOf: rest.prefix(take))
+            rest = UnsafeRawBufferPointer(rebasing: rest[take...])
+            if head.count == 12 && wanted == 12 {
+                guard Self.u32(head, 0) == Self.magic else { throw BCDContentError.decode }
+                let version = Int(Self.u32(head, 4)), size = Int(Self.u32(head, 8))
+                guard let least = Self.minimumHeader[version], size >= least, size <= Self.maxHeader else { throw BCDContentError.decode }
+                wanted = size
+            }
+            if head.count == wanted && wanted > 12 { try parseHeader() }
+        }
+        guard let header else { return }
+        guard rest.count > 0 else { return }
+        guard bodySeen + Int64(rest.count) <= header.bodySize else { throw BCDContentError.tooLarge }
+        bodySeen += Int64(rest.count)
+        if header.compressed {
+            try inflater!.feed(rest, emit: emit)
+        } else {
+            try emit(rest)
+        }
+    }
+
+    /// The whole file arrived: the header, and a body of exactly the size the header named.
+    func finish() throws {
+        guard let header, bodySeen == header.bodySize, header.bodySize > 0 else { throw BCDContentError.decode }
+        if header.compressed { try inflater!.finish() }
+    }
+
+    private func parseHeader() throws {
+        let version = Int(Self.u32(head, 4))
+        let stored = head[40]
+        // Encrypted chunks (preloads) need a key BCD does not have: refused, not retried.
+        guard stored & 2 == 0 else {
+            throw BCDContentError.refused("This game's files are encrypted by Epic (a pre-release download). BCD can't read them.")
+        }
+        let body = Int64(Self.u32(head, 12))
+        guard body > 0, body <= 1 << 30 else { throw BCDContentError.decode }
+        var sha: [UInt8]?
+        var decoded: Int64?
+        if version >= 2 { sha = Array(head[41..<61]) }
+        if version >= 3 { decoded = Int64(Self.u32(head, 62)) }
+        header = Header(version: version, headerSize: wanted, bodySize: body, guid: Array(head[16..<32]),
+                        rollingHash: Self.u64(head, 32), storedAs: stored, sha1: sha, decodedSize: decoded)
+        if stored & 1 != 0 { inflater = try BCDInflater() }
+        head = []
+    }
+
+    private static func u32(_ bytes: [UInt8], _ at: Int) -> UInt32 {
+        (0..<4).reduce(UInt32(0)) { $0 | UInt32(bytes[at + $1]) << (8 * UInt32($1)) }
+    }
+
+    private static func u64(_ bytes: [UInt8], _ at: Int) -> UInt64 {
+        (0..<8).reduce(UInt64(0)) { $0 | UInt64(bytes[at + $1]) << (8 * UInt64($1)) }
+    }
+}
+

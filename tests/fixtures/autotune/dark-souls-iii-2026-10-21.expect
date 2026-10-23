@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "x64-image-smc-nocopy"
+ ],
+ "next": [
+  "env.MADEIRA_X64_IMAGE_NOCOPY = 1"
+ ],
+ "note": "DARK SOULS III (Steam 374320 through BCD Dock), build 579, iPad17,3 (Send Log A3V7SV; also DCWTGJ build 574 and R138Z4, WVZQCV build 565 of earlier days, same game): the pure x64 DarkSoulsIII.exe runs from a JIT-pool copy and writes into its own code: [store-noalias] #1 addr=0x140010122 prot=1 max=3 (exec-downgraded page never dual-mapped), [wr-strip-declined] ... SEC_IMAGE WRITECOPY (12 times), 200+ unhandled faults (UNHANDLED #200), c0000005 at 28 s. The log ends before the redelivery guard's '256 identical redeliveries', so x64-image-smc-nocopy used to say nothing (status stuck); it now also fires on the Mach handler's UNHANDLED #200. Dark Souls II ran 379 s with env.MADEIRA_X64_IMAGE_NOCOPY = 1 and 34 s without.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

@@ -1,0 +1,648 @@
+[18:32:38.035] [INFO] Checking entitlements...
+[18:32:38.035] [INFO] [build] v0.1.580 (580)
+[18:32:38.036] [INFO] [device] model=iPhone15,2 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=5663MB available=4077MB cores=6
+[18:32:38.036] [INFO] [device] address-map=[0x102fa4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[18:32:38.054] [INFO] [device] gpu="Apple A16 GPU" family=apple8 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[18:33:33.426] [INFO] Requesting JIT with Built-in StikJIT...
+[18:33:34.908] [INFO] [bcd] library launch pes2013.exe: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[18:33:34.935] [INFO] Running full Wine sequence...
+[18:33:34.935] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102fa4000,0x8000000000) 512GB available=4056MB low-power=0 thermal=nominal
+[18:33:34.941] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[18:33:34.941] [INFO] Allocating 896MB JIT pool via debugger...
+[18:33:34.942] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[18:33:34.942] [INFO] [jit-debugger] attached=1 at the pool request
+[18:33:34.945] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[18:33:35.951] [INFO] RX pool at 0x148000000
+[18:33:35.981] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.088s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[18:33:36.385] [Wine connect] fd_socket=38, receiving version fd...
+[Wine init_process] waiting for request_fd from wineserver...
+[18:33:36.385] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=44, sending init_first_thread...
+[18:33:36.385] [Wine init_process] reply_pipe=44, sending init_first_thread...
+ml992: os_proc_available_memory=3467 MB + phys_footprint=628 MB = 4096 MB (hw.memsize says 5663 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x1482a0000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x1483b8000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x14842d000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x1487f0000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148914000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x1489bc000)
+[footprint] rev=ml358 phys=683 MB (peak 683) internal=682 MB compressed=0 MB external=100 MB reusable=8 MB (cycle=1)
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x148b3c000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148bc0000)
+[free-delay] #1 release of 0x7024a30000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7024b30000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7024d30000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7025130000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7025930000+0xfd0000 held for 2000 ms (5 in flight)
+D 24 Load module pes2013.exe (pes2013.exe-8c3d49489327a669): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83f3f4fd): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ee0075): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728a9612d3): 717BC40000
+D 24 Load module d3d9.dll (d3d9.dll-23c8601a8ef51d64): 717BC10000
+D 24 Load module USER32.dll (user32.dll-7d7be97280e239db): 717BA50000
+D 24 Load module IPHLPAPI.DLL (iphlpapi.dll-af232f72e6cfe26c): 717A030000
+D 24 Load module dnsapi.dll (dnsapi.dll-2ed353fb7eb2e5ed): 717A000000
+D 24 Load module nsi.dll (nsi.dll-4a95f0fb6ce3df8f): 7179FE0000
+D 24 Load module WSOCK32.dll (wsock32.dll-baa0216ae086e137): 7179FC0000
+D 24 Load module VERSION.dll (version.dll-f3fe55759b08f5e1): 7179FA0000
+[gdi-shared] session table 0x7027a20000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1489634460e1fd): 7179F60000
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"kitserver13\\kload.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #6 release of 0x7103f20000+0x510000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x7104430000+0x120000 held for 2000 ms (7 in flight)
+[store-undecoded] #1 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x7104552684 rw_addr=0x7000c72684 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #1 p0=WRITE p1=0x7104552684 hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16b038e5c addr=0x7104552684 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7104550000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16b038e5c addr=0x7104552684 x18=0x0 type=1 lr=0x16b037880 sp=0x702490f350 x16=0x148305e94 x17=0x702490f2b0
+[guest-code] rev=ml333 pool_rip=0x21e74e0 (PE 0x21e74e0) -- NO pool copy for this address (identity translate)
+[fault-host] 16b038d5c: 54002e08 52800414 53103ce0 6b14401f 54002ea8 710000ff 54002f81 1400017f
+[fault-host] 16b038d7c: 52800034 b3401e86 f90f639f 17ffff5d 510018b4 8b344278 78bfc305 d503201f
+[fault-host] 16b038d9c: 530d30aa 0b070d4b 5280100a 7140217f 54002e68 52880034 6b14017f 540025e3
+[fault-host] 16b038dbc: 53103ca5 2a0500e7 92880014 0b070e8a 530a7d4a 1101c14a 14000169 aa0403e5
+[fault-host] 16b038ddc: 51004134 8b344278 b8bfc307 d503201f 5100b134 8b344278 d503201f 889fff06
+[fault-host] 16b038dfc: 51011134 8b344278 b8bfc304 d503201f 110020b4 8b344278 d503201f 889fff04
+[mach_exc] insn_stream PC-12..PC+8: 11001174 8b344278 2a2403e1 [b8e11314] 1b057cc6 51008135 8b354278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-undecoded] #2 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x7104552684 rw_addr=0x7000c72684 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #2 p0=WRITE p1=0x7104552684 hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16b038e5c addr=0x7104552684 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7104550000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16b038e5c addr=0x7104552684 x18=0x0 type=1 lr=0x16b037880 sp=0x702490f350 x16=0x148305e94 x17=0x702490f2b0
+[guest-code] rev=ml333 pool_rip=0x21e74e0 (PE 0x21e74e0) -- NO pool copy for this address (identity translate)
+[fault-host] 16b038dbc: 53103ca5 2a0500e7 92880014 0b070e8a 530a7d4a 1101c14a 14000169 aa0403e5
+[fault-host] 16b038ddc: 51004134 8b344278 b8bfc307 d503201f 5100b134 8b344278 d503201f 889fff06
+[fault-host] 16b038dfc: 51011134 8b344278 b8bfc304 d503201f 110020b4 8b344278 d503201f 889fff04
+[fault-host] 16b038e1c: 110010b4 8b344278 b8bfc304 d503201f 5ac00086 5ac010c6 12800024 aa0503eb
+[fault-host] 16b038e3c: aa0703e5 aa0603e7 924010f4 cb1403f4 1ad42c84 11001174 8b344278 2a2403e1
+[fault-host] 16b038e5c: b8e11314 1b057cc6 51008135 8b354278 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 11001174 8b344278 2a2403e1 [b8e11314] 1b057cc6 51008135 8b354278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-undecoded] #3 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x710455bc24 rw_addr=0x7000c77c24 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #3 p0=WRITE p1=0x710455bc24 hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x0 pc=0x16b038e5c addr=0x710455bc24 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7104558000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x16b038e5c addr=0x710455bc24 x18=0x0 type=1 lr=0x16b037880 sp=0x702490f350 x16=0x148305e94 x17=0x702490f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d8cc (PE 0xfff8d8cc) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 11001174 8b344278 2a2403e1 [b8e11314] 1b057cc6 51008135 8b354278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-undecoded] #4 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x710455bc24 rw_addr=0x7000c77c24 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #4 p0=WRITE p1=0x710455bc24 hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x0 pc=0x16b038e5c addr=0x710455bc24 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x7104558000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x16b038e5c addr=0x710455bc24 x18=0x0 type=1 lr=0x16b037880 sp=0x702490f350 x16=0x148305e94 x17=0x702490f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d8cc (PE 0xfff8d8cc) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 11001174 8b344278 2a2403e1 [b8e11314] 1b057cc6 51008135 8b354278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-undecoded] #5 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x71045c3e2c rw_addr=0x7000c7be2c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #5 p0=WRITE p1=0x71045c3e2c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=5 rip=0x0 pc=0x16b038e5c addr=0x71045c3e2c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x71045c0000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #5 pc=0x16b038e5c addr=0x71045c3e2c x18=0x0 type=1 lr=0x16b037880 sp=0x702490f350 x16=0x148305e94 x17=0x702490f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d8cc (PE 0xfff8d8cc) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: 11001174 8b344278 2a2403e1 [b8e11314] 1b057cc6 51008135 8b354278
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[store-undecoded] #6 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x71045c3e2c rw_addr=0x7000c7be2c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #6 p0=WRITE p1=0x71045c3e2c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=6 rip=0x0 pc=0x16b038e5c addr=0x71045c3e2c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x71045c0000+0x4000 rev=ml555
+[store-undecoded] #7 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x71045df73c rw_addr=0x7000c8373c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=7 rip=0x0 pc=0x16b038e5c addr=0x71045df73c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x71045dc000+0x4000 rev=ml555
+[store-undecoded] #8 rev=ml350 insn=0xb8e11314 pc=0x16b038e5c addr=0x71045df73c rw_addr=0x7000c8373c — alias OK, ADD THIS ENCODING to the case-4 emulator
+[fault_rip] cnt=8 rip=0x0 pc=0x16b038e5c addr=0x71045df73c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x71045dc000+0x4000 rev=ml555
+[fault_rip] cnt=9 rip=0x0 pc=0x16b038e5c addr=0x710455c01c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x710455c000+0x4000 rev=ml555
+[fault_rip] cnt=10 rip=0x0 pc=0x16b038e5c addr=0x710455c01c kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x710455c000+0x4000 rev=ml555
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #19 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #20 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #21 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #22 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #23 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[av-detail] ml613 #24 p0=WRITE p1=0x710455c01c hostpc=0x16b038e5c hinsn=0xb8e11314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x16affc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[redeliv] 256 identical redeliveries pc=0x16b038e5c addr=0x710455c01c — storm forming rev=ml461
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+D 24 Handled self-modifying code: pc: 16B038E5C fault: 710455C01C
+[redeliv] 2000 identical redeliveries pc=0x16b038e5c addr=0x710455c01c — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] terminating process rev=ml465

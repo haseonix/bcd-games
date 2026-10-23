@@ -21,7 +21,8 @@ Source checks, each pinned to the classic library's own code:
     session. BCD's interface runs with the library engine on (the JIT prompt is the library's);
   - GOG: its hook (BCDLiveStoreGOG.gogPlayEntry) hands the installed game's library entry, made
     from its program, arguments and working folder as a game added from Files, to the same Play;
-    its download queue holds while a game runs. Epic: listed nowhere, started by nothing;
+    its download queue holds while a game runs. Epic (milestone 0): its hook (BCDLiveStoreEpic) lists the account's
+    games as not installed; nothing starts them and Install only says that installing comes later;
   - downloads: Install, Update, Resume and Check files call SteamOwnedLibrary.install (repair) at
     once, as the classic download sheet and Game details do, so the queue's pump starts iOS 26's
     continued-processing task (SteamDownloadBackground) while BCD is in front; Pause and Stop are
@@ -121,9 +122,10 @@ check("if library.current != nil {\n                    sessionBody" in content 
       and "LibraryController.shared.configure(enabled: true, ownsInput: true)" in block(lib, "func refreshFlag()"),
       "BCD's interface runs with the library engine always on: its Play, JIT prompt and alerts are the library's")
 start = code(block(store, "private func start(_ game: BCDGame)"))
-check(start.count("launch(entry)") == 3 and "guard let launch else { return }" in start
-      and "if let entry = gogPlayEntry(game) { launch(entry); return }" in start,
-      "BCDLiveStore.start: the connected Play is its only way to start a game (GOG, a game from Files or the desktop, Steam)")
+check(start.count("launch(entry)") == 4 and "guard let launch else { return }" in start
+      and "if let entry = gogPlayEntry(game) { launch(entry); return }" in start
+      and "if let entry = epicPlayEntry(game) { launch(entry); return }" in start,
+      "BCDLiveStore.start: the connected Play is its only way to start a game (GOG, Epic, a game from Files or the desktop, Steam)")
 check("library.entries.first(where: { $0.id == id })\n"
       "                    ?? (id == LibraryEntry.desktopID ? LibraryEntry.desktopEntry : nil)" in start,
       "a program added from Files and the Windows desktop: the stored entry, or the desktop's stand-in before its first start")
@@ -218,7 +220,7 @@ check("if AutoTune.enabled { AutoTune.sessionBegan(entry, remember: remember, do
 check("library.$current.sink { [weak self] current in self?.session(running: current != nil) }" in store,
       "BCD's in-game state follows the session LibraryModel.begin starts")
 
-# ---- GOG: its own hook, then the same Play; Epic: listed nowhere, started by nothing -------------
+# ---- GOG: its own hook, then the same Play; Epic (M0): listed as not installed by its hook, started by nothing --
 gog_live = (APP / "BCDGOG/BCDLiveStoreGOG.swift").read_text()
 gog_core = (APP / "BCDGOG/BCDGOG.swift").read_text()
 queue_src = (APP / "BCDContent/BCDContentQueue.swift").read_text()
@@ -242,17 +244,23 @@ check("store: .local" in code(block(store, "private func localGame(_ entry: Libr
       and "store: .steam" in code(block(store, "private func steamGame("))
       and not re.search(r"BCDGame\([^)]*store:\s*\.epic", code(store) + code(gog_live))
       and len(re.findall(r"BCDGame\(id:", code(store))) == 2 and "gogMerge(&games)" in store,
-      "the live store lists library and Steam games, GOG's through its hook; no Epic game reaches a screen")
-check("BCDAccount(store: .epic, name: nil, available: false)" in store and "gogAccount()," in store,
-      "Epic's account shows as not available in this build; GOG's comes from its hook")
+      "the live store lists library and Steam games, GOG's and Epic's through their hooks")
+epic_live = (APP / "BCDEpic/BCDLiveStoreEpic.swift").read_text()
+check("epicMerge(&games)" in store and "epicState(id, installed: epic.installs[id], queue: queue)" in code(block(epic_live, "func epicMerge(_ games: inout [BCDGame])"))
+      and "state: .ready" not in code(epic_live) and "return installed == nil ? .notInstalled : .ready" in code(epic_live)
+      and "launch" not in code(epic_live),
+      "Epic's hook lists a game as installed only when its record says so, and starts nothing itself (it hands BCDLiveStore the library entry, as GOG's does)")
+check("epicAccount()," in store and "gogAccount()," in store and "BCDAccount(store: .epic" not in store,
+      "Epic's account and GOG's come from their hooks")
 ids = block(store, "enum BCDLiveID {")
 check('id.hasPrefix("steam.")' in ids and 'id.hasPrefix("local.")' in ids and "epic" not in ids
-      and "case nil:\n" in start and "Its Play plugs in where GOG's does" in block(store, "private func start(_ game: BCDGame)"),
-      "BCDLiveID knows Steam and library ids (GOG's go to its hook first): an Epic id starts nothing, and where its Play plugs in is marked")
+      and "case nil:\n" in start and "GOG's and Epic's games start through gogPlayEntry and epicPlayEntry" in block(store, "private func start(_ game: BCDGame)"),
+      "BCDLiveID knows Steam and library ids (GOG's and Epic's go to their hooks first): any other id starts nothing, and where Play plugs in is marked")
 check('guard case .steam(let appID)? = BCDLiveID.parse(game.id) else { return }' in block(store, "func install(_ game: BCDGame, place: BCDInstallPlace)")
       and "if gog(.install, game.id) { return }" in block(store, "func install(_ game: BCDGame, place: BCDInstallPlace)")
+      and "if epic(.install, game.id, place: place) { return }" in block(store, "func install(_ game: BCDGame, place: BCDInstallPlace)")
       and "guard front == .steam else { return }" in block(store, "func signIn(_ front: BCDStoreFront)"),
-      "Install and sign-in: GOG's hook first, then Steam; nothing for Epic")
+      "Install and sign-in: GOG's and Epic's hooks first (Epic's Install only says it comes later), then Steam")
 
 # ---- downloads: the classic calls, at once; the background task untouched ----------------------
 download = code(block(store, "private func download(_ appID: Int)"))

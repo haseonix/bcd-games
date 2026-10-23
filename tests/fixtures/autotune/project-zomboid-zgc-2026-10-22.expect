@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "java-zgc-off"
+ ],
+ "next": [
+  "env._JAVA_OPTIONS = -XX:-UseZGC"
+ ],
+ "note": "Project Zomboid (Steam 108600, Java) build 580, iPhone15,4: the JVM's ZGC reserves its heap at 4 TiB and up, which the 512 GB map does not have; the process exits 1 after 12,230 refused reservations",
+ "outcome": "exited-early",
+ "stage": 2,
+ "status": "trying"
+}

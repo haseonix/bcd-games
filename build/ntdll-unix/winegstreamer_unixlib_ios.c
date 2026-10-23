@@ -510,6 +510,10 @@ static unsigned int wma_av_log_count;
  * decoder contexts are told apart by their class (the demuxer / its I/O) or
  * by the marker the core leaves in AVCodecContext.opaque, so a parser
  * diagnostic is not reported as a WMA one.  One cap for both. */
+/* The marker the WMV transform (winegstreamer_wmv_ios.c) leaves in its AVCodecContext.opaque. */
+static const char wmv_decoder_marker;
+#define WMV_DECODER_MARKER ((void *)&wmv_decoder_marker)
+
 static const char *av_log_owner( void *avcl )
 {
     const AVClass *cls = avcl ? *(const AVClass **)avcl : NULL;
@@ -520,6 +524,9 @@ static const char *av_log_owner( void *avcl )
     if (!strcmp( cls->class_name, "AVCodecContext" )
         && ((AVCodecContext *)avcl)->opaque == MAV_DECODER_MARKER)
         return "[wg-parser] av:";
+    if (!strcmp( cls->class_name, "AVCodecContext" )
+        && ((AVCodecContext *)avcl)->opaque == WMV_DECODER_MARKER)
+        return "[wmv] av:";
     return "[wma] av:";
 }
 
@@ -2034,6 +2041,10 @@ static NTSTATUS transform_set_output_type( wg_transform_t handle, const struct w
     return STATUS_SUCCESS;
 }
 
+/* MADEIRA 2026-10-22: the WMV decoder transform, the video half of wg_transform.  Reached
+ * through the 64-bit table only (see the entries below and that file's header). */
+#include "winegstreamer_wmv_ios.c"
+
 /***********************************************************************
  *           the unix call entries
  */
@@ -2053,25 +2064,40 @@ static NTSTATUS wma_not_implemented( void *args )
     return STATUS_NOT_IMPLEMENTED;
 }
 
+/* The 64-bit table's entries.  A video input goes to the WMV transform, which refuses what is not
+ * WMV with STATUS_NOT_SUPPORTED and the handle left 0, exactly as transform_create does for a video
+ * type; the wow64 table calls transform_create directly and never sees a WMV handle.  The entries
+ * the two tables share tell a WMV handle from a WMA one by the magic in its first member. */
 static NTSTATUS wma_transform_create( void *args )
 {
-    return transform_create( args );
+    struct wg_transform_create_params *params = args;
+
+    if (IsEqualGUID( &params->input_type.major, &madeira_MFMediaType_Video ))
+        return wmv_transform_create( params );
+    return transform_create( params );
 }
 
 static NTSTATUS wma_transform_destroy( void *args )
 {
-    return transform_destroy( *(wg_transform_t *)args );
+    wg_transform_t handle = *(wg_transform_t *)args;
+
+    if (wmv_is_handle( handle )) return wmv_destroy( handle );
+    return transform_destroy( handle );
 }
 
 static NTSTATUS wma_transform_get_output_type( void *args )
 {
     struct wg_transform_get_output_type_params *params = args;
+
+    if (wmv_is_handle( params->transform )) return wmv_get_output_type( params->transform, &params->media_type );
     return transform_get_output_type( params->transform, &params->media_type );
 }
 
 static NTSTATUS wma_transform_set_output_type( void *args )
 {
     struct wg_transform_set_output_type_params *params = args;
+
+    if (wmv_is_handle( params->transform )) return wmv_set_output_type( params->transform, &params->media_type );
     return transform_set_output_type( params->transform, &params->media_type );
 }
 
@@ -2081,6 +2107,8 @@ static NTSTATUS wma_transform_push_data( void *args )
     struct wg_sample *sample = params->sample;
 
     if (!sample) return STATUS_INVALID_PARAMETER;
+    if (wmv_is_handle( params->transform ))
+        return wmv_push_data( params->transform, sample, (const void *)(UINT_PTR)sample->data, &params->result );
     return transform_push_data( params->transform, sample,
                                 (const void *)(UINT_PTR)sample->data, &params->result );
 }
@@ -2091,6 +2119,8 @@ static NTSTATUS wma_transform_read_data( void *args )
     struct wg_sample *sample = params->sample;
 
     if (!sample) return STATUS_INVALID_PARAMETER;
+    if (wmv_is_handle( params->transform ))
+        return wmv_read_data( params->transform, sample, (void *)(UINT_PTR)sample->data, &params->result );
     return transform_read_data( params->transform, sample,
                                 (void *)(UINT_PTR)sample->data, &params->result );
 }
@@ -2098,8 +2128,10 @@ static NTSTATUS wma_transform_read_data( void *args )
 static NTSTATUS wma_transform_get_status( void *args )
 {
     struct wg_transform_get_status_params *params = args;
-    struct wma_transform *transform = get_transform( params->transform );
+    struct wma_transform *transform;
 
+    if (wmv_is_handle( params->transform )) return wmv_get_status( params->transform, &params->accepts_input );
+    transform = get_transform( params->transform );
     if (!transform) return STATUS_INVALID_HANDLE;
     pthread_mutex_lock( &transform->lock );
     params->accepts_input = (transform->pcm_len == transform->pcm_pos);
@@ -2109,9 +2141,11 @@ static NTSTATUS wma_transform_get_status( void *args )
 
 static NTSTATUS wma_transform_drain( void *args )
 {
-    struct wma_transform *transform = get_transform( *(wg_transform_t *)args );
+    struct wma_transform *transform;
     NTSTATUS status;
 
+    if (wmv_is_handle( *(wg_transform_t *)args )) return wmv_drain( *(wg_transform_t *)args );
+    transform = get_transform( *(wg_transform_t *)args );
     if (!transform) return STATUS_INVALID_HANDLE;
     pthread_mutex_lock( &transform->lock );
     WMA_LOG( "drain: transform=%p after %u packets\n", transform, transform->packet_count );
@@ -2139,8 +2173,10 @@ static NTSTATUS wma_transform_drain( void *args )
 
 static NTSTATUS wma_transform_flush( void *args )
 {
-    struct wma_transform *transform = get_transform( *(wg_transform_t *)args );
+    struct wma_transform *transform;
 
+    if (wmv_is_handle( *(wg_transform_t *)args )) return wmv_flush( *(wg_transform_t *)args );
+    transform = get_transform( *(wg_transform_t *)args );
     if (!transform) return STATUS_INVALID_HANDLE;
     pthread_mutex_lock( &transform->lock );
     report_failures( transform );

@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "mfc-missing-dock"
+ ],
+ "next": [
+  "env.MADEIRA_MFC_DOCK = 1"
+ ],
+ "note": "Age of Empires II HD (Steam 221380) through BCD Dock, build 580 (B2NWDX, iPhone18,2; GYYAAC and MXMRJ3 are snapshots of the same run): Launcher.exe stops at once with c0000135, import_dll Library mfc140u.dll not found. MADEIRA_MFC_DOCK links mfc140u.dll into sysx64.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

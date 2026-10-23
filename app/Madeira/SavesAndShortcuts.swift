@@ -230,8 +230,7 @@ enum SaveBackup {
         let drive = LibraryModel.drive
         let users = drive.appendingPathComponent("users", isDirectory: true)
         guard fm.fileExists(atPath: users.path) else { throw LibraryError.message("No Windows drive has been set up yet.") }
-        let stamp = DateFormatter(); stamp.dateFormat = "yyyy-MM-dd_HH-mm"
-        let out = fm.temporaryDirectory.appendingPathComponent("BCD-saves-\(stamp.string(from: Date())).zip")
+        let out = fm.temporaryDirectory.appendingPathComponent("BCD-saves-\(BCDFormat.fileStamp(Date(), seconds: false)).zip")
         try? fm.removeItem(at: out)
         let zip = try SaveZipWriter(url: out)
         var leftOut = 0

@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true
+ },
+ "matched": [
+  "dock-launch-failed-session-open"
+ ],
+ "next": [],
+ "note": "Spec Ops: The Line (Steam 50300; per-account executable, CEG) through BCD Dock, build 579 (NEXHHM, the tester's iPhone17,2): Valve's client could not prepare the executable (RPC error 1726, ceg-job-result 55), the Dock host finished with probe-result 49 a few seconds after it asked, no game process ever ran and the session stayed open on its desktop until the tester closed BCD (2FRXXM, the same game and device, waited 271 s). Build 580 ends such a session 20 s after the host's failure (DockGameEnd.swift, watchDockFailedLaunch) and shows the host's reason. The cause is Steam's; no config line changes it. The end facts here are what auto-tune is given after the tester closed BCD.",
+ "outcome": "hung",
+ "stage": 2,
+ "status": "known"
+}

@@ -38,6 +38,7 @@ The Swift parts need xcrun swiftc; --require-swift makes their absence a failure
 leaves the preview build out (a quick run while working on the page; CI builds it).
 """
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -175,10 +176,14 @@ for what, needle in [
     ("... and at most 20 MB", 'guard bytes <= 20_000_000 else { throw BCDGameError("Choose a picture under 20 MB.") }'),
     ("the game's config is its own file, edited as text", "if profile.text != text { profile.text = text }"),
     ("the Wine desktop has its page, before its first start too", "(id == LibraryEntry.desktopID ? LibraryEntry.desktopEntry : nil)"),
-    ("... with the desktop's settings and none of a game's library rows", "if !desktop { d.groups.append(libraryGroup(entry, gog: game.store == .gog)) }"),
+    ("... with the desktop's settings and none of a game's library rows", "if !desktop { d.groups.append(libraryGroup(entry, gog: game.store == .gog || game.store == .epic)) }"),
     ("an installed GOG game's settings are its library entry's", "guard BCDGOG.enabled, let id = BCDGOG.shared.installs[product]?.entryID else { return nil }"),
-    ("... with GOG's note on what it may need", "d.storeNote = BCDLiveStore.shared.gogNote(game.id)"),
-    ("... and Uninstall, which deletes its files through the store", "} else if game.store == .gog {\n            // Uninstall deletes a GOG game's files through the store (BCDLiveStoreGOG).\n            d.removal = .uninstall(frees: entry.folderBytes ?? game.size)"),
+    ("... with GOG's note on what it may need (and Epic's)", "d.storeNote = BCDLiveStore.shared.gogNote(game.id) ?? BCDLiveStore.shared.epicNote(game.id)"),
+    ("... and Uninstall, which deletes its files through the store", "} else if game.store == .gog || game.store == .epic {\n            // Uninstall deletes a GOG or Epic game's files through the store (BCDLiveStoreGOG, BCDLiveStoreEpic).\n            d.removal = .uninstall(frees: entry.folderBytes ?? game.size)"),
+    ("an installed Epic game's settings are its library entry's", "if let id = BCDLiveStore.shared.epicEntryID(game.id) { return library.entries.first { $0.id == id } }"),
+    ("an Epic game's page looks at its manifest when it opens, and reads its details again when the look answers", "BCDLiveStore.shared.epicOpened(game.id)\n        guard game.state.isInstalled else { return }"),
+    ("... through the one hook line in the watched changes", "BCDLiveStore.shared.epicDetailChanges,"),
+    ("an Epic game BCD cannot install says why before Install, and one that may not start says so", "let advice = BCDLiveStore.shared.epicInstallAdvice(game.id)\n        d.installBlocker = advice.blocker\n        d.installWarning = advice.warning"),
     ("the program's graphics API is read once, off the main thread", "return LibraryModel.graphicsImports(program)"),
     ("Steam's blockers before Play are the engine's", "SteamGamesRules.blocker(installed: installed, client: MadeiraDock.clientInstalled"),
     ("Uninstall is offered only for BCD's own downloads", "SteamInstallPaths.isManaged(library: $0.library)"),
@@ -239,7 +244,8 @@ for focus_id in ('"game.main"', '"game.back"', '"game.options"', '"game.other.\\
                  '"game.panel.row.match.\\(match.id)"', '"game.store"'):
     check(f"a control carries the focus id {focus_id}", focus_id in views)
 check("the question's controls are \"game.ask.yes\" and \"game.ask.no\" on the page (the card menu's question gives its own prefix)",
-      'var prefix = "game.ask."' in views and "BCDGameQuestionView(question: asked.question) { model.answer($0) }" in views)
+      'var prefix = "game.ask."' in views and "BCDGameQuestionView(question: asked.question, answerAlternative: { model.answerAlternative() }) { model.answer($0) }" in views
+      and 'prefix + "alt"' in views)
 plain = code(views)
 check("every button of the page can be reached with a controller",
       len(re.findall(r"\bButton\(", plain)) - len(re.findall(r"\.bcdFocusable\(", plain)) <= 2,
@@ -278,6 +284,32 @@ for f, text in ((PAGE, page), (LIVE, live), (SAMPLE, sample)):
     shown = [s for s in literals if "madeira" in s.lower() and not s.startswith("env.MADEIRA_")]
     check(f"{f.name}: no \"Madeira\" in its text", not shown, shown)
 
+# ---- dates ----------------------------------------------------------------------------------------------
+# Every date text is made from numbers (BCDFormat in BCDStore.swift). An ICU date formatter, built while the interface draws,
+# killed BCD itself in three tester logs (udat_open in BCDGamePageLive.day: KDY8E6, A7V9T2, DFSTWB); the first fix covered one
+# helper only. No file of the app may build one: not the screens, not the engine's file names and log stamps.
+ICU_DATE = re.compile(r"DateFormatter\(|\.formatted\(date:|\.formatted\(\)|ISO8601DateFormatter|RelativeDateTimeFormatter|DateIntervalFormatter"
+                      r"|DateComponentsFormatter|NSDateFormatter|CFDateFormatter|\.dateFormat\b|\.dateStyle\b|\.timeStyle\b|Date\.FormatStyle"
+                      r"|\.formatted\(\.(dateTime|iso8601|relative)|Text\([^\n]*style: *\.(date|time|relative|timer|offset)\b")
+icu_hits = []
+for f in sorted((R / "app").rglob("*.swift")):
+    if "/licenses/" in f.as_posix():
+        continue
+    for number, line in enumerate(code(f.read_text()).split("\n"), 1):
+        if ICU_DATE.search(line):
+            icu_hits.append(f"{f.relative_to(R)}:{number}: {line.strip()[:100]}")
+check("no file of the app builds an ICU date formatter (DateFormatter, Date.formatted, ISO8601DateFormatter ...)", not icu_hits, icu_hits[:8])
+rules_text = (R / "build/tools/autotune_rules.py").read_text()
+icu_rule = rules_text[rules_text.index('"id": "bcd-date-formatter-crash"'):]
+icu_rule = icu_rule[:icu_rule.index("\n    },\n")]
+check("auto-tune knows a log that shows BCD itself dying in udat_open (bcd-date-formatter-crash: no lines, fixedIn 580; tests/fixtures/autotune)",
+      '"lines": []' in icu_rule and '"fixedIn": 580' in icu_rule and "udat_open" in icu_rule
+      and (R / "tests/fixtures/autotune/synthetic-bcd-date-formatter-crash.expect").exists())
+store_text = (APP / "BCDStore.swift").read_text()
+check("BCDStore.swift keeps the date helpers between the markers the Steam and Dock reset host checks cut out",
+      store_text.count("    // dates-begin") == 1 and store_text.count("    // dates-end") == 1
+      and store_text.index("    // dates-begin") < store_text.index("static func fullDate") < store_text.index("    // dates-end"))
+
 # ---- the page's rules, compiled and run -------------------------------------------------------------
 TEST = (Path(__file__).resolve().parent / "bcd_game_page_checks.swift").read_text()
 
@@ -290,10 +322,11 @@ else:
     with tempfile.TemporaryDirectory(prefix="bcd-game-page-") as tmp:
         t = Path(tmp)
         (t / "BCDStore.swift").write_text((APP / "BCDStore.swift").read_text())
+        (t / "BCDGameDLC.swift").write_text((APP / "BCDGameDLC.swift").read_text())   # the question before a first install (the model asks it)
         (t / "Rules.swift").write_text("import Combine\nimport Foundation\nimport SwiftUI\n\n" + page[start:end])
         (t / "Main.swift").write_text(TEST)
         r = subprocess.run(["xcrun", "swiftc", "-parse-as-library", "-swift-version", "5", "-o", str(t / "rules"),
-                            str(t / "BCDStore.swift"), str(t / "Rules.swift"), str(t / "Main.swift")],
+                            str(t / "BCDStore.swift"), str(t / "BCDGameDLC.swift"), str(t / "Rules.swift"), str(t / "Main.swift")],
                            capture_output=True, text=True)
         check("the page's rules compile on their own with BCDStore.swift", r.returncode == 0, (r.stderr or r.stdout)[-3000:])
         if r.returncode == 0:
@@ -302,6 +335,11 @@ else:
                                capture_output=True, text=True, timeout=120)
             print("\n".join("     " + line for line in r.stdout.strip().split("\n")))
             check("the page's rules hold (states, questions, actions)", r.returncode == 0, r.stderr[-2000:])
+            # The date helpers again in zones with other offsets and clock changes (the first run used this Mac's).
+            for zone in ("Asia/Kolkata", "Asia/Kathmandu", "America/Los_Angeles", "Pacific/Auckland", "Australia/Lord_Howe", "Pacific/Kiritimati", "Pacific/Pago_Pago"):
+                r = subprocess.run([str(t / "rules"), "-datesOnly"], capture_output=True, text=True, timeout=120,
+                                   env=dict(os.environ, TZ=zone))
+                check(f"the date helpers give Foundation's text in {zone}", r.returncode == 0, (r.stdout + r.stderr)[-1500:])
 
     # The preview build: every BCD screen file but the engine-bound ones, with the sample data.
     if args.no_preview:

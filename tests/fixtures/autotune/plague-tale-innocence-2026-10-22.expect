@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "nettle-cbc-unaligned-abort"
+ ],
+ "next": [],
+ "note": "A Plague Tale: Innocence (GOG copy started from the library, APlagueTaleInnocence_x64.exe), build 580, Send Log 3S5DV8 (7ZGYFT on 576 ended the same way): after about 50 s of play and BCryptCreateHash / BCryptGenerateSymmetricKey a thread reached nettle's cbc_decrypt with a length that is not a multiple of the block size; the assert ended the whole app. Build 591: Wine's bcrypt unix side answers STATUS_INVALID_BUFFER_SIZE before calling GnuTLS (a code fix, so the rule has no line and says known). What the game does with the error is not known.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "known"
+}

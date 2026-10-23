@@ -129,6 +129,9 @@ static int reserved_areas;
 static void mmap_add_reserved_area( void *addr, size_t size ) { (void)addr; (void)size; reserved_areas++; }
 static void ios_va_describe_range( void *addr, ULONG_PTR len, char *buf, size_t n ) { (void)addr; (void)len; snprintf( buf, n, "-" ); }
 static void *ios_jit_current_peb( void ) { return NULL; }
+/* win32u's two symbols the [gdi-shared] diagnostic in ios_wow_session_arm reads (weak in virtual_ios.c; the app
+ * defines them in win32u): the host harness has no win32u, so it gives a not-yet-initialised session. */
+int win32u_wow_session; void *ios_win32u_session_peb;
 """ + block + r"""
 static int teardowns;
 int ios_thread_registry_range_busy( uintptr_t base, uintptr_t size ) { (void)base; (void)size; return 0; }

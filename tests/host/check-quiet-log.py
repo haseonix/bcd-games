@@ -195,7 +195,7 @@ def config(rule):
 m = rules.get("horizon-zero-dawn")
 check(bool(m) and m["title"] == "Horizon Zero Dawn", "Horizon Zero Dawn's list found")
 if m:
-    check(m["version"] == 16, "Horizon Zero Dawn's list is version 16")
+    check(m["version"] == 17, "Horizon Zero Dawn's list is version 17 (16 + the Dock MFC link, build 591)")
     check("quiet-log = 1" in config(m), "Horizon Zero Dawn's list sets quiet-log = 1")
     check("env.MADEIRA_SRV_FGETPATH = 1" in config(m), "Horizon Zero Dawn's list sets env.MADEIRA_SRV_FGETPATH = 1")
 hfw = rules.get("horizon-forbidden-west")

@@ -55,6 +55,11 @@ check('the call is inside the UNHANDLED report, right after ios_x87_int64_diag a
       unhandled < signal_src.index('ios_x87_int64_diag( &state, req->exception, fault_addr );') < site
       < signal_src.index('madeira-bcd [fault-full]: every register', site))
 
+bus_call = 'ios_wow_null_diag_bus( &((ucontext_t *)sigcontext)->uc_mcontext->__ss, (uintptr_t)NtCurrentTeb(), (uintptr_t)siginfo->si_addr );'
+check('build 591: one call from the BSD path, inside "BUS->AV: unreadable target", after the [bus-regs] block and before bus_fatal',
+      signal_src.count(bus_call) == 1 and signal_src.rindex('BUS->AV: unreadable target', 0, signal_src.index(bus_call)) > 0
+      and signal_src.index('[bus-regs] ml1043 x0=') < signal_src.index(bus_call) < signal_src.index('goto bus_fatal;', signal_src.index(bus_call))
+      and 'goto bus_fatal;' not in signal_src[signal_src.index(bus_call) - 400:signal_src.index(bus_call)].replace('goto bus_fatal;\n            }', ''))
 forbidden = ('thread_set_state', 'thread_suspend', 'thread_terminate', 'vm_protect', 'mprotect(', 'mach_vm_write', 'vm_write(', 'memset(',
              'memcpy(', 'mmap(', 'free(', 'malloc(', 'abort(', 'exit(', 'sigaction', 'fopen(', 'open(', 'mach_vm_read_overwrite')
 check('no write, protect, stop, exit or file call, and no direct memory read (ios_av_args_read is the one reader)',
@@ -249,6 +254,20 @@ int main(int argc, char **argv)
         printf("benign-done\n");
         return 0;
     }
+    if (!strcmp(s, "bus")) {
+        w = make(0, 0, 0);
+        w.st.__x[24] = WIN + 0x20;                                                        /* the temporary does not hold the address (an LDAR address register) */
+        ios_wow_null_diag(&w.st, w.teb64, EXC_BAD_ACCESS, WIN + 0x10c);                   /* the Mach path's gate: nothing */
+        ios_wow_null_diag_bus(&w.st, w.teb64, WIN + 0x10c);                               /* the BSD path: reports */
+        w.st.__pc += 4;
+        ios_wow_null_diag(&w.st, w.teb64, EXC_BAD_ACCESS, WIN + 0x10c);                   /* strict again: nothing */
+        w.st.__pc += 4; w.st.__x[19] = 0x5000000010ULL;
+        ios_wow_null_diag_bus(&w.st, w.teb64, w.st.__x[19] + 0x10c);                      /* the BSD path still needs a window base */
+        w.st.__pc += 4; w.st.__x[19] = WIN;
+        ios_wow_null_diag_bus(&w.st, w.teb64, WIN + 0x20000);                             /* ... and the NULL page */
+        printf("bus-done\n");
+        return 0;
+    }
     if (!strcmp(s, "noteb")) {
         w = make(0, 0, 0);
         w32(WIN + TEB32_G + 0x18, 0x999000);                                              /* Self does not match: not this TEB */
@@ -306,6 +325,11 @@ else:
             r = run('benign')
             check('other exception kinds, an address beyond the NULL page, a mismatched x24, a non-window x19, a pc outside the pool and no TEB print nothing',
                   r.stderr == '' and r.stdout.strip() == 'benign-done', r.stderr + r.stdout)
+            r = run('bus')
+            n = len([l for l in r.stderr.splitlines() if 'rev=ajan7-arkham #' in l])
+            check('build 591, the BSD path: with x24 not holding the address the Mach gate prints nothing, the bus wrapper prints one report, and the '
+                  'strict gate is strict again afterwards; the bus wrapper still wants a 4 GB window base and the NULL page',
+                  n == 1 and 'bus-done' in r.stdout, r.stderr + r.stdout)
             r = run('noteb')
             lines = [l for l in r.stderr.splitlines() if l.startswith('[wow-null32]')]
             check('a TEB32 whose Self does not match: the registers and stack print, the TLS is not read',

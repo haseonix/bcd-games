@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "sc-pa-pools-missing"
+ ],
+ "next": [
+  "env.MADEIRA_SC_PA_POOLS = 2"
+ ],
+ "note": "Grand Theft Auto IV (Steam 12210, Dock, Rockstar Launcher) build 580, iPhone18,2, 512 GB map: Social Club's browser asks for PartitionAlloc's glued pools and BCD has none to give without env.MADEIRA_SC_PA_POOLS",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

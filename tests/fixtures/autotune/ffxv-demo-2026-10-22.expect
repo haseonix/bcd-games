@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "fwpuclnt-dll-optin"
+ ],
+ "next": [
+  "env.MADEIRA_OPTIN_DLLS = fwpuclnt"
+ ],
+ "note": "FINAL FANTASY XV WINDOWS EDITION PLAYABLE DEMO (Steam 671210), build 580, Send Log DM9SAF (CDC7AK is the second Send Log of the same session): ffxv_s.exe imports fwpuclnt.dll, which BCD's 64-bit set does not ship; c0000135 after 0 s (Library fwpuclnt.dll ... not found). env.MADEIRA_OPTIN_DLLS = fwpuclnt (build 591) links Wine's DLL for the game. Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

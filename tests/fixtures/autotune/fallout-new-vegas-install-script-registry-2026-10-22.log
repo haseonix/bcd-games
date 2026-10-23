@@ -1,0 +1,172 @@
+[11:35:56.027] [INFO] Checking entitlements...
+[11:35:56.028] [INFO] [build] v0.1.580 (580)
+[11:35:56.028] [INFO] [device] model=iPhone16,2 idiom=phone os=iOS Version 26.6.1 (Build 23G83) ram=7653MB available=6126MB cores=6
+[11:35:56.029] [INFO] [device] address-map=[0x100b90000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[11:35:56.043] [INFO] [device] gpu="Apple A17 Pro GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:36:00.011] [INFO] [bcd] library launch Fallout New Vegas: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[11:36:00.012] [INFO] Requesting JIT with StikDebug...
+[11:36:00.035] [INFO] Opening StikDebug to enable JIT...
+[11:36:12.473] [INFO] [dock-launch] image-retire=1
+[11:36:12.473] [INFO] [dock-launch] image-map-guard=1
+[11:36:12.670] [INFO] [dock-installers] app=22380 program=visualcredist file=vcredist_x86.exe status=done key=HKLM\Software\Valve\Steam\Apps\22380 recorded=1 minimum=1 machine=0x14c
+[11:36:12.739] [INFO] [dock-installers] app=22380 program=directx file=DXSETUP.exe status=done key=HKLM\Software\Valve\Steam\Apps\22380 recorded=1 minimum=1 machine=0x14c
+[11:36:12.739] [INFO] [dock-installers] app=22380 scripts=1 programs=2 pending=0 done=2 missing=0 unsupported=0 provided=0 default-key=1 services-step=- session-madsync-off=0 installs-only=0
+[11:36:12.740] [INFO] [madeira-dock] starting the host for app 22380; Valve's client authenticates and authorizes the launch
+[11:36:12.756] [INFO] Running full Wine sequence...
+[11:36:12.757] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100b90000,0xfc0000000) 63GB available=6095MB low-power=0 thermal=nominal
+[11:36:12.760] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:36:12.761] [INFO] Allocating 896MB JIT pool via debugger...
+[11:36:12.761] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:36:12.761] [INFO] [jit-debugger] attached=1 at the pool request
+[11:36:16.627] [INFO] RX pool at 0x300000000
+[phase] wine-start             t+  3.974s rev=ml526
+[11:36:17.114] [Wine init_process] reply_pipe=40, sending init_first_thread...
+ml992: os_proc_available_memory=5184 MB + phys_footprint=959 MB = 6144 MB (hw.memsize says 7653 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x300004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x300238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x3003b8000)
+[footprint] rev=ml358 phys=964 MB (peak 964) internal=963 MB compressed=0 MB external=86 MB reusable=6 MB (cycle=1)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x30048c000)
+[gdi-shared] session table 0x11bf80000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  4.665s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x301837000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x3018d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x301a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x301aa2000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  4.766s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x302e70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11E180000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): FBE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): FBCF90000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): FBCF10000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): FBCE00000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): FBCD40000
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=1 at 0xffff70000+0x90000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x306e8d000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l..."
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1294 MB (peak 1294) internal=1291 MB compressed=1 MB external=163 MB reusable=3 MB (cycle=2)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1397 MB (peak 1397) internal=1392 MB compressed=3 MB external=166 MB reusable=7 MB (cycle=3)
+[footprint] rev=ml358 phys=1413 MB (peak 1413) internal=1408 MB compressed=3 MB external=166 MB reusable=7 MB (cycle=4)
+[footprint] rev=ml358 phys=1437 MB (peak 1437) internal=1432 MB compressed=3 MB external=166 MB reusable=7 MB (cycle=5)
+[footprint] rev=ml358 phys=1448 MB (peak 1448) internal=1443 MB compressed=3 MB external=166 MB reusable=7 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Fallout New Vegas\\FalloutNVLauncher.exe" t+ 16.506s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+[pool-poison] HANDED OUT NON-EXEC off=0xa418000 +0x0 va=0x30a418000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa41c000 +0x0 va=0x30a41c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa420000 +0x0 va=0x30a420000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa424000 +0x0 va=0x30a424000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa428000 +0x0 va=0x30a428000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa42c000 +0x0 va=0x30a42c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa438000 +0x0 va=0x30a438000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[alloc-fail] ml814 #2 status=c0000018 hint=0x4ffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b4 | STAGE=none err=3 at 0xc00000000+0x1000000
+[pool-poison] HANDED OUT NON-EXEC off=0xa43c000 +0x0 va=0x30a43c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[pool-poison] HANDED OUT NON-EXEC off=0xa440000 +0x0 va=0x30a440000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[11:36:31.019] [INFO] [dock-report] launch-game-running=1
+D B4 Load module DbgHelp.dll (dbghelp.dll-04363877bca3188a): 478CC0000
+00b4:err:module:load_dll [dll-missing] rev=ml336 #9 L"C:\\CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #10 L"CSERHelper.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+D B4 Load module GameOverlayRenderer.dll (gameoverlayrenderer.dll-ed94af4a19c9af98): 478B40000
+[alloc-fail] ml814 #3 status=c0000018 hint=0x47bebf000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0xc00000000+0x8c000
+[pool-poison] HANDED OUT NON-EXEC off=0xa444000 +0x0 va=0x30a444000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+[win-name] #31 hwnd=0x10062 class='' text="Default IME" rev=ml853
+[win-name] #35 hwnd=0x10064 class='' text="?y" rev=ml853
+[win-name] #36 hwnd=0x10064 class='' text="?y" rev=ml853
+[pool-poison] HANDED OUT NON-EXEC off=0xa448000 +0x0 va=0x30a448000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+D BC Load module mmdevapi.dll (mmdevapi.dll-57d37935cbc77aa6): 478B00000
+D B4 Load module d3d9.dll (d3d9.dll-23c8601a8ef51d64): 478AD0000
+D B4 Load module d3d9-emulated.dll (d3d9-emulated.dll-cd2c823312477e86): 478770000
+[pool-poison] HANDED OUT NON-EXEC off=0xa44c000 +0x0 va=0x30a44c000 prot=3 max=3 reused=0 user_tag=0 share_mode=5 regionsz=0x4000
+D B4 Load module winemetal.dll (winemetal.dll-5ddc509614b0cc76): 478750000
+[launch-view] dismissed reason=game-window logs=0
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=44 resident=1618MB dbg=DEBUGGED rev=ml525
+[11:36:46.830] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[hwinput] keyboard focus: program (responder)
+[11:37:16.903] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=45 resident=1621MB dbg=DEBUGGED rev=ml525
+00b4:err:dialog:madeira_msgbox_origin [msgbox-origin] box L"Error" / L"Fallout: New Vegas does not appear to be installed and the installer could not be found.\nTry exploring to your DVD-ROM drive and selecting setup.exe to install the game.": main exe base 00400000 size 0x1fc000
+[win-name] #345 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #346 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #347 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #348 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #349 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #350 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #351 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #352 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #353 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #354 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #356 hwnd=0x10098 class='' text="Fallout: New Vegas does not appear to be installed and the installer could not be found.?Try exploring to your DVD-ROM drive and selecting setup.exe to install the game." rev=ml853
+[win-name] #358 hwnd=0x1007c class='' text="Error" rev=ml853
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)
+[11:37:46.934] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=45 resident=1043MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (app active)
+[win-name] #364 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #365 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #366 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #367 hwnd=0x1007c class='' text="Error" rev=ml853
+[win-name] #617 hwnd=0x10064 class='' text="?y" rev=ml853
+[win-name] #618 hwnd=0x1006a class='' text="?i" rev=ml853
+[win-name] #619 hwnd=0x1006e class='' text="?x" rev=ml853
+[win-name] #620 hwnd=0x10068 class='' text="?u" rev=ml853
+[win-name] #621 hwnd=0x1006c class='' text="?k" rev=ml853
+[win-name] #622 hwnd=0x10064 class='' text="?y" rev=ml853
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=9373
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=9382
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=497
+[Wine ntdll/server] process_exit_wrapper(0)
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[11:37:59.467] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=9799
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[11:37:59.759] [INFO] [dock-report] probe-result=0
+[frontend] graceful close requested
+[hwinput] keyboard focus: elsewhere (app inactive)
+[11:40:28.567] [INFO] detach-wait: presents=0 running=1 elapsed=251s
+[freeze] alive t+247s beats=4 gaps=1 iter=463 gen=1 threads=27 resident=725MB dbg=DEBUGGED rev=ml525
+[hwinput] keyboard focus: program (app active)
+[footprint] rev=ml358 phys=1334 MB (peak 1567) internal=539 MB compressed=792 MB external=182 MB reusable=3 MB (cycle=60)
+[footprint] rev=ml358 phys=1335 MB (peak 1567) internal=540 MB compressed=792 MB external=182 MB reusable=3 MB (cycle=61)
+[footprint] rev=ml358 phys=1334 MB (peak 1567) internal=540 MB compressed=792 MB external=182 MB reusable=4 MB (cycle=62)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=1335 MB (peak 1567) internal=540 MB compressed=792 MB external=182 MB reusable=3 MB (cycle=63)
+[footprint] rev=ml358 phys=1334 MB (peak 1567) internal=540 MB compressed=792 MB external=182 MB reusable=3 MB (cycle=64)
+[footprint] rev=ml358 phys=1335 MB (peak 1567) internal=540 MB compressed=792 MB external=182 MB reusable=3 MB (cycle=65)
+[hwinput] keyboard focus: elsewhere (app inactive)
+[hwinput] mouse focus: elsewhere (app inactive)

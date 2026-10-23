@@ -142,6 +142,15 @@ corpus = [
     "addr 2a02:1234:5678:9abc:def0:1234:5678:9abc, fe80::1c2b:3d4e%en0, fd12:3456::1, std::thread dxmt::Presenter Face::Add",
     "keyboard connected: Ali's Keyboard; GameController connected: Jane’s DualSense Wireless Controller; it's a keyboard",
     "[xp-t] 23:25:02.028 m670405:17/20:1.9/2.0:214 m685463:0/2:2.4/1.1:9",
+    "epic token eg1~eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhIn0.c2lnbmF0dXJl and egoc1~eyJhbGci.abc.def, not eg1~ alone or PROGRA~1 or veg1~x",
+    '{"redirectUrl":"https://localhost/launcher/authorized?code=x","authorizationCode":"0123456789abcdef0123456789abcdef","sid":null}',
+    '"authorizationCode" : "short" and "authorizationCode":null',
+    # Epic Games milestone 2: a signed-in start's command line (as the runtime prints it escaped, and plain), its masks, an address with a code.
+    r'NtCreateUserProcess: image=L"C:\\Games\\a.exe" cmdline=L"\"C:\\Games\\a.exe\" -AUTH_LOGIN=unused -AUTH_PASSWORD=0123456789abcdef0123456789abcdef -AUTH_TYPE=exchangecode -epicapp=Sugar -epicusername=\"Some One\" -epicuserid=fedcba9876543210fedcba9876543210 -epiclocale=en"',
+    'cmd -auth_password=ABCDEF0123456789ABCDEF0123456789 -EPICUSERID=fedcba9876543210fedcba9876543210 -epicusername=Plain',
+    'masked: -AUTH_PASSWORD=* -epicuserid=* -epicusername=* and -AUTH_PASSWORD=<code> -epicuserid=<id> stay',
+    'page https://www.epicgames.com/activate?userCode=ABCD1234&x=1 and https://localhost/cb?code=0123456789abcdef&state=2 and exchangeCode=abcdef0123456789abcdef; not exit code=0 or barcode=1 or -AUTH_PASSWORD alone',
+    'short -epicuserid=12 and -epicusername="" and -epicusername= end',
     "",
     "x" * 20000,
 ]

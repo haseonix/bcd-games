@@ -76,10 +76,87 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
     if !ok { failures += 1 }
 }
 
+/// Dates are made from numbers (BCDFormat, the "dates" part of BCDStore.swift): the same text Foundation gives in the
+/// device's time zone, for 4000 moments. The host test may use DateFormatter; the app may not. The zone is the process's
+/// (check-bcd-game-page.py runs this with TZ set to several zones, "-datesOnly" for the dates alone).
+func dateChecks() {
+    let zone = TimeZone.current
+    if let wanted = ProcessInfo.processInfo.environment["TZ"] {
+        check("dates: the process runs in the zone the test asked for (\(wanted))", zone.identifier == wanted, zone.identifier)
+    }
+    func foundation(_ pattern: String, _ date: Date, utc: Bool = false) -> String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.calendar = Calendar(identifier: .gregorian)
+        f.timeZone = utc ? TimeZone(identifier: "UTC")! : zone
+        f.dateFormat = pattern
+        return f.string(from: date)
+    }
+    var mismatches: [String] = []
+    var seed: UInt64 = 0x9E37_79B9_7F4A_7C15
+    let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    for i in 0..<4000 {
+        seed = seed &* 6364136223846793005 &+ 1442695040888963407
+        // From 1970 to 2100; every seventh moment is a whole second plus a fixed fraction.
+        let seconds = i % 7 == 0 ? (Double(seed >> 33) / Double(1 << 31) * 4_100_000_000).rounded(.down) + 0.987
+                                 : Double(seed >> 33) / Double(1 << 31) * 4_100_000_000
+        let date = Date(timeIntervalSince1970: seconds)
+        let monthName = months[Int(foundation("M", date))! - 1]
+        let day = "\(Int(foundation("d", date))!) \(monthName) \(foundation("yyyy", date))"
+        let wants: [(String, String, String)] = [
+            ("fullDate", BCDFormat.fullDate(date), day),
+            ("dateTime", BCDFormat.dateTime(date), day + " at " + foundation("HH:mm", date)),
+            ("reportTime", BCDFormat.reportTime(date), foundation("yyyy-MM-dd HH:mm", date)),
+            ("fileStamp", BCDFormat.fileStamp(date), foundation("yyyy-MM-dd_HH-mm-ss", date)),
+            ("fileStamp minutes", BCDFormat.fileStamp(date, seconds: false), foundation("yyyy-MM-dd_HH-mm", date)),
+            ("compactStamp", BCDFormat.compactStamp(date), foundation("yyyyMMdd-HHmmss", date)),
+            ("utcFolderStamp", BCDFormat.utcFolderStamp(date), foundation("yyyy-MM-dd'T'HH-mm-ss'Z'", date, utc: true)),
+            ("logClock", BCDFormat.logClock(date), foundation("HH:mm:ss.SSS", date)),
+        ]
+        for (name, got, want) in wants where got != want { mismatches.append("\(name) \(seconds): \(got) != \(want)") }
+        if mismatches.count > 5 { break }
+    }
+    check("dates in \(zone.identifier): the helpers give Foundation's text for 4000 moments", mismatches.isEmpty, mismatches.prefix(5))
+    // The clock changes of the zone: each hour around the two changes of 2026, and the days at the year's edges.
+    var edge: [String] = []
+    var moment = 1_767_225_600.0 - 40 * 86_400   // 2025-12-31 minus 40 days
+    while moment < 1_767_225_600.0 + 400 * 86_400 {
+        let date = Date(timeIntervalSince1970: moment)
+        if BCDFormat.fileStamp(date) != foundation("yyyy-MM-dd_HH-mm-ss", date) { edge.append("\(moment): \(BCDFormat.fileStamp(date))") }
+        moment += 1_800
+    }
+    check("dates in \(zone.identifier): every half hour of 15 months, including the clock changes", edge.isEmpty, edge.prefix(5))
+    let nowDate = Date(timeIntervalSince1970: 1_790_000_000)
+    check("dates in \(zone.identifier): shortDate drops this year only",
+          BCDFormat.shortDate(nowDate, now: nowDate).split(separator: " ").count == 2
+          && BCDFormat.shortDate(Date(timeIntervalSince1970: 1_600_000_000), now: nowDate).hasSuffix(" 2020"))
+    // "2026-10-18" is that day (at noon) in the zone; shapes that are not a real day are nil.
+    check("dates in \(zone.identifier): day(\"2026-10-18\") is that day at noon", BCDFormat.day("2026-10-18").map { foundation("yyyy-MM-dd HH:mm", $0) } == "2026-10-18 12:00")
+    check("dates in \(zone.identifier): day() takes leap days and nothing else",
+          BCDFormat.day("2028-02-29") != nil && BCDFormat.day("2026-02-29") == nil && BCDFormat.day("2100-02-29") == nil
+          && BCDFormat.day("2000-02-29") != nil && BCDFormat.day("2026-13-01") == nil && BCDFormat.day("2026-00-10") == nil
+          && BCDFormat.day("2026-04-31") == nil && BCDFormat.day("") == nil && BCDFormat.day("2026-10-18T10:00") == nil
+          && BCDFormat.day("26-10-2018") == nil && BCDFormat.day("2026/10/18") == nil && BCDFormat.day("2026-1-018") == nil
+          && BCDFormat.day("0000-01-01") == nil)
+    // "Last played": today, yesterday, a date.
+    check("dates in \(zone.identifier): dayWord says Today, Yesterday and the date",
+          BCDFormat.dayWord(nowDate, now: nowDate) == "Today" && BCDFormat.dayWord(nowDate.addingTimeInterval(-86_400), now: nowDate) == "Yesterday"
+          && BCDFormat.dayWord(nowDate.addingTimeInterval(-3 * 86_400), now: nowDate) == BCDFormat.fullDate(nowDate.addingTimeInterval(-3 * 86_400)))
+    check("dates: dates that are no moment (infinite, NaN, distant) do not trap",
+          BCDFormat.fullDate(Date(timeIntervalSinceReferenceDate: .infinity)) == "1 Jan 1970"
+          && BCDFormat.logClock(Date(timeIntervalSinceReferenceDate: .nan)) == "00:00:00.000"
+          && !BCDFormat.dateTime(.distantPast).isEmpty && !BCDFormat.dateTime(.distantFuture).isEmpty)
+}
+
 @MainActor func settle() async { for _ in 0..<20 { try? await Task.sleep(nanoseconds: 50_000_000) } }
 
 @main struct Main {
     @MainActor static func main() async {
+        if CommandLine.arguments.contains("-datesOnly") {
+            dateChecks()
+            print(failures == 0 ? "dates: all passed" : "dates: \(failures) failed")
+            exit(failures == 0 ? 0 : 1)
+        }
         var system = BCDSystemStatus()
         system.jit = .on
         system.memoryLimitBytes = 6_000_000_000
@@ -163,12 +240,15 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
               && p.notes.first?.text.contains("extended virtual addressing") == false, p)
         noMemory.extendedAddressing = false
         p = plan(ready, nil, noMemory)
-        check("neither limit nor extended addressing: one note names both", p.notes.first?.text.contains("increased memory limit and extended virtual addressing") == true, p)
+        // Owner, 2026-10-22: only the increased memory limit is named; extended virtual addressing did not change the
+        // address map on any iOS version in the logs, so a missing VA+ gets no note of its own and no mention.
+        check("neither limit nor extended addressing: the memory note only, GetMoreRam named",
+              p.notes.first?.text.contains("lacks the increased memory limit, so") == true && p.notes.first?.text.contains("GetMoreRam") == true
+              && !p.notes.contains { $0.text.contains("virtual addressing") }, p)
         var noVA = system
         noVA.extendedAddressing = false
         p = plan(ready, nil, noVA)
-        check("no extended addressing: its own note, GetMoreRam or a paid account",
-              p.notes.first?.text.contains("lacks extended virtual addressing") == true && p.notes.first?.text.contains("GetMoreRam") == true, p)
+        check("no extended addressing alone: no note about it", !p.notes.contains { $0.text.contains("virtual addressing") }, p)
         p = plan(big, nil, noVA)
         check("the missing entitlement does not concern a game that is not installed", p.notes.isEmpty || !p.notes.contains { $0.text.contains("virtual addressing") }, p)
         // Wine Mono: the last start of this game died for want of it (Panzer Paladin, 2026-10-20), and the device still has none.
@@ -384,6 +464,32 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
         check("GOG: Options offer no Check and repair files", !gogDetails.offersRepair(gogGame)
               && gogDetails.offersRepair(BCDGame(id: "steam.1", title: "S", store: .steam, state: .ready, size: nil)))
 
+        // Epic (milestone 1): a game BCD cannot install shows the reason and no Install; one that may not start says so beside
+        // Install; with neither, the page is what it was.
+        let epicGame = BCDGame(id: "epic.Fixture", title: "Fixture", store: .epic, state: .notInstalled, size: 4_000_000_000)
+        var epicBlocked = BCDGameDetails()
+        epicBlocked.installBlocker = "This game comes with Easy Anti-Cheat anti-cheat, which can't run in BCD."
+        let blockedPlan = BCDGamePagePlan(game: epicGame, download: nil, system: system, otherDownloads: false, details: epicBlocked)
+        check("Epic: a game BCD cannot install has no Install, no size line and its reason as a warning",
+              blockedPlan.main == nil && blockedPlan.others.isEmpty && blockedPlan.installLine == nil && blockedPlan.progress == nil
+              && blockedPlan.notes.first?.text == epicBlocked.installBlocker && blockedPlan.notes.first?.warning == true, blockedPlan)
+        var warned = BCDGameDetails()
+        warned.installWarning = "Epic says this game must be online to start."
+        let warnedPlan = BCDGamePagePlan(game: epicGame, download: nil, system: system, otherDownloads: false, details: warned)
+        check("Epic: a game that may not start keeps Install, and says so as a plain note",
+              warnedPlan.main?.action == .install(.device) && warnedPlan.notes.contains { $0.text == warned.installWarning && !$0.warning }, warnedPlan)
+        let plainPlan = BCDGamePagePlan(game: epicGame, download: nil, system: system, otherDownloads: false, details: BCDGameDetails())
+        let steamLikePlan = BCDGamePagePlan(game: BCDGame(id: "gog.1", title: "G", store: .gog, state: .notInstalled, size: 4_000_000_000), download: nil,
+                                            system: system, otherDownloads: false, details: BCDGameDetails())
+        check("Epic: with no blocker and no warning the page is the other stores' (Install, the size and the room left)",
+              plainPlan.main?.action == .install(.device) && plainPlan.notes.isEmpty && plainPlan.installLine == steamLikePlan.installLine
+              && plainPlan.notes == steamLikePlan.notes, plainPlan)
+        var blockedElsewhere = BCDGameDetails()
+        blockedElsewhere.installBlocker = "x"
+        check("a blocker concerns only a game that is not installed",
+              BCDGamePagePlan(game: BCDGame(id: "epic.A", title: "A", store: .epic, state: .ready, size: 1), download: nil, system: system, otherDownloads: false,
+                              details: blockedElsewhere).main?.action == .play)
+
         // The online list's other answers, word for word.
         check("refresh lines: updated, downloaded list offline, nothing online yet, a list refused",
               BCDRecommendedRefresh.updated(changes: 1).line == "Updated: 1 change"
@@ -489,6 +595,227 @@ func check(_ what: String, _ ok: Bool, _ detail: Any = "") {
         gone.open(store)
         gone.request(.play)
         check("a game no longer in the library: nothing runs", gone.game == nil && !recorder.calls.contains("play nothing"))
+        // Steam DLC (BCDGameDLC.swift): the question before a first install, and Options' DLC section.
+        func spaced(_ text: String?) -> String? { text?.replacingOccurrences(of: "\u{00A0}", with: " ") }
+        do {
+            recorder.calls = []
+            let dlcBackend = Backend()
+            dlcBackend.shown.dlcOffer = BCDDLCOffer(items: [BCDDLCOfferItem(id: 11, name: "Alpha", bytes: 1_500_000_000),
+                                                           BCDDLCOfferItem(id: 12, name: "Beta", bytes: 2_000_000_000),
+                                                           BCDDLCOfferItem(id: 13, name: "Gamma", bytes: 1_000_000_000)])
+            let dlcModel = BCDGamePageModel(gameID: "steam.620", backend: dlcBackend)
+            dlcModel.close = { recorder.calls.append("close") }
+            dlcModel.open(store)
+            dlcBackend.calls = []
+            dlcModel.request(.install(.device))
+            let asked = dlcModel.pending
+            check("a game with owned DLC asks before its first install: Choose DLC…, Game only, Cancel, and the sizes",
+                  recorder.calls.isEmpty && asked?.question.alternative == "Game only" && asked?.question.confirm == "Choose DLC…"
+                  && asked?.question.message.contains("3 DLC") == true && asked?.question.message.contains(BCDFormat.bytes(4_500_000_000)) == true
+                  && asked?.question.message.contains("\u{201C}Alpha\u{201D}, \u{201C}Beta\u{201D} and \u{201C}Gamma\u{201D}") == true
+                  && asked?.question.destructive == false && asked?.action == .chooseDLC(.device)
+                  && asked?.alternative == .installChoosingDLC(.device, chosen: []), asked as Any)
+            dlcModel.answer(true)
+            check("Choose DLC… opens the chooser: every owned DLC, all on; nothing installs and nothing is stored yet",
+                  dlcModel.pending == nil && dlcModel.chooser?.rows.map(\.id) == [11, 12, 13] && dlcModel.chooser?.selected == [11, 12, 13]
+                  && dlcModel.chooser?.place == .device && dlcBackend.calls.isEmpty && recorder.calls.isEmpty, dlcModel.chooser as Any)
+            check("the chooser says what the download comes to: the game and the DLC chosen",
+                  dlcModel.chooser?.chosenBytes == 4_500_000_000 && dlcModel.chooser?.totalBytes == 12_800_000_000 + 4_500_000_000
+                  && spaced(dlcModel.chooser?.summary) == "Download: the game \(BCDFormat.bytes(12_800_000_000)) + 3 of 3 DLC \(BCDFormat.bytes(4_500_000_000)) = \(BCDFormat.bytes(17_300_000_000))"
+                  && dlcModel.chooser?.installTitle == "Install", dlcModel.chooser?.summary as Any)
+            check("a size and its unit never split across two lines (no-break spaces)",
+                  dlcModel.chooser?.summary.contains("12.8\u{00A0}GB") == true && dlcModel.chooser?.summary.contains("=\u{00A0}17.3\u{00A0}GB") == true
+                  && dlcModel.chooser?.summary.contains("4.5\u{00A0}GB") == true, dlcModel.chooser?.summary as Any)
+            dlcModel.chooserToggle(12)
+            check("a switch turns one DLC off; the total follows",
+                  dlcModel.chooser?.selected == [11, 13] && dlcModel.chooser?.chosenBytes == 2_500_000_000
+                  && dlcModel.chooser?.summary.contains("2 of 3 DLC") == true && dlcModel.chooser?.allOn == false)
+            dlcModel.chooserToggle(99)
+            check("a DLC that is not in the list can not be switched", dlcModel.chooser?.selected == [11, 13])
+            dlcModel.chooserSelectNone()
+            check("Select none: no DLC; Install then says it is the game only",
+                  dlcModel.chooser?.selected == [] && dlcModel.chooser?.noneOn == true && dlcModel.chooser?.installTitle == "Install the game only"
+                  && spaced(dlcModel.chooser?.summary) == "Download: the game \(BCDFormat.bytes(12_800_000_000)), no DLC")
+            dlcModel.chooserSelectAll()
+            check("Select all: every DLC again", dlcModel.chooser?.selected == [11, 12, 13] && dlcModel.chooser?.allOn == true)
+            dlcModel.chooserBack()
+            check("Cancel in the chooser goes back to the question and stores nothing",
+                  dlcModel.chooser == nil && dlcModel.pending?.action == .chooseDLC(.device) && dlcBackend.calls.isEmpty && recorder.calls.isEmpty)
+            dlcModel.answer(true)
+            check("the chooser opens again with every switch on (nothing was kept)", dlcModel.chooser?.selected == [11, 12, 13])
+            dlcModel.chooserToggle(11)
+            dlcModel.chooserInstall()
+            check("Install stores exactly the DLC chosen, then the page closes and Install runs",
+                  dlcBackend.calls == ["set dlc.choice=12,13"] && recorder.calls == ["close", "install steam.620 device"] && dlcModel.chooser == nil,
+                  [dlcBackend.calls, recorder.calls])
+            recorder.calls = []; dlcBackend.calls = []
+            dlcModel.request(.install(.device))
+            dlcModel.answer(true)
+            dlcModel.chooserInstall()
+            check("everything left on stores every DLC's App ID (the all-on case)", dlcBackend.calls == ["set dlc.choice=11,12,13"], dlcBackend.calls)
+            recorder.calls = []; dlcBackend.calls = []
+            dlcModel.request(.install(.device))
+            dlcModel.answer(true)
+            dlcModel.chooserSelectNone()
+            dlcModel.chooserInstall()
+            check("none chosen is the game only: \"none\" is stored and the game installs",
+                  dlcBackend.calls == ["set dlc.choice=none"] && recorder.calls == ["close", "install steam.620 device"], [dlcBackend.calls, recorder.calls])
+            check("the choice reads back in the backend's words", BCDGameDLC.chosenSet("12,13") == [12, 13] && BCDGameDLC.chosenSet("none") == []
+                  && BCDGameDLC.chosenSet("all") == nil && BCDGameDLC.chosenSet("5, x, 7") == [5, 7]
+                  && BCDGameDLC.chooseValue([13, 11]) == "11,13" && BCDGameDLC.chooseValue([]) == "none")
+            recorder.calls = []; dlcBackend.calls = []
+            dlcModel.request(.install(.externalDrive))
+            dlcModel.answerAlternative()
+            check("Game only: the game alone is remembered, then Install runs",
+                  dlcBackend.calls == ["set dlc.choice=none"] && recorder.calls == ["close", "install steam.620 externalDrive"], [dlcBackend.calls, recorder.calls])
+            recorder.calls = []; dlcBackend.calls = []
+            dlcModel.request(.install(.device))
+            dlcModel.answer(false)
+            check("Cancel: nothing is chosen and nothing installs", dlcBackend.calls.isEmpty && recorder.calls.isEmpty && dlcModel.pending == nil)
+            dlcBackend.shown.dlcOffer = nil
+            dlcModel.reload()
+            dlcModel.request(.install(.device))
+            check("no offer (no DLC, asked before, DLC support off): Install runs at once, as before",
+                  recorder.calls == ["close", "install steam.620 device"] && dlcModel.pending == nil && dlcBackend.calls.isEmpty, recorder.calls)
+            check("the DLC install actions close the page like Install; opening the chooser does not", BCDGameAction.installChoosingDLC(.device, chosen: []).closesPage
+                  && BCDGameAction.installChoosingDLC(.device, chosen: []).question(for: ready, details: BCDGameDetails()) == nil
+                  && !BCDGameAction.chooseDLC(.device).closesPage)
+
+            let rows = [BCDDLCRow(id: 11, name: "Alpha", bytes: 200_000_000, installed: true, wanted: true),
+                        BCDDLCRow(id: 12, name: "Beta", bytes: 1_000_000_000, installed: false, wanted: false),
+                        BCDDLCRow(id: 13, name: "Gamma", bytes: 0, installed: true, wanted: false)]
+            let section = BCDGameDLC.group(BCDDLCState(rows: rows, withoutFiles: 2, notOwned: 4))
+            check("no owned DLC with files: no DLC section", BCDGameDLC.group(BCDDLCState(rows: [], withoutFiles: 2, notOwned: 4)) == nil)
+            check("the section: a switch per owned DLC at its installed state, its size and state in the note",
+                  section?.settings.prefix(3).map(\.id) == ["dlc.11", "dlc.12", "dlc.13"]
+                  && section?.settings[0].value == "1" && section?.settings[1].value == "0" && section?.settings[2].value == "0"
+                  && section?.settings[2].defaultValue == "1" && section?.settings[2].changed == true && section?.settings[0].changed == false
+                  && section?.settings[0].note == "\(BCDFormat.bytes(200_000_000)) · Installed"
+                  && section?.settings[1].note == "\(BCDFormat.bytes(1_000_000_000)) · Not installed"
+                  && section?.settings[2].note == "Will be removed", section as Any)
+            let tail = section?.settings.dropFirst(3).map(\.id) ?? []
+            check("then Install all (the DLC not installed), Apply, and the DLC not owned as a number", tail == ["dlc.all", "dlc.apply", "dlc.notowned", "dlc.nofiles"], tail)
+            check("Apply says what it does and asks, destructively when files go",
+                  section?.settings.first { $0.id == "dlc.apply" }?.title == "Remove 1 DLC"
+                  && section?.settings.first { $0.id == "dlc.apply" }?.question?.destructive == true
+                  && section?.settings.first { $0.id == "dlc.all" }?.title == "Install all your DLC · \(BCDFormat.bytes(1_000_000_000))"
+                  && section?.settings.first { $0.id == "dlc.all" }?.question?.destructive == false)
+            let both = BCDGameDLC.group(BCDDLCState(rows: [BCDDLCRow(id: 1, name: "A", bytes: 5_000, installed: false, wanted: true),
+                                                           BCDDLCRow(id: 2, name: "B", bytes: 0, installed: true, wanted: false)]))
+            check("a download and a removal at once: one Apply row names both", both?.settings.first { $0.id == "dlc.apply" }?.title
+                  == "Download 1 DLC · \(BCDFormat.bytes(5_000)), Remove 1 DLC", both?.settings.map(\.title) as Any)
+            check("the section's row says how many are installed and that changes wait",
+                  section?.summary == "2 of 3 installed · changes waiting"
+                  && BCDGameDLC.group(BCDDLCState(rows: [BCDDLCRow(id: 1, name: "A", bytes: 0, installed: false, wanted: false)]))?.summary == "None installed")
+            check("nothing to apply, everything installed: only the switches", BCDGameDLC.group(BCDDLCState(rows: [BCDDLCRow(id: 1, name: "A", bytes: 0, installed: true, wanted: true)]))?.settings.map(\.id) == ["dlc.1"])
+            let busy = BCDGameDLC.group(BCDDLCState(rows: rows, busy: true))
+            check("while the game downloads the switches and buttons wait for it", busy?.settings.filter { $0.id.hasPrefix("dlc.") }.allSatisfy { $0.locked != nil } == true)
+            check("the section's text offers no purchase", !(section?.settings.flatMap { [$0.title, $0.note ?? "", $0.value] } ?? []).joined(separator: " ").lowercased().contains("buy")
+                  && !(section?.settings.flatMap { [$0.title, $0.note ?? "", $0.value] } ?? []).joined(separator: " ").lowercased().contains("purchase"))
+            check("setting ids go to the engine and back", BCDGameDLC.dlcID("dlc.123") == 123 && BCDGameDLC.dlcID("dlc.all") == nil && BCDGameDLC.dlcID("display") == nil)
+            // Through the model: a switch is a setting of the section; Apply asks first.
+            let sectionBackend = Backend()
+            sectionBackend.shown.groups = section.map { [$0] } ?? []
+            let sectionModel = BCDGamePageModel(gameID: "steam.620", backend: sectionBackend)
+            sectionModel.close = {}
+            sectionModel.open(store)
+            sectionModel.showSettings(true)
+            sectionBackend.calls = []
+            sectionModel.request(.set("dlc.12", "1"))
+            sectionModel.request(.set("dlc.11", "1"))
+            check("a switch moves the engine's choice at once; an unchanged one does nothing", sectionBackend.calls == ["set dlc.12=1"], sectionBackend.calls)
+            sectionModel.request(.set("dlc.apply", "run"))
+            check("Apply asks before it removes files", sectionModel.pending?.question.destructive == true && sectionBackend.calls == ["set dlc.12=1"])
+            sectionModel.answer(true)
+            check("... and runs once confirmed", sectionBackend.calls == ["set dlc.12=1", "set dlc.apply=run"], sectionBackend.calls)
+        }
+
+        // Install waits for the DLC lookup (BCDGameDLC.swift, "Checking your DLC…"): the question must not be missed by a tap that
+        // comes before Steam has answered which DLC the player owns.
+        do {
+            func waiting(_ configure: (Backend) -> Void = { _ in }) -> (BCDGamePageModel, Backend) {
+                let b = Backend()
+                b.shown.dlcCheck = .checking
+                configure(b)
+                let m = BCDGamePageModel(gameID: "steam.620", backend: b)
+                m.checkSeconds = 0.4
+                m.close = { recorder.calls.append("close") }
+                m.open(store)
+                recorder.calls = []; b.calls = []
+                return (m, b)
+            }
+            let owned = BCDDLCOffer(items: [BCDDLCOfferItem(id: 11, name: "Alpha", bytes: 1_000_000_000), BCDDLCOfferItem(id: 12, name: "Beta", bytes: 2_000_000_000)])
+            var (m, b) = waiting()
+            m.request(.install(.device))
+            check("Install while Steam is still asked about the DLC waits: a card says Checking your DLC…, nothing installs",
+                  recorder.calls.isEmpty && m.pending?.checking == true && m.pending?.question.title == "Checking your DLC…"
+                  && m.pending?.question.confirm == "Game only" && m.pending?.question.alternative == nil && b.calls.isEmpty, m.pending as Any)
+            let card = m.pending
+            m.request(.install(.device))
+            check("a second tap on Install changes nothing", m.pending == card && recorder.calls.isEmpty)
+            b.shown.dlcCheck = .none
+            b.shown.dlcOffer = owned
+            m.reload()
+            check("the lookup is done with owned DLC: the card turns into the DLC question, still waiting for the answer",
+                  m.pending?.checking == false && m.pending?.question.title == "Install your DLC too?"
+                  && m.pending?.alternative == .installChoosingDLC(.device, chosen: []) && m.pending?.action == .chooseDLC(.device) && recorder.calls.isEmpty, m.pending as Any)
+            m.answer(true)
+            m.chooserInstall()
+            check("Choose DLC… then Install (all left on) installs with the choice remembered first",
+                  b.calls == ["set dlc.choice=11,12"] && recorder.calls == ["close", "install steam.620 device"], [b.calls, recorder.calls])
+            await settle()
+            check("... and the wait's timer does not install it a second time", recorder.calls == ["close", "install steam.620 device"], recorder.calls)
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            b.shown.dlcCheck = .none
+            m.reload()
+            check("the lookup is done, no owned DLC with files: the game installs alone at once, nothing logged as skipped",
+                  recorder.calls == ["close", "install steam.620 device"] && m.pending == nil && b.calls.isEmpty, [b.calls, recorder.calls])
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            b.shown.dlcCheck = .failed
+            m.reload()
+            check("the lookup failed: the game installs alone and the backend logs why",
+                  recorder.calls == ["close", "install steam.620 device"] && b.calls == ["set dlc.skipped=lookup-failed"] && m.pending == nil,
+                  [b.calls, recorder.calls])
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            await settle()
+            check("the wait ran out (the test shortens it): the game installs alone and the backend logs the timeout",
+                  recorder.calls == ["close", "install steam.620 device"] && b.calls == ["set dlc.skipped=timeout"] && m.pending == nil,
+                  [b.calls, recorder.calls])
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            m.answer(false)
+            await settle()
+            check("Cancel on the card: nothing installs, and the timer does not install it later",
+                  recorder.calls.isEmpty && b.calls.isEmpty && m.pending == nil, [b.calls, recorder.calls])
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            m.answer(true)
+            await settle()
+            check("Game only on the card: installs at once without a remembered choice, and only once",
+                  recorder.calls == ["close", "install steam.620 device"] && b.calls.isEmpty, [b.calls, recorder.calls])
+
+            (m, b) = waiting { $0.shown.dlcCheck = .failed }
+            m.request(.install(.device))
+            check("a lookup that already failed: no wait, the game installs alone and the backend logs why",
+                  recorder.calls == ["close", "install steam.620 device"] && b.calls == ["set dlc.skipped=lookup-failed"], [b.calls, recorder.calls])
+
+            (m, b) = waiting()
+            m.request(.install(.device))
+            m.leave()
+            await settle()
+            check("leaving the page while it waits stops the timer", recorder.calls.isEmpty && b.calls.isEmpty, [b.calls, recorder.calls])
+            check("the checking card draws no spinner or timer of its own (a plain card)",
+                  BCDGameDLC.checkingQuestion(title: "Portal 2").message.contains("Portal 2") && BCDGameDLC.checkSeconds == 15)
+        }
+        dateChecks()
         print(failures == 0 ? "page rules: all passed" : "page rules: \(failures) failed")
         exit(failures == 0 ? 0 : 1)
     }

@@ -146,6 +146,12 @@ compile_unixlib "$BUILD_DIR/dnsapi_unixlib_ios.c" "dnsapi_unixlib" "dnsapi" \
 FFMPEG_PREFIX="$REPO_ROOT/toolchains/ffmpeg-ios"
 compile_unixlib "$BUILD_DIR/winegstreamer_unixlib_ios.c" "winegstreamer_unixlib" "winegstreamer" \
     -I"$WINE_SRC/dlls/winegstreamer" -I"$FFMPEG_PREFIX/include"
+# MADEIRA 2026-10-22: winedmo's unix side (dlls/winedmo), the FFmpeg demuxer behind Wine's ASF media
+# source (mfasfsrcsnk.dll): Resident Evil 2's cutscenes are WMV in an ASF file.  Both DLLs are opt-in
+# files (tools/build-wine-extra-dlls.sh); this table is bound by name in virtual_ios.c.  Its
+# unixlib.h (not winegstreamer's) is the one on the include path.
+compile_unixlib "$BUILD_DIR/winedmo_unixlib_ios.c" "winedmo_unixlib" "winedmo" \
+    -I"$WINE_SRC/dlls/winedmo" -I"$FFMPEG_PREFIX/include"
 # MADEIRA ml1990: the wg_parser's H.264/HEVC (VideoToolbox) and AAC
 # (AudioToolbox) decoders.  Its own translation unit with NO Wine header --
 # CoreFoundation and winnt.h disagree about several names -- so it is compiled
@@ -214,7 +220,7 @@ ar rcs "$OBJ_DIR/libntdll_unix.a" \
     "$OBJ_DIR/gnutls_symtab_ios.o" "$OBJ_DIR/ws2_32_unixlib.o" \
     "$OBJ_DIR/bcrypt_unixlib.o" "$OBJ_DIR/secur32_unixlib.o" "$OBJ_DIR/crypt32_unixlib.o" \
     "$OBJ_DIR/dwrite_unixlib.o" "$OBJ_DIR/dnsapi_unixlib.o" \
-    "$OBJ_DIR/winegstreamer_unixlib.o" "$OBJ_DIR/wg_parser_apple_ios.o" \
+    "$OBJ_DIR/winegstreamer_unixlib.o" "$OBJ_DIR/wg_parser_apple_ios.o" "$OBJ_DIR/winedmo_unixlib.o" \
     "$OBJ_DIR/cdrom.o" "$OBJ_DIR/debug.o" "$OBJ_DIR/env.o" "$OBJ_DIR/file.o" \
     "$OBJ_DIR/loader.o" "$OBJ_DIR/loadorder.o" "$OBJ_DIR/process.o" "$OBJ_DIR/registry.o" \
     "$OBJ_DIR/security.o" "$OBJ_DIR/serial.o" "$OBJ_DIR/server.o" \

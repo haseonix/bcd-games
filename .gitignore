@@ -201,3 +201,7 @@ bcd-smoke/out/
 app/Madeira/arm64ec-windows/bcd-smoke-*.exe
 # tools/update-altsource.py output (the AltStore/SideStore source, built by .github/workflows/altsource.yml on GitHub)
 build-out/altsource/
+
+# BCD Host (Epic Games signed-in start): built from bcd-host/ by build/bcd-host/build.sh
+app/Madeira/arm64ec-windows/bcdhost.exe
+bcd-host/out/

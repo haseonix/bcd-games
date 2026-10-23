@@ -466,6 +466,9 @@ check(kind(addLine("breakneck", #"env.MADEIRA_PRELOAD_DLLS = C:\x\evil.dll"#)) =
 check(kind(addLine("breakneck", "dxmt = d3d11.mipClampBC=1")) == .ok && kind(addLine("breakneck", "swap-min-kb = 64")) == .ok,
       "the two app-level keys that are game settings")
 check(kind(addLine("breakneck", "env.MADEIRA_FEX_AVX = 1")) == .ok, "auto-tune's known fix")
+check(kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg")) == .ok && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = fwpuclnt,SensApi")) == .ok
+      && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = sensapi;oledlg")) == .ok && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg,evil")) == .policy
+      && kind(addLine("rdr2-steam", "env.MADEIRA_OPTIN_DLLS = oledlg32")) == .policy, "the opt-in DLLs oledlg, fwpuclnt and sensapi are allowed, another name is not")
 check(kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 400000000")) == .ok && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 0x400000000")) == .ok
       && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 40000000")) == .ok && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 1000000000")) == .ok,
       "the .NET GC's address range, 1 GB to 64 GB in hexadecimal (with or without 0x)")
@@ -473,6 +476,19 @@ check(kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 20000000")) == .poli
       && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 16GB")) == .policy && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = -400000000")) == .policy
       && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 0x")) == .policy && kind(addLine("breakneck", "env.DOTNET_GCRegionRange = 4000000000000000000")) == .policy,
       "...and nothing else: not under 1 GB, not over 64 GB, not text")
+check(["MADEIRA_FAULT_GUARD_RATE", "MADEIRA_MFC_DOCK", "MADEIRA_DOCK_SCRIPT_REGISTRY", "MADEIRA_ANON_CAS_FLUSH", "MADEIRA_NLS_EXTRA", "MADEIRA_WG_VIDEO"]
+        .allSatisfy { kind(addLine("breakneck", "env.\($0) = 1")) == .ok && kind(addLine("breakneck", "env.\($0) = 0")) == .ok },
+      "the build 591 switches (and Albino Lullaby's media switch) that are 0 or 1")
+check(["MADEIRA_FAULT_GUARD_RATE", "MADEIRA_MFC_DOCK", "MADEIRA_DOCK_SCRIPT_REGISTRY", "MADEIRA_ANON_CAS_FLUSH", "MADEIRA_NLS_EXTRA", "MADEIRA_WG_VIDEO"]
+        .allSatisfy { kind(addLine("breakneck", "env.\($0) = 2")) == .policy && kind(addLine("breakneck", "env.\($0) = on")) == .policy
+                      && kind(addLine("breakneck", "env.\($0) = 1;2")) == .policy },
+      "...and nothing else: not 2, not text")
+check(["8", "32", "64", "512"].allSatisfy { kind(addLine("breakneck", "env.MADEIRA_USER_VA_GB = \($0)")) == .ok }
+      && ["0", "7", "513", "1000", "32GB", "-32", "3.5", "0x20"].allSatisfy { kind(addLine("breakneck", "env.MADEIRA_USER_VA_GB = \($0)")) == .policy },
+      "the advertised address space in whole GiB, 8 to 512 (FINAL FANTASY TACTICS)")
+check(kind(addLine("breakneck", "env._JAVA_OPTIONS = -XX:-UseZGC")) == .ok
+      && ["-XX:+UseZGC", "-Xmx1g", "-XX:-UseZGC -Xmx1g", "-javaagent:x.jar", "-XX:-UseZGC;-Xmx1g", "-XX:-UseG1GC"].allSatisfy { kind(addLine("breakneck", "env._JAVA_OPTIONS = \($0)")) == .policy },
+      "the JVM's own variable only with the one value that turns ZGC off (Project Zomboid)")
 let later = addLine("breakneck", ["line": "a-key-of-build-700 = 1", "minBuild": 700])
 check(kind(later, build: 600) == .ok && kind(later, build: 700) == .policy && kind(later, build: 600, everyLine: true) == .policy
       && kind(later, build: nil) == .ok,

@@ -1,0 +1,170 @@
+[11:49:40.968] [INFO] Checking entitlements...
+[11:49:40.968] [INFO] [build] v0.1.579 (579)
+[11:49:40.969] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=8140MB cores=6
+[11:49:40.969] [INFO] [device] address-map=[0x100db0000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[11:49:40.984] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[11:50:22.369] [INFO] [bcd] library launch Raidou TMOTSA: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[11:50:22.369] [INFO] Requesting JIT with Built-in StikJIT...
+[11:50:23.829] [INFO] [dock-launch] image-retire=1
+[11:50:23.829] [INFO] [dock-launch] image-map-guard=1
+[11:50:23.833] [INFO] [dock-installers] app=2288350 scripts=0 programs=0
+[11:50:23.841] [INFO] Running full Wine sequence...
+[11:50:23.841] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100db0000,0x8000000000) 512GB available=8133MB low-power=0 thermal=nominal
+[11:50:23.843] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[11:50:23.844] [INFO] Allocating 896MB JIT pool via debugger...
+[11:50:23.844] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[11:50:23.844] [INFO] [jit-debugger] attached=1 at the pool request
+[11:50:23.845] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 608MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[11:50:24.588] [INFO] RX pool at 0x148000000
+[11:50:24.606] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.818s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7511 MB + phys_footprint=680 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=691 MB (peak 691) internal=690 MB compressed=0 MB external=77 MB reusable=30 MB (cycle=1)
+[gdi-shared] session table 0x7026f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.246s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\windows\\system32\\dockhost.exe" 0x117830000+0x99000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #1 0x117830000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #2 0x117830000+0x8000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #3 0x117838000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #4 0x117838000+0x4000 prot=r-x -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying r-- (MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] #5 0x11783c000+0x4000 prot=rwx -- pure-x64 image page, EXEC has no host meaning here (the emulator runs it at the PE VA); applying rw- (MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x14996c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149a02000)
+[copy-verify] oleaut32.dll: OK, 21 .text pages executable (copy @0x149e1c000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.320s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] imm32.dll: OK, 4 .text pages executable (copy @0x14ae64000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 117830000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702b5f0000+0x100000 held for 2000 ms (1 in flight)
+[hwinput] keyboard focus: program (poll)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[free-delay] #2 release of 0x70323b0000+0x400000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702fa70000+0x120000 held for 2000 ms (3 in flight)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[copy-verify] dbghelp.dll: OK, 22 .text pages executable (copy @0x14d6e4000)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x71f6460000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\video64.dll" 0x71f5dc0000+0x697000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1103 MB (peak 1103) internal=1101 MB compressed=0 MB external=152 MB reusable=35 MB (cycle=2)
+[free-delay] #4 release of 0x703c810000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #5 release of 0x703d7e0000+0xfd0000 held for 2000 ms (4 in flight)
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x20056 class='' text="WineD3D fake window" rev=ml853
+[footprint] rev=ml358 phys=1179 MB (peak 1179) internal=1178 MB compressed=0 MB external=154 MB reusable=35 MB (cycle=3)
+[footprint] rev=ml358 phys=1175 MB (peak 1179) internal=1174 MB compressed=0 MB external=154 MB reusable=43 MB (cycle=4)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Raidou TMOTSA\\Raidou TMOTSA.exe" t+  8.899s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Raidou TMOTSA\\Raidou TMOTSA.exe" 0x116e10000+0x46000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Raidou TMOTSA\\UnityPlayer.dll" 0x71f2ce0000+0x1e31000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x1500e0000)
+[footprint] rev=ml358 phys=1275 MB (peak 1275) internal=1274 MB compressed=0 MB external=189 MB reusable=43 MB (cycle=5)
+ml985: map_image_view size=0x180d1000 base=0x6fffde550000 info_base=0x180000000 map_addr=0x6fffde550000 flags=0x4 charact=0x2022 limits=0x10000..0x73fffeffff
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Raidou TMOTSA\\GameAssembly.dll" 0x71d8af0000+0x180d1000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D AC Load module dnsapi.dll (dnsapi.dll-2edb73fb7e267a8a): 71D89C0000
+D AC Load module nsi.dll (nsi.dll-4a9d70fb6c86a57d): 71D8940000
+D AC Load module dbghelp.dll (dbghelp.dll-043eb877bc0ae473): 71D8850000
+[x64-image] L"\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Raidou TMOTSA\\baselib.dll" 0x71d87e0000+0x69000 mapped without a pool copy (pure x64: the emulator runs it at the PE VA; MADEIRA_X64_IMAGE_NOCOPY)
+D AC Load module baselib.dll (baselib.dll-422575b75963b4a6): 71D87E0000
+D AC Load module WININET.dll (wininet.dll-7ef66a985cac5fca): 71D85D0000
+D AC Load module mpr.dll (mpr.dll-09cefd52a3669014): 71D8540000
+0050:err:module:load_dll [dll-missing] rev=ml336 #53 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #54 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x16cff8574 NO pool/anon alias | region 0x100db0000+0x2048000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x16cff8574 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x16cff8000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x22a087b30 pc=0x16cff8574 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16cff8574 addr=0x0 x18=0x703e440000 type=1 lr=0x16cff8354 sp=0x71d8540000 x16=0xfffffffffffff0b0 x17=0x71d853cc10
+[guest-code] rev=ml333 pool_rip=0x22a087b30 (PE 0x22a087b30) -- NO pool copy for this address (identity translate)
+[fault-host] 16cff8474: a9460f82 a9471784 a9485393 a9495b95 29426389 d53bd06b 927df16b f944856b
+[fault-host] 16cff8494: f94bc56b 3900057f d61f0140 d4400000 d4400000 d53b420a b9040b8a a9020388
+[fault-host] 16cff84b4: a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95 29026389
+[fault-host] 16cff84d4: 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000 d53b420a b9040b8a
+[fault-host] 16cff84f4: a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95
+[fault-host] 16cff8514: 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4200000 d53b420a
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d48 4c9f2d4c 52800001 [f9400021] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x703e440000 TEB=0x703e440000 TEB[0x58]=0x70326a7b30 *(gs_cached+0x58)=0x70326a7b30
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x16cff8574 NO pool/anon alias | region 0x100db0000+0x2048000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x16cff8574 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x16cff8000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x22a087b30 pc=0x16cff8574 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16cff8574 addr=0x0 x18=0x703e440000 type=1 lr=0x16cff8354 sp=0x71d8540000 x16=0xfffffffffffff0b0 x17=0x71d853cc10
+[guest-code] rev=ml333 pool_rip=0x22a087b30 (PE 0x22a087b30) -- NO pool copy for this address (identity translate)
+[fault-host] 16cff84d4: 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4400000 d53b420a b9040b8a
+[fault-host] 16cff84f4: a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393 a9095b95
+[fault-host] 16cff8514: 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c d4200000 d53b420a
+[fault-host] 16cff8534: b9040b8a a9020388 a9036f81 a9047797 a9056b99 a9060f82 a9071784 a9085393
+[fault-host] 16cff8554: a9095b95 29026389 9107038a 4c9f2d40 4c9f2d44 4c9f2d48 4c9f2d4c 52800001
+[fault-host] 16cff8574: f9400021 d53b420a b9040b8a a9020388 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2d48 4c9f2d4c 52800001 [f9400021] d53b420a b9040b8a a9020388
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x703e440000 TEB=0x703e440000 TEB[0x58]=0x70326a7b30 *(gs_cached+0x58)=0x70326a7b30
+00c4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16cff8574 RX from -32, 64 of 64 bytes: 95 5b 09 a9 89 63 02 29 8a 03 07 91 40 2d 9f 4c 44 2d 9f 4c 48 2d 9f 4c 4c 2d 9f 4c 01 00 80 52 21 00 40 f9 0a 42 3b d5 8a 0b 04 b9 88 03 02 a9 81 6f 03 a9 97 77 04 a9 99 6b 05 a9 82 0f 06 a9 
+00c4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16cff8574 (not an anon-JIT page)
+00c4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x22a087b30 RX from -32, 64 of 64 bytes: a8 e2 64 02 fa 6f a0 01 07 70 a0 01 3c 08 a2 01 49 08 a2 01 bb e2 a4 01 d7 59 a1 01 32 0c a0 01 00 00 40 01 c8 e2 24 03 bb e2 a4 01 d7 59 a1 01 32 0c a0 01 e1 e2 e4 02 d7 59 a1 01 32 0c a0 01 
+00c4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 no RW alias for 0x22a087b30 (not an anon-JIT page)
+00c4:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x22a087b30
+00c4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=9761
+[Wine ntdll/server] process_exit_wrapper(-1073741819): closing child fd_socket=448
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[11:50:34.842] [INFO] [dock-game-end] raidou tmotsa.exe ended with status 0xc0000005; the session goes on for now (grace)
+[footprint] rev=ml358 phys=1755 MB (peak 1755) internal=1754 MB compressed=0 MB external=194 MB reusable=43 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #55 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #57 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #58 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=1760 MB (peak 1762) internal=1759 MB compressed=0 MB external=194 MB reusable=43 MB (cycle=8)
+[free-delay] #6 release of 0x7031be0000+0x150000 held for 2000 ms (1 in flight)
+[11:50:40.603] [INFO] [dock-report] launch-game-ended=1
+[free-delay] #7 release of 0x702f150000+0x120000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x7027640000+0x800000 held for 2000 ms (3 in flight)
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=10169
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=10177
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=102
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=133
+[Wine ntdll/server] process_exit_wrapper(0)
+[footprint] rev=ml358 phys=1572 MB (peak 1762) internal=1571 MB compressed=0 MB external=190 MB reusable=43 MB (cycle=9)
+[footprint] rev=ml358 phys=1572 MB (peak 1762) internal=1571 MB compressed=0 MB external=190 MB reusable=43 MB (cycle=10)
+[frontend] graceful close requested
+[11:50:44.342] [INFO] [dock-game-end] raidou tmotsa.exe ended with status 0xc0000005 after 1 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[frontend] returned to library
+[footprint] rev=ml358 phys=1574 MB (peak 1762) internal=1572 MB compressed=0 MB external=190 MB reusable=43 MB (cycle=11)
+[11:50:46.391] [INFO] Detaching debugger...
+[hwinput] keyboard focus: elsewhere (app inactive)
+[footprint] rev=ml358 phys=1586 MB (peak 1762) internal=1583 MB compressed=0 MB external=190 MB reusable=42 MB (cycle=12)
+[footprint] rev=ml358 phys=1583 MB (peak 1762) internal=1581 MB compressed=0 MB external=190 MB reusable=42 MB (cycle=13)

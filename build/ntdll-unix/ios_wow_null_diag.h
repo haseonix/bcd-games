@@ -102,6 +102,13 @@ static const char *ios_wn32_where( const struct ios_wn32_mod *mods, unsigned n, 
     return out;
 }
 
+/* build 591: the same report from the BSD signal path (bus_handler's "BUS->AV: unreadable target"; Devil May Cry, GKQD2V: a load-acquire
+ * of guest address 0x68 reported "BUS->AV: unreadable target addr=0x7900000068" and nothing else, because only the Mach path called this).
+ * There the host's temporary x24 need not hold the address (an LDAR/LDAPR address register is whichever FEX picked), so the x24 test is
+ * dropped for that call; everything else of the gate stays: a data fault in JIT code, x19 a 4 GB aligned window base, the address in the
+ * window's first 64 KB. */
+static int ios_wn_loose;
+
 static void ios_wow_null_diag( const arm_thread_state64_t *st, uintptr_t thread_teb, int exception, uintptr_t fault_addr )
 {
     static volatile int reports;
@@ -116,7 +123,7 @@ static void ios_wow_null_diag( const arm_thread_state64_t *st, uintptr_t thread_
 
     if (exception != EXC_BAD_ACCESS || !thread_teb || !ios_av_args_pc_is_jit( pc )) return;
     if (!((base & 0xffffffffULL) == 0 && base >= 0x100000000ULL && fault_addr >= base && fault_addr - base < 0x10000 &&
-          st->__x[24] == fault_addr)) return;
+          (st->__x[24] == fault_addr || ios_wn_loose))) return;
     for (k = 0; k < 3; k++) if (seen[k] == pc) return;
     if ((num = __sync_add_and_fetch( &reports, 1 )) > 3) return;
     seen[num - 1] = pc;
@@ -221,6 +228,14 @@ static void ios_wow_null_diag( const arm_thread_state64_t *st, uintptr_t thread_
                  teb32, peb32, bits[1], bits[0], tlsexp, nset, set, cut ? " (list cut)" : "" );
         dprintf( STDERR_FILENO, "[wow-null32]   %u allocated index(es) whose cell is NULL in this thread:%s\n", nempty, empty );
     }
+}
+
+
+static void ios_wow_null_diag_bus( const arm_thread_state64_t *st, uintptr_t thread_teb, uintptr_t fault_addr )
+{
+    ios_wn_loose = 1;
+    ios_wow_null_diag( st, thread_teb, EXC_BAD_ACCESS, fault_addr );
+    ios_wn_loose = 0;
 }
 
 #endif

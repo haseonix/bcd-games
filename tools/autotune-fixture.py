@@ -75,6 +75,16 @@ SCRUB = [
     (re.compile(r"\b(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}\b"), "<ip6>"),
     (re.compile(r"(?i)\b(?:fe80|f[cd][0-9a-f]{2}|[23][0-9a-f]{3})(?::[0-9a-f]{1,4})*::(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4})*)?"), "<ip6>"),
     (re.compile(r"""[^\s'’"\\/]{1,40}['’]s (?=(?:[A-Za-z0-9-]+ )?(?:iPhone|iPad|Mac|MacBook|AirPods|Keyboard|Mouse|Trackpad|Controller|DualSense|DualShock|Xbox|Joy-Con)\b)"""), "<name>'s "),
+    # 2026-10-22, Epic Games sign-in (BCDEpic): Epic's two token families and the sign-in page's code.
+    (re.compile(r"\beg1~[A-Za-z0-9._~+/=-]+"), "eg1~<token>"),
+    (re.compile(r"\begoc1~[A-Za-z0-9._~+/=-]+"), "egoc1~<token>"),
+    (re.compile(r'("authorizationCode"\s*:\s*")[0-9A-Za-z]{16,64}'), r"\1<code>"),
+    # 2026-10-22, Epic Games milestone 2 (BCDEpicStart): a signed-in start's one-time code, account ID and name on a command line (the
+    # runtime masks them "*" before they are logged; a value is replaced here, a mask or placeholder is left), and a code in an address.
+    (re.compile(r"""(?i)(-AUTH_PASSWORD=)(?![*<])[^\s"'\\]+"""), r"\1<code>"),
+    (re.compile(r"""(?i)(-epicuserid=)(?![*<])[0-9A-Za-z]{8,64}"""), r"\1<id>"),
+    (re.compile(r"""(?i)(-epicusername=)(?![*<])(?:\\?"[^"]*?\\?"|[^\s"'\\]+)"""), r"\1<name>"),
+    (re.compile(r"""(?i)((?:exchangeCode|userCode)=|[?&]code=)(?![*<])[^&\s"'\\]+"""), r"\1<code>"),
 ]
 
 

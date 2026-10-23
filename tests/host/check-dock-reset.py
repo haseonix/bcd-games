@@ -336,9 +336,13 @@ with tempfile.TemporaryDirectory(prefix='madeira-dock-reset-') as directory:
         print('SKIP: Swift compiler unavailable locally; macOS CI runs this check with --require-swift')
     else:
         (temporary / 'main.swift').write_text(main_swift)
+        # The backup folder's name comes from BCD's date helpers (BCDStore.swift, Foundation only; no ICU date formatter).
+        store_source = (app / 'BCDStore.swift').read_text(encoding='utf-8')
+        (temporary / 'dates.swift').write_text('import Foundation\n\nenum BCDFormat {\n' + store_source[
+            store_source.index('    // dates-begin'):store_source.index('    // dates-end')] + '}\n', encoding='utf-8')
         binary = temporary / 'dockreset'
-        subprocess.run([compiler, '-swift-version', '5', str(app / 'DockReset.swift'), str(temporary / 'main.swift'),
-                        '-o', str(binary)], check=True)
+        subprocess.run([compiler, '-swift-version', '5', str(app / 'DockReset.swift'), str(temporary / 'dates.swift'),
+                        str(temporary / 'main.swift'), '-o', str(binary)], check=True)
 
         # 1. Reset without sign-out.
         base = temporary / 'one'

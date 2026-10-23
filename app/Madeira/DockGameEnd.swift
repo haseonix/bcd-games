@@ -25,6 +25,7 @@ import Foundation
 //     (a launcher's relaunch came within 0.4 s in the logs of 331 Dock sessions; the next start after any crash of
 //     a program was 27 s later or never: Rockstar's service retries).
 // A game that ended with exit code 0, or any other status, is left as it is today.
+// A launch the host reported as failed, with no game process, is the second rule below (round 580).
 
 /// One process of the session, as the engine's process table reports it.
 struct DockProcess: Equatable {
@@ -130,6 +131,60 @@ enum DockGameEndRules {
         if !state.gameOver { return wait("host-still-counts-the-game") }
         if !state.finished { return wait("host-not-finished") }
         return .end(status: last.status, file: last.fileName, lived: last.lived)
+    }
+
+    // MARK: A launch that failed (round 580)
+    //
+    // The other way a Dock session stays open for good: the host reports that the LAUNCH failed and no game process ever
+    // ran. Spec Ops: The Line (2FRXXM, NEXHHM) and Risen 2 (9DBDZ6) are games whose executable Valve builds for each
+    // account (CEG); Valve's client could not (RPC error 1726, `ceg-result=55`), the host finished with `probe-result=49`
+    // a few seconds after it asked Valve's client, the starting screen showed the reason, and the session sat on its desktop: 271 s in the
+    // longest log until the user closed BCD. The host's report is final once it holds `probe-result` (the host has shut
+    // Valve's client down by then, so nothing is still being prepared in the background), and the game never ran
+    // (`launch-game-running` is absent): the same wait as above for a program that is about to start (`failedLaunchGrace`),
+    // then the session ends, and the library says why. A game that ran, or a program of the game that runs now, is never
+    // touched: the first is the crash rule's, the second is a session that is going on.
+
+    /// What the host's report says about the launch (MadeiraDock.Report), as two facts.
+    struct DockHostResult: Equatable {
+        /// `probe-result`: the number the host finished with; nil while it has not finished.
+        var result: Int?
+        /// `launch-game-running=1`: Valve's client saw the game run.
+        var gameRan: Bool
+    }
+
+    /// A launch the host reported as failed, with nothing of the game running. `blocked`: why the session must not be
+    /// ended on this reading (a short fixed word for the log); nil when it may be, once `failedLaunchGrace` has passed.
+    struct FailedLaunch: Equatable {
+        var result: Int
+        var blocked: String?
+    }
+
+    /// Seconds the failure must have stood, with nothing of the game running, before the session ends. The host finished
+    /// before this started counting; a spawn the table has not caught up with yet shows within it.
+    static let failedLaunchGrace = 20.0
+
+    /// nil: nothing to say (the host has not finished, it finished well, the game ran, or a program of the game runs).
+    /// `host` is asked only when nothing of the game runs, so the report file is not read while a game plays.
+    static func failedLaunch(_ table: DockProcessTable, places: SteamLaunchScene.Places,
+                             host: () -> DockHostResult) -> FailedLaunch? {
+        let shared = valveShared(places)
+        for p in table.processes where !p.helper && p.running {
+            switch SteamLaunchScene.owner(p.path, places: places) {
+            case .other:
+                if let shared, SteamLaunchScene.path(p.path).hasPrefix(shared) { break }
+                return nil
+            case .unknown:
+                return nil   // a program whose folder is unknown may be the game: never end under it
+            case .helper, .client:
+                break
+            }
+        }
+        let state = host()
+        guard let result = state.result, result != 0, !state.gameRan else { return nil }
+        if !table.complete { return FailedLaunch(result: result, blocked: "table-incomplete") }
+        if table.untracked > 0 { return FailedLaunch(result: result, blocked: "untracked-process") }
+        return FailedLaunch(result: result, blocked: nil)
     }
 
     /// The engine's text (process_ios.c, madeira_child_report): one line per process, tab separated, path last.

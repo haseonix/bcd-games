@@ -73,6 +73,14 @@ assert len(dns) == 1, len(dns)
 assert "funcs64 = (const void *)dnsapi_unix_call_funcs;" in dns[0], dns[0]
 assert "funcs_wow64 = (const void *)dnsapi_unix_call_wow64_funcs;" in dns[0], dns[0]
 branches = [b for b in branches if b is not dns[0]]
+# winedmo's branch is new too (2026-10-22: Wine's ASF media source, Resident Evil 2 and 7; upstream has no winedmo unix side on
+# iOS): entered by 64-bit callers only (`!wow`), it offers no wow64 table, so a 32-bit caller falls through to the generic
+# fallback, which refuses it.
+dmo = [b for b in branches if 'strstr(match, "winedmo")' in b.split("\n")[0]]
+assert len(dmo) == 1, len(dmo)
+assert dmo[0].split("\n")[0].rstrip().endswith("&& !wow) {"), dmo[0].split("\n")[0]
+assert "funcs64 = (const void *)winedmo_unix_call_funcs;" in dmo[0] and "funcs_wow64" not in dmo[0], dmo[0]
+branches = [b for b in branches if b is not dmo[0]]
 assert len(branches) == len(upstream) + 1, len(branches)
 for (test, table), body in zip(upstream, branches):
     assert test in body.split("\n")[0], (test, body.split("\n")[0])

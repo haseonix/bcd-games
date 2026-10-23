@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "mfc-missing-dock"
+ ],
+ "next": [
+  "env.MADEIRA_MFC_DOCK = 1"
+ ],
+ "note": "Horizon Zero Dawn (Steam 1151640) through BCD Dock, build 580 (TH3BJ8, iPad17,3): the game's process stops at once with c0000135, import_dll Library mfc140.dll not found; the Dock session has no MFC where the x64 game looks (sysx64). MADEIRA_MFC_DOCK links it there. The same game started directly (ARM64EC) has MFC in system32 and runs.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

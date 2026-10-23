@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "nls-extra-codepage"
+ ],
+ "next": [
+  "env.MADEIRA_NLS_EXTRA = 1"
+ ],
+ "note": "Sword and Fairy 3 (PAL3.exe, 32-bit, a local copy), build 580, Send Log 6FW5J5: the game asks for the Simplified-Chinese ANSI code page (id=936) four times, BCD's nls folder has no c_936.nls, and 0.8 s after the start the game's own code reads the NULL page and the process ends (c0000005). env.MADEIRA_NLS_EXTRA = 1 (build 591) makes Wine's c_936.nls and the other extra tables visible. Not tried on a device: whether the missing table is the cause is likely, not shown.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

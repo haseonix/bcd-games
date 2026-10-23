@@ -37,7 +37,8 @@ struct BCDAboutSettings<Backend: BCDAboutBackend>: View {
                 BCDLogoMark(size: layout == .pad ? 72 : 60)
                 VStack(alignment: .leading, spacing: 4) {
                     Text("BCD").font(BCDStyle.title(layout == .pad ? 32 : 26))
-                    Text("Version \(backend.version) (\(backend.build))").font(BCDStyle.label(15)).monospacedDigit()
+                    // BCD is in alpha (owner, 2026-10-21): said next to the version, as on GitHub's releases.
+                    Text("Version \(backend.version) (\(backend.build)) · alpha").font(BCDStyle.label(15)).monospacedDigit()
                     if let stamp = backend.stamp, !stamp.isEmpty {
                         Text(stamp).font(BCDStyle.body(13)).foregroundStyle(BCDStyle.textSoft)
                     }

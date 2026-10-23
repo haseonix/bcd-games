@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "Persona 4 Golden (Steam 1113000 through BCD Dock, no memory entitlements: 454 GB map), build 579, iPhone14,3 (Send Logs 2F8ZK6, 9AMZKP, QK7BQP): P4G.exe is an 888 MiB program with its relocations stripped (ml985: map_image_view size=0x378b2000 base=0x140000000 charact=0x23) that must load at 0x140000000: 'failed to create main module ... c0000018'. exe-window-fixed-base matched and its try (exe-window-mb = 512, QK7BQP header) widened the window to 512 MB, still 376 MiB short; no window can pass the system thread stack at 0x16d060000 (720 MiB from the base). The rule now has exeMaxMB 511, so no try is spent on a program of 512 MiB or more.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "stuck"
+}

@@ -1,0 +1,118 @@
+[08:48:29.258] [INFO] Checking entitlements...
+[08:48:29.259] [INFO] [build] v0.1.580 (580)
+[08:48:29.259] [INFO] [device] model=iPad16,5 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=15416MB available=16365MB cores=10
+[08:48:29.259] [INFO] [device] address-map=[0x1009e8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[08:48:29.284] [INFO] [device] gpu="Apple M4 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[08:48:33.048] [INFO] Requesting JIT with Built-in StikJIT...
+[08:48:34.521] [INFO] [bcd] library launch APlagueTaleInnocence_x64.exe: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off
+[08:48:34.540] [INFO] Running full Wine sequence...
+[08:48:34.541] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1009e8000,0x8000000000) 512GB available=16357MB low-power=0 thermal=nominal
+[08:48:34.546] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[08:48:34.546] [INFO] Allocating 896MB JIT pool via debugger...
+[08:48:34.546] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[08:48:34.547] [INFO] [jit-debugger] attached=1 at the pool request
+[08:48:34.549] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[08:48:35.304] [INFO] RX pool at 0x148000000
+[08:48:35.321] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.831s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[08:48:35.647] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[08:48:35.647] [Wine init_process] reply_pipe=42, sending init_first_thread...
+ml992: os_proc_available_memory=15714 MB + phys_footprint=669 MB = 16384 MB (hw.memsize says 15416 MB)
+[exe-window] 0x140000000+0x1820000 is under the 64MB floor but its relocations are stripped: it can only run at this base, so it gets the window (MADEIRA_EXE_WINDOW_SMALL_FIXED=0 refuses it as before)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ThePlaguex64_PCSUB.exe: OK, 930 .text pages executable (copy @0x148007000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x149828000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149962000)
+[copy-verify] ucrtbase.dll: OK, 34 .text pages executable (copy @0x149d7c000)
+[copy-verify] kernel32.dll: OK, 10 .text pages executable (copy @0x149eb0000)
+[copy-verify] kernelbase.dll: OK, 28 .text pages executable (copy @0x149f78000)
+[footprint] rev=ml358 phys=732 MB (peak 732) internal=728 MB compressed=0 MB external=69 MB reusable=3 MB (cycle=1)
+D 24 Load module APlagueTaleInnocence_x64.exe (aplaguetaleinnocence_x64.exe-5a3123fdcb021273): 140000000
+D 24 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FFCD0000
+D 24 Load module USER32.dll (user32.dll-7d4349728057d260): 71FE150000
+D 24 Load module gdi32.dll (gdi32.dll-c5970f8a59a953f3): 71FE060000
+D 24 Load module advapi32.dll (advapi32.dll-e40c14e1190b1df2): 71FDFB0000
+D 24 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FDF30000
+[copy-verify] oleaut32.dll: OK, 24 .text pages executable (copy @0x14b72c000)
+[copy-verify] msvcp140.dll: OK, 32 .text pages executable (copy @0x14b860000)
+[copy-verify] vcruntime140.dll: OK, 1 .text pages executable (copy @0x14b994000)
+[copy-verify] vcomp140.dll: OK, 2 .text pages executable (copy @0x14ba18000)
+[copy-verify] steam_api64.dll: OK, 14 .text pages executable (copy @0x14ba9d000)
+[copy-verify] winemetal.dll: OK, 2 .text pages executable (copy @0x14d39a000)
+0038:err:module:load_dll [dll-missing] rev=ml336 #1 L"Kerberos.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0038:err:module:load_dll [dll-missing] rev=ml336 #2 L"MSV1_0.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=983 MB (peak 983) internal=979 MB compressed=0 MB external=107 MB reusable=3 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 0), 0 extents, file used 0 of 4096 MB, backs 0 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[footprint] rev=ml1060 fast phys=983 MB compressed=0 MB
+[footprint] rev=ml358 phys=984 MB (peak 984) internal=979 MB compressed=0 MB external=107 MB reusable=3 MB (cycle=3)
+[win-name] #5 hwnd=0x10032 class='' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x2002e class='' text="A Plague Tale: Innocence" rev=ml853
+[swap] ml1077 backed 0x702faf0000+0x1760000 (file off 0 MB): 23 MB in 1 extents, peak 23 MB, 0 refused
+[win-name] #7 hwnd=0x2002e class='' text="A Plague Tale: Innocence" rev=ml853
+[win-name] #9 hwnd=0x20030 class='' text="Console" rev=ml853
+[win-name] #14 hwnd=0x10040 class='' text="Tab2" rev=ml853
+[win-name] #15 hwnd=0x10040 class='' text="Tab2" rev=ml853
+[win-name] #72 hwnd=0x10064 class='' text="[R] Restore Prohibited" rev=ml853
+[win-name] #74 hwnd=0x10066 class='' text="&<<" rev=ml853
+[win-name] #75 hwnd=0x10066 class='' text="&<<" rev=ml853
+[win-name] #77 hwnd=0x10068 class='' text="&>>" rev=ml853
+[win-name] #78 hwnd=0x10068 class='' text="&>>" rev=ml853
+[hwinput] keyboard focus: program (program cursor)
+[free-delay] #1 release of 0x7031a60000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x703d010000+0x110000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7037ec0000+0x110000 held for 2000 ms (3 in flight)
+[win-name] #83 hwnd=0x2002e class='' text="A Plague Tale: Innocence" rev=ml853
+[swap] ml1077 backed 0x7041160000+0x9df0000 (file off 23 MB): 181 MB in 2 extents, peak 181 MB, 0 refused
+[footprint] rev=ml358 phys=1242 MB (peak 1242) internal=1237 MB compressed=0 MB external=290 MB reusable=3 MB (cycle=4)
+[swap] ml1077 backed 0x70426b0000+0x2010000 (file off 23 MB): 55 MB in 2 extents, peak 181 MB, 0 refused
+[swap] ml1077 backed 0x7044ec0000+0xc10000 (file off 55 MB): 67 MB in 3 extents, peak 181 MB, 0 refused
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"OculusSpatializerWwise.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #4 release of 0x7049ac0000+0x370000 held for 2000 ms (4 in flight)
+[footprint] rev=ml1060 fast phys=1766 MB compressed=0 MB
+[08:48:41.961] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml1060 fast phys=2067 MB compressed=0 MB
+[free-delay] #5 release of 0x704adb0000+0x110000 held for 2000 ms (5 in flight)
+[swap] ml1077 backed 0x7057540000+0x2010000 (file off 67 MB): 99 MB in 4 extents, peak 181 MB, 0 refused
+[swap] ml1077 backed 0x7059550000+0x1560000 (file off 99 MB): 120 MB in 5 extents, peak 181 MB, 0 refused
+[free-delay] #6 release of 0x7057540000+0xa10000 held for 2000 ms (6 in flight)
+D 24 Load module xaudio2_7.dll (xaudio2_7.dll-02fa8eaf137b3314): 71F9320000
+D 24 Load module mfplat.dll (mfplat.dll-d7c9f54ea3dcd997): 71F9250000
+D 24 Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71F91B0000
+D 24 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 71F9130000
+D 24 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 71F9090000
+[free-delay] #7 release of 0x7029ec0000+0x800000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x705d4d0000+0x210000 held for 2000 ms (8 in flight)
+[footprint] rev=ml1060 fast phys=2188 MB compressed=0 MB
+D DC Load module XAudio2_9.dll (xaudio2_9.dll-b31aa379071159e6): 71F8E90000
+[footprint] rev=ml1060 fast phys=2229 MB compressed=0 MB
+[footprint] rev=ml358 phys=2206 MB (peak 2206) internal=1710 MB compressed=0 MB external=346 MB reusable=3 MB (cycle=5)
+[swap] ml1077 backed 0x7073cb0000+0x1a60000 (file off 67 MB): 357 MB in 8 extents, peak 357 MB, 0 refused
+[swap] ml1077 backed 0x7076360000+0x2010000 (file off 371 MB): 389 MB in 9 extents, peak 389 MB, 0 refused
+[swap] ml1077 backed 0x7078370000+0x1560000 (file off 403 MB): 410 MB in 10 extents, peak 410 MB, 0 refused
+[swap] ml1077 backed 0x7076360000+0xa10000 (file off 403 MB): 367 MB in 9 extents, peak 410 MB, 0 refused
+[swap] ml1077 backed 0x7076f80000+0x2010000 (file off 371 MB): 389 MB in 9 extents, peak 410 MB, 0 refused
+[swap] ml1077 backed 0x707f960000+0x1560000 (file off 424 MB): 410 MB in 10 extents, peak 410 MB, 0 refused
+[footprint] rev=ml1060 fast phys=2350 MB compressed=46 MB
+[footprint] rev=ml1060 fast phys=2424 MB compressed=162 MB
+[footprint] rev=ml1060 fast phys=2471 MB compressed=336 MB
+[footprint] rev=ml1060 fast phys=2540 MB compressed=353 MB
+Assertion failed: (!(length % block_size)), function nettle_cbc_decrypt, file cbc.c, line 72.
+00e0:err:seh:NtRaiseException Unhandled exception code 37e33404 flags 70 addr 0x127dbfa00
+00e0:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x37e33404) syscalls=0 unix_calls=5480
+[Wine ntdll/server] process_exit_wrapper(937636868)
+[srv-kill] kill_process pid=0020 violent=0 threads: 00e0 rev=ml586
+[footprint] rev=ml358 phys=2540 MB (peak 2540) internal=1627 MB compressed=353 MB external=449 MB reusable=0 MB (cycle=6)
+[WineProc] stopping wineserver...
+[frontend] returned to library
+[08:48:51.793] [INFO] Detaching debugger...
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=22 resident=2093MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2431 MB (peak 2540) internal=1647 MB compressed=352 MB external=452 MB reusable=0 MB (cycle=22)
+[footprint] rev=ml358 phys=2431 MB (peak 2540) internal=1646 MB compressed=352 MB external=452 MB reusable=0 MB (cycle=23)
+[footprint] rev=ml358 phys=2436 MB (peak 2540) internal=1651 MB compressed=352 MB external=454 MB reusable=0 MB (cycle=24)
+[footprint] rev=ml358 phys=2436 MB (peak 2540) internal=1652 MB compressed=352 MB external=454 MB reusable=0 MB (cycle=25)
+[footprint] rev=ml358 phys=2436 MB (peak 2540) internal=1651 MB compressed=352 MB external=454 MB reusable=0 MB (cycle=26)
+[footprint] rev=ml358 phys=2437 MB (peak 2540) internal=1653 MB compressed=352 MB external=455 MB reusable=0 MB (cycle=27)

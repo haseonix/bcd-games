@@ -1,0 +1,19 @@
+{
+ "dialogs": [
+  "Error",
+  "Fallout: New Vegas does not appear to be installed and the installer could not be found.?Try exploring to your DVD-ROM drive and selecting setup.exe to install the game."
+ ],
+ "end": {
+  "killed": true
+ },
+ "matched": [
+  "install-script-registry-missing"
+ ],
+ "next": [
+  "env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1"
+ ],
+ "note": "Fallout: New Vegas (Steam 22380) through BCD Dock, build 580 (GA6QN2, iPhone16,2): FalloutNVLauncher.exe shows 'does not appear to be installed and the installer could not be found' (its registry check: the Installed Path that the game's install script, a Registry section, has Steam on Windows write) and nothing is presented; the tester left after about 4.5 minutes. The end facts here are what auto-tune is given when BCD is closed then. MADEIRA_DOCK_SCRIPT_REGISTRY writes the script's missing registry values before the start.",
+ "outcome": "hung",
+ "stage": 3,
+ "status": "trying"
+}

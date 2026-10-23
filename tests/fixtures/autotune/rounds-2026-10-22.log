@@ -1,0 +1,280 @@
+[15:31:30.751] [INFO] Checking entitlements...
+[15:31:30.752] [INFO] [build] v0.1.580 (580)
+[15:31:30.752] [INFO] [device] model=iPad13,8 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7519MB available=8174MB cores=8
+[15:31:30.753] [INFO] [device] address-map=[0x1020dc000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[15:31:30.770] [INFO] [device] gpu="Apple M1 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[15:31:31.838] [INFO] [bcd] library launch ROUNDS: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[15:31:31.839] [INFO] Requesting JIT with Built-in StikJIT...
+[15:31:34.374] [INFO] [dock-launch] image-retire=1
+[15:31:34.374] [INFO] [dock-launch] image-map-guard=1
+[15:31:34.384] [INFO] [dock-installers] app=1557740 scripts=0 programs=0
+[15:31:34.395] [INFO] Running full Wine sequence...
+[15:31:34.395] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1020dc000,0x8000000000) 512GB available=8159MB low-power=0 thermal=serious
+[15:31:34.399] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[15:31:34.399] [INFO] Allocating 896MB JIT pool via debugger...
+[15:31:34.399] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[15:31:34.400] [INFO] [jit-debugger] attached=1 at the pool request
+[15:31:34.401] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 592MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[15:31:35.755] [INFO] RX pool at 0x148000000
+[15:31:35.781] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.443s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7550 MB + phys_footprint=641 MB = 8192 MB (hw.memsize says 7519 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[gdi-shared] session table 0x7025f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=652 MB (peak 652) internal=652 MB compressed=0 MB external=86 MB reusable=5 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #6 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.951s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.028s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 119670000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702a5c0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702a6c0000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702a8c0000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702acc0000+0x800000 held for 2000 ms (4 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[nt-fail] #1 NtAllocateVirtualMemory status=c000000d proc=dockhost.exe tid=0038 size=0x1 type=0x2000 prot=0x1 hint=0xffeeffeeffeeffee zb=0x0 hits=1 rev=ajan5-rockstar
+[hwinput] keyboard focus: elsewhere (poll)
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=909 MB (peak 909) internal=908 MB compressed=0 MB external=154 MB reusable=5 MB (cycle=2)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1078 MB (peak 1078) internal=1076 MB compressed=0 MB external=161 MB reusable=5 MB (cycle=3)
+[footprint] rev=ml358 phys=1087 MB (peak 1087) internal=1086 MB compressed=0 MB external=161 MB reusable=5 MB (cycle=4)
+[footprint] rev=ml358 phys=1122 MB (peak 1122) internal=1121 MB compressed=0 MB external=161 MB reusable=5 MB (cycle=5)
+[footprint] rev=ml358 phys=1121 MB (peak 1122) internal=1120 MB compressed=0 MB external=161 MB reusable=5 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS.exe" t+ 13.363s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] cryptbase.dll: OK, 1 .text pages executable (copy @0x154cd0000)
+E AC [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f0250000 xend=0x71f07d2810 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+D AC Load module mono-2.0-bdwgc.dll (mono-2.0-bdwgc.dll-0fb718a11a336905): 71F0250000
+E AC [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f0250000 xend=0x71f07d2810 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[swp-emul] ml626 #1 insn=0xf8fa80da size=8 Rs=x26 Rt=x26 addr=0x702b4a0c08 rw=0x700ef0cc08 in=0x702b4a0de0 old=0x702b4a0c5b
+[win-name] #33 hwnd=0x10066 class='' text="Default IME" rev=ml853
+[15:31:49.395] [INFO] [dock-report] launch-game-running=1
+00ac:err:module:load_dll [dll-missing] rev=ml336 #55 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed/mono/aot-cache/amd64/UnityEngine.LocalizationModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #56 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed\\UnityEngine.NVIDIAModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #57 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed/mono/aot-cache/amd64/UnityEngine.NVIDIAModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #58 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed\\UnityEngine.ParticleSystemModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed/mono/aot-cache/amd64/UnityEngine.ParticleSystemModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00ac:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\ROUNDS\\ROUNDS_Data\\Managed\\UnityEngine.PerformanceReportingModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[stp-emul] ml629 #1 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2ca0 rw=0x700ef0eca0 base 0x702b4a2ca0 -> 0x702b4a2cc0 (writeback)
+[stp-emul] ml629 #2 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2cc0 rw=0x700ef0ecc0 base 0x702b4a2cc0 -> 0x702b4a2ce0 (writeback)
+[stp-emul] ml629 #3 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2ce0 rw=0x700ef0ece0 base 0x702b4a2ce0 -> 0x702b4a2d00 (writeback)
+[stp-emul] ml629 #4 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2d00 rw=0x700ef0ed00 base 0x702b4a2d00 -> 0x702b4a2d20 (writeback)
+[stp-emul] ml629 #5 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2d20 rw=0x700ef0ed20 base 0x702b4a2d20 -> 0x702b4a2d40 (writeback)
+[stp-emul] ml629 #6 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2d40 rw=0x700ef0ed40 base 0x702b4a2d40 -> 0x702b4a2d60 (writeback)
+[stp-emul] ml629 #7 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2d60 rw=0x700ef0ed60 base 0x702b4a2d60 -> 0x702b4a2d80 (writeback)
+[stp-emul] ml629 #8 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x702b4a2d80 rw=0x700ef0ed80 base 0x702b4a2d80 -> 0x702b4a2da0 (writeback)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x702b4b0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #2 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x702b4b0000 zb=0x0 hits=1 rev=ajan5-rockstar
+[free-delay] #5 release of 0x71b38b0000+0xfd0000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #3 status=c0000018 hint=0x71b3870000 size=0x20000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #3 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x20000 type=0x3000 prot=0x40 hint=0x71b3870000 zb=0x0 hits=1 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=1846 MB compressed=0 MB
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71b5870000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #4 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x71b5870000 zb=0x0 hits=2 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=1863 MB compressed=0 MB
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[footprint] rev=ml1060 fast phys=1924 MB compressed=0 MB
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71b5c40000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #5 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x71b5c40000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71b9780000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #6 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x10000 type=0x3000 prot=0x40 hint=0x71b9780000 zb=0x0 hits=4 rev=ajan5-rockstar
+[vdcfg] QueryDisplayConfig flags=0x4 -> 0, 0 paths 0 modes
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[win-name] #35 hwnd=0x2005e class='' text="ROUNDS" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x20010000) and no V8 cage was asked for; its first page stays a guard
+[footprint] rev=ml1060 fast phys=2070 MB compressed=0 MB
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71b9f90000 size=0x10000 type=0x3000 protect=0x40 tid=0180 | STAGE=none err=3 at 0x7200000000+0x20000000
+[footprint] rev=ml1060 fast phys=2279 MB compressed=0 MB
+[alloc-fail] ml814 #8 status=c0000018 hint=0x7220a20000 size=0x10000 type=0x3000 protect=0x40 tid=0180 | STAGE=none err=3 at 0x7200000000+0x20000000
+[footprint] rev=ml1060 fast phys=2530 MB compressed=0 MB
+[alloc-fail] ml814 #9 status=c0000018 hint=0x7240c00000 size=0x10000 type=0x3000 protect=0x40 tid=0180 | STAGE=none err=3 at 0x7200000000+0x20000000
+[alloc-fail] ml814 #10 status=c0000018 hint=0x7240fb0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x7241be0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[copy-verify] InControlNative.dll: OK, 9 .text pages executable (copy @0x1583b3000)
+[alloc-fail] ml814 #12 status=c0000018 hint=0x7242c10000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[win-name] #40 hwnd=0x10070 class='' text="DIEmWin" rev=ml853
+[win-name] #43 hwnd=0x10078 class='' text="Default IME" rev=ml853
+[win-name] #44 hwnd=0x10074 class='' text="InControl Message Window" rev=ml853
+[alloc-fail] ml814 #13 status=c0000018 hint=0x7242f20000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x7244370000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x7245ac0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[free-delay] #6 release of 0x7026610000+0x800000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #16 status=c0000018 hint=0x7246aa0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[free-delay] #7 release of 0x702e4e0000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x7246ba0000+0x100000 held for 2000 ms (3 in flight)
+[alloc-fail] ml814 #17 status=c0000018 hint=0x72474d0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x7247ee0000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[footprint] rev=ml1060 fast phys=2679 MB compressed=0 MB
+[alloc-fail] ml814 #19 status=c0000018 hint=0x7249310000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x7249560000 size=0x10000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+D AC Load module PSAPI.DLL (psapi.dll-d7e4f9fa39d6aaff): 73FE1E0000
+D AC Load module tier0_s64.dll (tier0_s64.dll-46fed3100444d04b): 73FE040000
+D AC Load module vstdlib_s64.dll (vstdlib_s64.dll-0805e0d24f89e963): 73FDF70000
+D AC Load module MSWSOCK.dll (mswsock.dll-e1b26fc99ab81cd3): 73FDEE0000
+D AC Load module Secur32.dll (secur32.dll-f6ff7e0cf92170a6): 73FDE50000
+[alloc-fail] ml814 #21 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[footprint] rev=ml1060 fast phys=2775 MB compressed=0 MB
+D AC Load module gameoverlayrenderer64.dll (gameoverlayrenderer64.dll-662268bc678e11f2): 73FDCA0000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f5632000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f5633000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f5634000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #12 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f5634000 zb=0x0 hits=3 rev=ajan5-rockstar
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f5635000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #13 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f5635000 zb=0x0 hits=4 rev=ajan5-rockstar
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f5636000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f5637000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f5638000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f5639000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #14 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f5639000 zb=0x0 hits=8 rev=ajan5-rockstar
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f563a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f563b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f563c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f563d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f563e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f563f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f6497000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f6498000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #15 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f6498000 zb=0x0 hits=16 rev=ajan5-rockstar
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f6499000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f649a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f649b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f649c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f649d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f649e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f649f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f6b37000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f6b38000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f6b39000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f6b3a000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f6b3b000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f6b3c000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f6b3d000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f6b3e000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f6b3f000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #16 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f6b3f000 zb=0x0 hits=32 rev=ajan5-rockstar
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f71d7000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f71d8000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f71d9000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f71da000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f71db000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f71dc000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f71dd000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f71de000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f71df000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f7907000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f7908000 size=0x1000 type=0x3000 protect=0x40 tid=00ac | STAGE=none err=1 at 0x100000000+0x100000
+[nt-fail] #17 NtAllocateVirtualMemory status=c0000018 proc=rounds.exe tid=00ac size=0x1000 type=0x3000 prot=0x40 hint=0x71f86dd000 zb=0x0 hits=64 rev=ajan5-rockstar
+[footprint] rev=ml1060 fast phys=2792 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2819 MB compressed=0 MB
+[footprint] rev=ml1060 fast phys=2979 MB compressed=0 MB
+[guest-log] #3 tid=00ac [Authentication]: Network error detected, retrying...
+[guest-log] #5 tid=00ac [Authentication]: Network error detected, retrying...
+[footprint] rev=ml1060 fast phys=2996 MB compressed=0 MB
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=106 resident=2464MB dbg=DEBUGGED rev=ml525
+[15:32:05.949] [INFO] detach-wait: presents=278 running=1 elapsed=30s
+[footprint] rev=ml358 phys=2826 MB (peak 2994) internal=2108 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=21)
+[footprint] rev=ml358 phys=2790 MB (peak 2994) internal=2072 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=22)
+[footprint] rev=ml358 phys=2767 MB (peak 2994) internal=2040 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=23)
+[store-noalias] #1 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x7246ba4ac0 pc=0x16659c694 addr=0x28 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1020dc000+0x20f8000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16659c694 addr=0x28 x18=0x71ffe40000 type=1 lr=0x16bff8354 sp=0x71f4d30000 x16=0xfffffffffffff0b0 x17=0x71f4d2cc10
+[guest-code] rev=ml333 pool_rip=0x7246ba4ac0 (PE 0x7246ba4ac0) -- NO pool copy for this address (identity translate)
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x28 at host pc=0x16659c694; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R9=0x71f0a05680 = mono-2.0-bdwgc.dll+0x7b5680
+[av-args]   R10=0x71f4baa668 = UnityPlayer.dll+0x1d2a668 [R10]=UnityPlayer.dll+0x1c14100
+[fault-host] 16659c594: fc1f82f2 fc5f82e0 1e624010 6e040600 1e22c010 6e080600 1e624010 6e040605
+[fault-host] 16659c5b4: bc17c3a5 bc57c3a0 1e22c010 6e080600 1e624010 6e040605 bc17c3a5 bc57c3a0
+[fault-host] 16659c5d4: 1e22c010 6e080600 1e624010 6e040605 bc17c3a5 d9410108 d503201f bc57c3a0
+[fault-host] 16659c5f4: 1e22c010 6e080600 1e624010 6e040605 bd001905 39506f86 3952cb87 5280002e
+[fault-host] 16659c614: 11001cc6 120008c6 1ac621c6 0a2600e6 3912cb86 19451348 7100011f 540002a0
+[fault-host] 16659c634: d9428340 d503201f 6b010029 52800001 d29f96e5 f2b6b865 f2c00e25 d2897d66
+[mach_exc] insn_stream PC-12..PC+8: d503201f d9430108 d503201f [d9428108] d503201f d9488108 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe40000 TEB=0x71ffe40000 TEB[0x58]=0x7037e36490 *(gs_cached+0x58)=0x7037e36490
+[store-noalias] #2 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x7246ba4ac0 pc=0x16659c694 addr=0x28 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1020dc000+0x20f8000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16659c694 addr=0x28 x18=0x71ffe40000 type=1 lr=0x16bff8354 sp=0x71f4d30000 x16=0xfffffffffffff0b0 x17=0x71f4d2cc10
+[guest-code] rev=ml333 pool_rip=0x7246ba4ac0 (PE 0x7246ba4ac0) -- NO pool copy for this address (identity translate)
+[fault-host] 16659c5f4: 1e22c010 6e080600 1e624010 6e040605 bd001905 39506f86 3952cb87 5280002e
+[fault-host] 16659c614: 11001cc6 120008c6 1ac621c6 0a2600e6 3912cb86 19451348 7100011f 540002a0
+[fault-host] 16659c634: d9428340 d503201f 6b010029 52800001 d29f96e5 f2b6b865 f2c00e25 d2897d66
+[fault-host] 16659c654: f2a8d746 f2c00e46 f81f8ee6 a94a2f8a 8a05116b 8b0b014a a940294b cb05014a
+[fault-host] 16659c674: b400006a f945b38b f9000f85 d63f0160 d9430348 d503201f d9430108 d503201f
+[fault-host] 16659c694: d9428108 d503201f d9488108 d503201f 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d503201f d9430108 d503201f [d9428108] d503201f d9488108 d503201f
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe40000 TEB=0x71ffe40000 TEB[0x58]=0x7037e36490 *(gs_cached+0x58)=0x7037e36490
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x16659c694 RX from -32, 64 of 64 bytes: 6a 00 00 b4 8b b3 45 f9 85 0f 00 f9 60 01 3f d6 48 03 43 d9 1f 20 03 d5 08 01 43 d9 1f 20 03 d5 08 81 42 d9 1f 20 03 d5 08 81 48 d9 1f 20 03 d5 08 81 42 d9 1f 20 03 d5 08 01 43 d9 1f 20 03 d5 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x16659c694 (not an anon-JIT page)
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x7246ba4f18 RX from -32, 64 of 64 bytes: 8d ad 00 00 00 00 49 bb d3 4f ba 46 72 00 00 00 41 ff d3 e9 3b 00 00 00 48 8b 47 30 48 8b 40 30 48 8b 40 28 48 8b 80 88 00 00 00 48 8b 40 28 48 8b 40 30 4c 8b 47 38 48 8b c8 48 8b d6 83 38 00 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 rw=0x70127e8f18 alias=[0x7246ba0000,0x7246bb0000) RW  -32..+31: 48 8b 40 28 48 8b 80 88 00 00 00 48 8b 40 28 48 8b 40 30 4c 8b 47 38 48 8b c8 48 8b d6 83 38 00 48 8d 64 24 00 90 49 bb a7 4f ba 46 72 00 00 00 41 ff d3 b8 01 00 00 00 48 8b 75 f0 48 8b 7d f8 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 VERDICT: RX and RW **DIFFER** — alias coherency/finalisation
+[store-noalias] #3 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x16659c694 RX from -32, 64 of 64 bytes: 6a 00 00 b4 8b b3 45 f9 85 0f 00 f9 60 01 3f d6 48 03 43 d9 1f 20 03 d5 08 01 43 d9 1f 20 03 d5 08 81 42 d9 1f 20 03 d5 08 81 48 d9 1f 20 03 d5 08 81 42 d9 1f 20 03 d5 08 01 43 d9 1f 20 03 d5 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x16659c694 (not an anon-JIT page)
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x7246ba4f18 RX from -32, 64 of 64 bytes: 8d ad 00 00 00 00 49 bb d3 4f ba 46 72 00 00 00 41 ff d3 e9 3b 00 00 00 48 8b 47 30 48 8b 40 30 48 8b 40 28 48 8b 80 88 00 00 00 48 8b 40 28 48 8b 40 30 4c 8b 47 38 48 8b c8 48 8b d6 83 38 00 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 rw=0x70127e8f18 alias=[0x7246ba0000,0x7246bb0000) RW  -32..+31: 48 8b 40 28 48 8b 80 88 00 00 00 48 8b 40 28 48 8b 40 30 4c 8b 47 38 48 8b c8 48 8b d6 83 38 00 48 8d 64 24 00 90 49 bb a7 4f ba 46 72 00 00 00 41 ff d3 b8 01 00 00 00 48 8b 75 f0 48 8b 7d f8 
+00ac:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 VERDICT: RX and RW **DIFFER** — alias coherency/finalisation
+[store-noalias] #4 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-noalias] #5 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-noalias] #6 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-noalias] #7 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x28 insn=0xd9428108 pc=0x16659c694 NO pool/anon alias | region 0x1020dc000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[footprint] rev=ml358 phys=2775 MB (peak 2994) internal=2048 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=24)
+[av-detail] ml613 #19 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #21 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #22 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #23 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #24 p0=READ p1=0x28 hostpc=0x16659c694 hinsn=0xd9428108 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x162ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[redeliv] 256 identical redeliveries pc=0x16659c694 addr=0x28 — storm forming rev=ml461
+[footprint] rev=ml358 phys=2806 MB (peak 2994) internal=2087 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=25)
+[footprint] rev=ml358 phys=2900 MB (peak 2994) internal=2182 MB compressed=0 MB external=241 MB reusable=5 MB (cycle=26)
+[redeliv] 2000 identical redeliveries pc=0x16659c694 addr=0x28 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] terminating process rev=ml465

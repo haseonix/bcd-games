@@ -54,6 +54,36 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<!-- BCD (2026-10-22): content servers Valve's directory marks https_support "unavailable" (no TLS listener), listed
+	     from vancez's region (bcd-games pull request #11). Only these hosts may be fetched over plain HTTP, and only
+	     by the Steam downloader's fallback, when the directory gives no usable HTTPS server on Valve's domains; their
+	     chunks are always checked against the manifest's SHA-1. Every other request keeps App Transport Security. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>dl.steam.clngaa.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>edgenext.cdn.steampipe.steamcontent.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>st.dl.eccdnx.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>xz.pphimalayanrt.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_remotepairing-pairable-host._tcp</string>

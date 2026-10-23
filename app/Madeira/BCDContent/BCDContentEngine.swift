@@ -302,7 +302,7 @@ private actor BCDContentRun {
                     last = "http-\(status)"
                     try await source.refresh(group: chunk.group)
                     continue
-                case .diskFull, .io:
+                case .diskFull, .io, .refused:
                     throw error
                 default:
                     last = error.logReason
@@ -382,6 +382,7 @@ final class BCDChunkWriter: BCDHTTPConsumer {
     private var fetchHasher: BCDHasher?
     private var hasher: BCDHasher?
     private var inflater: BCDInflater?
+    private var epic: BCDChunkFileDecoder?
     private var produced: Int64 = 0
     private var files: [Int: Int32] = [:]
     private(set) var received: Int64 = 0
@@ -410,6 +411,7 @@ final class BCDChunkWriter: BCDHTTPConsumer {
         fetchHasher = chunk.fetchDigest.map { BCDHasher($0.kind) }
         hasher = chunk.digest.map { BCDHasher($0.kind) }
         inflater = nil
+        epic = nil
     }
 
     /// A failed try: what it received no longer counts.
@@ -422,10 +424,14 @@ final class BCDChunkWriter: BCDHTTPConsumer {
     func begin(at offset: Int64) throws {
         if offset == 0 { reset() } else if offset != received { throw BCDContentError.http(206) }
         if chunk.codec == .zlib, inflater == nil { inflater = try BCDInflater() }
+        if chunk.codec == .epic, epic == nil { epic = BCDChunkFileDecoder() }
     }
 
     func receive(_ data: Data) throws {
-        guard received + Int64(data.count) <= chunk.fetchSize else { throw BCDContentError.tooLarge }
+        // An Epic chunk file's own header says how long it is (the decoder holds it to that); the plan's
+        // size is for the meter, so a manifest that counts the header differently cannot fail a good chunk.
+        let limit = chunk.codec == .epic ? (1 << 30) + 1024 : chunk.fetchSize
+        guard received + Int64(data.count) <= limit else { throw BCDContentError.tooLarge }
         received += Int64(data.count)
         meter.add(Int64(data.count))
         try data.withUnsafeBytes { raw in
@@ -433,6 +439,7 @@ final class BCDChunkWriter: BCDHTTPConsumer {
             switch chunk.codec {
             case .stored: try emit(raw)
             case .zlib: try inflater!.feed(raw) { try emit($0) }
+            case .epic: try epic!.feed(raw) { try emit($0) }
             }
         }
     }
@@ -477,6 +484,13 @@ final class BCDChunkWriter: BCDHTTPConsumer {
     /// The whole chunk arrived: every check must pass before it counts.
     func finish() throws {
         if let inflater { try inflater.finish() } else if chunk.codec == .zlib { throw BCDContentError.decode }
+        if chunk.codec == .epic {
+            guard let epic else { throw BCDContentError.decode }
+            try epic.finish()
+            // The meter counted what arrived; the plan's size is what it is settled against.
+            if received != chunk.fetchSize { meter.drop(received - chunk.fetchSize) }
+            received = chunk.fetchSize
+        }
         guard received == chunk.fetchSize, produced == chunk.size else { throw BCDContentError.checkFailed }
         if let digest = chunk.fetchDigest, fetchHasher?.finalize() != digest.hex { throw BCDContentError.checkFailed }
         if let digest = chunk.digest, hasher?.finalize() != digest.hex { throw BCDContentError.checkFailed }

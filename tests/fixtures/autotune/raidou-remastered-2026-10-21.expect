@@ -1,0 +1,17 @@
+{
+ "dialogs": [
+  "Fatal error",
+  "Failed to load il2cpp"
+ ],
+ "end": {},
+ "matched": [
+  "x64-image-nocopy"
+ ],
+ "next": [
+  "env.MADEIRA_X64_IMAGE_NOCOPY = 1"
+ ],
+ "note": "RAIDOU Remastered: The Mystery of the Soulless Army (Steam 2288350 through BCD Dock, Unity IL2CPP), build 579, iPhone18,1 (Send Log B07FN7): the baseline. The 385 MiB GameAssembly.dll finds no room in the JIT pool ([jit-pool] EXHAUSTED (image 0x71d8ab0000+0x180d1000), no JIT-pool copy for section .srdata, STATUS_NO_MEMORY) and the game's own window says 'Failed to load il2cpp'; the scanner takes that window for a first frame (stage 3). x64-image-nocopy is the next line. The run with that line is raidou-remastered-nocopy-2026-10-21.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

@@ -1678,6 +1678,31 @@ static void ios_spin_capture( const char *wall, int look, double rate, double sh
                         (unsigned long long)rsp, (unsigned long long)st.__fp, (unsigned long long)st.__x[25], (unsigned long long)st.__x[26],
                         (unsigned long long)st.__x[2], (unsigned long long)st.__x[3], (unsigned long long)st.__x[4], (unsigned long long)st.__x[5],
                         (unsigned long long)st.__x[19], (unsigned long long)st.__x[20], (unsigned long long)st.__x[21], (unsigned long long)st.__x[22] );
+        {   /* madeira-bcd (build 591): is this spin tied to a compare-and-swap on an anonymous alias? (signal_arm64_ios.c ios_anon_cas_note) */
+            extern volatile unsigned long long ios_anon_cas_last_addr, ios_anon_cas_last_ms;
+            extern volatile unsigned ios_anon_cas_emulated, ios_anon_cas_handed;
+            if (ios_anon_cas_emulated || ios_anon_cas_handed)
+            {
+                const struct { const char *name; uint64_t v; } xr[] = {
+                    { "RAX", st.__x[8] }, { "RCX", st.__x[0] }, { "RDX", st.__x[1] }, { "RBX", st.__x[27] }, { "RSP", rsp }, { "RBP", st.__fp },
+                    { "RSI", st.__x[25] }, { "RDI", st.__x[26] }, { "R8", st.__x[2] }, { "R9", st.__x[3] }, { "R10", st.__x[4] },
+                    { "R11", st.__x[5] }, { "R12", st.__x[19] }, { "R13", st.__x[20] }, { "R14", st.__x[21] }, { "R15", st.__x[22] } };
+                unsigned long long last = ios_anon_cas_last_addr, page = last >> 14, now_ms;
+                struct timespec ts;
+                char in[120];
+                int n = 0, xi;
+
+                clock_gettime( CLOCK_MONOTONIC, &ts );
+                now_ms = (unsigned long long)ts.tv_sec * 1000ull + (unsigned long long)(ts.tv_nsec / 1000000);
+                in[0] = 0;
+                for (xi = 0; xi < (int)(sizeof(xr) / sizeof(xr[0])); xi++)
+                    if ((xr[xi].v >> 14) == page && n < (int)sizeof(in) - 12) n += snprintf( in + n, sizeof(in) - n, " %s", xr[xi].name );
+                wine_log_write( "[spin] ml1140   compare-and-swaps on an anonymous RWX alias so far: %u emulated here, %u handed to FEX "
+                                "(env.MADEIRA_ANON_CAS_FLUSH); the last at 0x%llx, %llu s before this look; registers inside its 16 KB page:%s",
+                                ios_anon_cas_emulated, ios_anon_cas_handed, last, now_ms >= ios_anon_cas_last_ms ? (now_ms - ios_anon_cas_last_ms) / 1000 : 0ull,
+                                in[0] ? in : " none" );
+            }
+        }
         if (have_code)
         {
             ios_spin_hex( code, (int)sizeof(code), hex );
@@ -5731,11 +5756,17 @@ static int ios_vcrt_version( const char *s, unsigned int v[4] )
  * following component(s) are required to run this program: Microsoft Visual
  * C++ 2015-2022 Redistributable (arm64)" and exits 0x2329. The prefix has the
  * x64 and x86 markers only (prefix-template.tar.gz). Off unless the game's own
- * file says env.MADEIRA_VCRT_ARM64_KEY = 1 (the template's version, 14.42.34433.0)
- * or a version such as 14.44.35211. The keys are volatile, as wineboot's
- * hardware keys: nothing is saved with the prefix, a key already there is left
- * alone. Written once per session by the first process, before the program
- * starts.
+ * file says env.MADEIRA_VCRT_ARM64_KEY = 1 or a version such as 14.44.35211.
+ * The keys are volatile, as wineboot's hardware keys: nothing is saved with the
+ * prefix, a key already there is left alone. Written once per session by the
+ * first process, before the program starts.
+ * BCD (2026-10-23, bcd-games issue #13): "1" writes 14.44.35211.0, the version of
+ * the VC++ runtime BCD downloads, not the template's older 14.42.34433.0: an
+ * Unreal bootstrap compares the marker with the version it was built against,
+ * and Dead as Disco's Pagoda.exe refused 14.42.34433.0 and started with
+ * 14.44.35211.0. A higher number only passes more of these checks. The app
+ * replaces "1" with the session runtime's own version when that is newer
+ * (WineProcessBridge.m, madeira_vcrt_arm64_version).
  */
 void ios_vcrt_arm64_key_publish(void)
 {
@@ -5746,7 +5777,7 @@ void ios_vcrt_arm64_key_publish(void)
         "Software\\Wow6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\arm64",
     };
     const char *sw = getenv( "MADEIRA_VCRT_ARM64_KEY" );
-    unsigned int v[4] = { 14, 42, 34433, 0 }, i, made = 0, kept = 0, failed = 0;
+    unsigned int v[4] = { 14, 44, 35211, 0 }, i, made = 0, kept = 0, failed = 0;
     char version[32], path[160];
     WCHAR pathW[160];
     UNICODE_STRING name;

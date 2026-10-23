@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "exe-window-fixed-base-large"
+ ],
+ "next": [
+  "exe-window-mb = 592"
+ ],
+ "note": "Resident Evil Requiem (Steam 3764200, Dock) build 579, iPad17,3: the same game after auto-tune's try of exe-window-mb = 512 (window widened to 512 MB, 63 MiB short of the 575 MiB program; the failure came back unchanged); the large rule proposes 592",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

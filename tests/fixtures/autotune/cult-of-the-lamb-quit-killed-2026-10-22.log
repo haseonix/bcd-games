@@ -1,0 +1,305 @@
+[06:28:51.911] [INFO] Checking entitlements...
+[06:28:51.911] [INFO] [build] v0.1.580 (580)
+[06:28:51.911] [INFO] [device] model=iPhone19,3 idiom=phone os=iOS Version 27.2 (Build 24B115) ram=11594MB available=8171MB cores=6
+[06:28:51.912] [INFO] [device] address-map=[0x1002d8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[06:28:51.932] [INFO] [device] gpu="Apple A20 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[06:28:58.085] [INFO] [bcd] library launch Cult of the Lamb: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[06:28:58.085] [INFO] Requesting JIT with Built-in StikJIT...
+[06:28:59.478] [INFO] [dock-launch] image-retire=1
+[06:28:59.479] [INFO] [dock-launch] image-map-guard=1
+[06:28:59.481] [INFO] [dock-installers] app=1313140 scripts=0 programs=0
+[06:28:59.490] [INFO] Running full Wine sequence...
+[06:28:59.490] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1002d8000,0x8000000000) 512GB available=8156MB low-power=0 thermal=nominal
+[06:28:59.492] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[06:28:59.492] [INFO] Allocating 896MB JIT pool via debugger...
+[06:28:59.492] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[06:28:59.492] [INFO] [jit-debugger] attached=1 at the pool request
+[06:28:59.493] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[06:29:00.099] [INFO] RX pool at 0x148000000
+[06:29:00.115] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.660s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[06:29:00.315] [Wine init_process] reply_pipe=42, sending init_first_thread...
+ml992: os_proc_available_memory=7514 MB + phys_footprint=677 MB = 8192 MB (hw.memsize says 11594 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[footprint] rev=ml358 phys=688 MB (peak 688) internal=687 MB compressed=0 MB external=71 MB reusable=6 MB (cycle=1)
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  0.946s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  0.990s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 119350000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c5f0000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=1107 MB (peak 1107) internal=1105 MB compressed=0 MB external=144 MB reusable=6 MB (cycle=2)
+[footprint] rev=ml358 phys=1106 MB (peak 1107) internal=1105 MB compressed=0 MB external=144 MB reusable=6 MB (cycle=3)
+[footprint] rev=ml358 phys=1111 MB (peak 1111) internal=1110 MB compressed=0 MB external=144 MB reusable=6 MB (cycle=4)
+[footprint] rev=ml358 phys=1170 MB (peak 1170) internal=1169 MB compressed=0 MB external=144 MB reusable=6 MB (cycle=5)
+[win-name] #31 hwnd=0x1005e class='' text="Default IME" rev=ml853
+[win-name] #32 hwnd=0x20056 class='' text="WineD3D fake window" rev=ml853
+[footprint] rev=ml358 phys=1190 MB (peak 1190) internal=1189 MB compressed=0 MB external=146 MB reusable=6 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cult of the Lamb\\Cult Of The Lamb.exe" t+ 14.100s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ole32.dll: OK, 23 .text pages executable (copy @0x154fa0000)
+E B4 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f0070000 xend=0x71f05f2930 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+E B4 [mono-cfg] ml623 module=mono-2.0-bdwgc.dll base=0x71f0070000 xend=0x71f05f2930 | MonoHacks=1 Multiblock=1 MaxInst=5000 => HOOKS ARMED (MarkMonoDetected)
+[swp-emul] ml626 #1 insn=0xf8fa80da size=8 Rs=x26 Rt=x26 addr=0x7037fe0c08 rw=0x700f4a8c08 in=0x7037fe0db0 old=0x7037fe0c5b
+[win-name] #37 hwnd=0x10068 class='' text="Default IME" rev=ml853
+[free-delay] #2 release of 0x71b0d10000+0x800000 held for 2000 ms (1 in flight)
+[free-delay] #3 release of 0x71b1510000+0xfd0000 held for 2000 ms (2 in flight)
+[free-delay] #4 release of 0x71b24e0000+0xfd0000 held for 2000 ms (3 in flight)
+[free-delay] #5 release of 0x71b34b0000+0xfd0000 held for 2000 ms (4 in flight)
+00b4:err:module:load_dll [dll-missing] rev=ml336 #59 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cult of the Lamb\\Cult Of The Lamb_Data\\Managed/mono/aot-cache/amd64/UnityEngine.ParticleSystemModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+00b4:err:module:load_dll [dll-missing] rev=ml336 #60 L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Cult of the Lamb\\Cult Of The Lamb_Data\\Managed\\UnityEngine.PerformanceReportingModule.dll.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[stp-emul] ml629 #1 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe27f0 rw=0x700f4aa7f0 base 0x7037fe27f0 -> 0x7037fe2810 (writeback)
+[stp-emul] ml629 #2 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe2810 rw=0x700f4aa810 base 0x7037fe2810 -> 0x7037fe2830 (writeback)
+[stp-emul] ml629 #3 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe2830 rw=0x700f4aa830 base 0x7037fe2830 -> 0x7037fe2850 (writeback)
+[stp-emul] ml629 #4 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe2850 rw=0x700f4aa850 base 0x7037fe2850 -> 0x7037fe2870 (writeback)
+[stp-emul] ml629 #5 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe2870 rw=0x700f4aa870 base 0x7037fe2870 -> 0x7037fe2890 (writeback)
+[stp-emul] ml629 #6 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe2890 rw=0x700f4aa890 base 0x7037fe2890 -> 0x7037fe28b0 (writeback)
+[stp-emul] ml629 #7 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe28b0 rw=0x700f4aa8b0 base 0x7037fe28b0 -> 0x7037fe28d0 (writeback)
+[stp-emul] ml629 #8 insn=0xac814570 mode=post off=+32 Rt=q16 Rt2=q17 Rn=x11 addr=0x7037fe28d0 rw=0x700f4aa8d0 base 0x7037fe28d0 -> 0x7037fe28f0 (writeback)
+[alloc-fail] ml814 #2 status=c0000018 hint=0x7037ff0000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #3 status=c0000018 hint=0x714d370000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[footprint] rev=ml1060 fast phys=1831 MB compressed=0 MB
+[alloc-fail] ml814 #4 status=c0000018 hint=0x71b5600000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[free-delay] #6 release of 0x71b5660000+0xf10000 held for 2000 ms (5 in flight)
+[alloc-fail] ml814 #5 status=c0000018 hint=0x71b5650000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[06:29:14.991] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml1060 fast phys=1886 MB compressed=0 MB
+[free-delay] #7 release of 0x71b8070000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #8 release of 0x71b9040000+0xfd0000 held for 2000 ms (7 in flight)
+[footprint] rev=ml1060 fast phys=1903 MB compressed=0 MB
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[alloc-fail] ml814 #6 status=c0000018 hint=0x71b6d80000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[footprint] rev=ml1060 fast phys=1991 MB compressed=0 MB
+[alloc-fail] ml814 #7 status=c0000018 hint=0x71bcad0000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[footprint] rev=ml1060 fast phys=2010 MB compressed=0 MB
+[vdcfg] QueryDisplayConfig flags=0x4 -> 0, 0 paths 0 modes
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[vdcfg] QueryDisplayConfig flags=0x2 -> 0, 0 paths 0 modes
+[win-name] #41 hwnd=0x20060 class='' text="Cult Of The Lamb" rev=ml853
+[launch-view] dismissed reason=game-window logs=0
+[free-delay] #1 reservation at 0x71bce10000+0x10000: 1 held release(s) from 0x71bce10000 (0x6a0000 bytes) freed at once (3 in flight)
+[alloc-fail] ml814 #8 status=c0000018 hint=0x71bce20000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73fff60000+0x90000
+[alloc-fail] ml814 #9 status=c0000018 hint=0x71b3150000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=3 at 0x73fff60000+0x90000
+[footprint] rev=ml1060 fast phys=2031 MB compressed=0 MB
+[cage] holdback handed to the allocator [0x7200004000,0x73ffff0000): the band is exhausted (request 0x20010000) and no V8 cage was asked for; its first page stays a guard
+[copy-verify] steam_api64.dll: OK, 10 .text pages executable (copy @0x15888d000)
+[alloc-fail] ml814 #10 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #11 status=c0000018 hint=0x71f51a2000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #12 status=c0000018 hint=0x71f51a3000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #13 status=c0000018 hint=0x71f51a4000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #14 status=c0000018 hint=0x71f51a5000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #15 status=c0000018 hint=0x71f51a6000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #16 status=c0000018 hint=0x71f51a7000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #17 status=c0000018 hint=0x71f51a8000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #18 status=c0000018 hint=0x71f51a9000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #19 status=c0000018 hint=0x71f51aa000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #20 status=c0000018 hint=0x71f51ab000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #21 status=c0000018 hint=0x71f51ac000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #22 status=c0000018 hint=0x71f51ad000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #23 status=c0000018 hint=0x71f51ae000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #24 status=c0000018 hint=0x71f51af000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #25 status=c0000018 hint=0x71f5338000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #26 status=c0000018 hint=0x71f5339000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #27 status=c0000018 hint=0x71f533a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #28 status=c0000018 hint=0x71f533b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #29 status=c0000018 hint=0x71f533c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #30 status=c0000018 hint=0x71f533d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #31 status=c0000018 hint=0x71f533e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #32 status=c0000018 hint=0x71f533f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #33 status=c0000018 hint=0x71f5384000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #34 status=c0000018 hint=0x71f5385000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #35 status=c0000018 hint=0x71f5386000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #36 status=c0000018 hint=0x71f5387000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #37 status=c0000018 hint=0x71f5388000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #38 status=c0000018 hint=0x71f5389000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #39 status=c0000018 hint=0x71f538a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #40 status=c0000018 hint=0x71f538b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #41 status=c0000018 hint=0x71f538c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #42 status=c0000018 hint=0x71f538d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #43 status=c0000018 hint=0x71f538e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #44 status=c0000018 hint=0x71f538f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #45 status=c0000018 hint=0x71f6457000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #46 status=c0000018 hint=0x71f6458000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #47 status=c0000018 hint=0x71f6459000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #48 status=c0000018 hint=0x71f645a000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #49 status=c0000018 hint=0x71f645b000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #50 status=c0000018 hint=0x71f645c000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #51 status=c0000018 hint=0x71f645d000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #52 status=c0000018 hint=0x71f645e000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #53 status=c0000018 hint=0x71f645f000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #54 status=c0000018 hint=0x71f6af7000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #55 status=c0000018 hint=0x71f6af8000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #56 status=c0000018 hint=0x71f6af9000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #57 status=c0000018 hint=0x71f6afa000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #58 status=c0000018 hint=0x71f6afb000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #59 status=c0000018 hint=0x71f6afc000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #60 status=c0000018 hint=0x71f6afd000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #61 status=c0000018 hint=0x71f6afe000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #62 status=c0000018 hint=0x71f6aff000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #63 status=c0000018 hint=0x71f7197000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[alloc-fail] ml814 #64 status=c0000018 hint=0x71f7198000 size=0x1000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\sysx64\\bthprops.cpl") not found
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\sysx64\\bthprops.cpl") not found
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\system32\\bthprops.cpl") not found
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\sysx64\\bthprops.cpl") not found
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\system32\\bthprops.cpl") not found
+00b4:err:module:import_dll Library bluetoothapis.dll (which is needed by L"C:\\windows\\sysx64\\bthprops.cpl") not found
+[06:29:30.221] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=101 resident=2569MB dbg=DEBUGGED rev=ml525
+[store-noalias] #1 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167188bd0 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x9b2 hostpc=0x167188bd0 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x7261172dbb pc=0x167188bd0 addr=0x9b2 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1002d8000+0x20f8000 [first] rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x167188bd0 addr=0x9b2 x18=0x71ffe10000 type=1 lr=0x16dff8354 sp=0x71f5380000 x16=0xfffffffffffff0b0 x17=0x71f537cc10
+[guest-code] rev=ml333 pool_rip=0x7261172dbb (PE 0x7261172dbb) -- NO pool copy for this address (identity translate)
+[av-args] rev=ajan3-dyinglight #1 NULL-class fault addr=0x9b2 at host pc=0x167188bd0; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R9=0x71f07df260 = mono-2.0-bdwgc.dll+0x76f260
+[fault-host] 167188ad0: 00000001 00000000 00000138 00000000 61172d40 00000072 0000007b 00000000
+[fault-host] 167188af0: 00000011 00000028 00000000 00000000 05800180 3131038b 61058931 61616161
+[fault-host] 167188b10: 51516161 0000089b d503201f d503201f 00000060 10ffffea f900038a b945eb8b
+[fault-host] 167188b30: 3400004b d4395fc0 d2804405 f2a6fda5 f2c00e05 d286cca6 f2ac22e6 f2c00e46
+[fault-host] 167188b50: f81f8ee6 a94a2f8a 8a05116b 8b0b014a a940294b cb05014a b400006a f945b38b
+[fault-host] 167188b70: f9000f85 d63f0160 6dff820c 00000001 0000008c 00000000 61173658 00000072
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 aa0803e0 9126c906 [194000c8] 71000109 540002c1 bd403b20
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe10000 TEB=0x71ffe10000 TEB[0x58]=0x7037ba68e0 *(gs_cached+0x58)=0x7037ba68e0
+[store-noalias] #2 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167188bd0 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x9b2 hostpc=0x167188bd0 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x7261172dbb pc=0x167188bd0 addr=0x9b2 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1002d8000+0x20f8000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x167188bd0 addr=0x9b2 x18=0x71ffe10000 type=1 lr=0x16dff8354 sp=0x71f5380000 x16=0xfffffffffffff0b0 x17=0x71f537cc10
+[guest-code] rev=ml333 pool_rip=0x7261172dbb (PE 0x7261172dbb) -- NO pool copy for this address (identity translate)
+[fault-host] 167188b30: 3400004b d4395fc0 d2804405 f2a6fda5 f2c00e05 d286cca6 f2ac22e6 f2c00e46
+[fault-host] 167188b50: f81f8ee6 a94a2f8a 8a05116b 8b0b014a a940294b cb05014a b400006a f945b38b
+[fault-host] 167188b70: f9000f85 d63f0160 6dff820c 00000001 0000008c 00000000 61173658 00000072
+[fault-host] 167188b90: 0000000d 00000000 00000002 00000028 00000000 00000000 088a0180 d503201f
+[fault-host] 167188bb0: 000000d8 10ffffea f900038a b945eb8b 3400004b d4395fc0 aa0803e0 9126c906
+[fault-host] 167188bd0: 194000c8 71000109 540002c1 bd403b20 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 aa0803e0 9126c906 [194000c8] 71000109 540002c1 bd403b20
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe10000 TEB=0x71ffe10000 TEB[0x58]=0x7037ba68e0 *(gs_cached+0x58)=0x7037ba68e0
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 RIP=0x167188bd0 RX from -32, 64 of 64 bytes: d8 00 00 00 ea ff ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 e0 03 08 aa 06 c9 26 91 c8 00 40 19 09 01 00 71 c1 02 00 54 20 3b 40 bd 10 c0 22 1e 00 06 08 6e e6 21 80 92 a0 eb 26 fc 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #1 no RW alias for 0x167188bd0 (not an anon-JIT page)
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 RIP=0x7261172dc1 RX from -32, 64 of 64 bytes: ff ff 49 ba b8 2d ce 40 72 00 00 00 90 49 bb 20 d2 45 b4 71 00 00 00 41 ff d3 48 8b c8 83 39 00 0f b6 80 b2 09 00 00 85 c0 0f 85 22 06 00 00 f3 0f 10 46 38 f3 0f 5a c0 f2 0f 11 85 f0 fe ff ff 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 rw=0x7013736dc1 alias=[0x7261170000,0x7261180000) RW  -32..+31: 0f b6 80 b2 09 00 00 85 c0 0f 85 22 06 00 00 f3 0f 10 46 38 f3 0f 5a c0 f2 0f 11 85 f0 fe ff ff 48 8d 64 24 00 49 bb 2c 36 17 61 72 00 00 00 41 ff d3 f3 0f 5a c8 f2 0f 10 85 f0 fe ff ff f2 0f 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #2 VERDICT: RX and RW **DIFFER** — alias coherency/finalisation
+[store-noalias] #3 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=3 rip=0x7261172dbb pc=0x167530b00 addr=0x9b2 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1002d8000+0x20f8000 rev=ml555
+[mach_exc] UNHANDLED #3 pc=0x167530b00 addr=0x9b2 x18=0x71ffe10000 type=1 lr=0x16dff8354 sp=0x71f5380000 x16=0xfffffffffffff0b0 x17=0x71f537cc10
+[guest-code] rev=ml333 pool_rip=0x7261172dbb (PE 0x7261172dbb) -- NO pool copy for this address (identity translate)
+[av-args] rev=ajan3-dyinglight #2 NULL-class fault addr=0x9b2 at host pc=0x167530b00; x86 registers that point at a module, an object with a vtable or text:
+[av-args]   R9=0x71f07df260 = mono-2.0-bdwgc.dll+0x76f260
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 aa0803e0 9126c906 [194000c8] 71000109 540002c1 bd403b20
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x71ffe10000 TEB=0x71ffe10000 TEB[0x58]=0x7037ba68e0 *(gs_cached+0x58)=0x7037ba68e0
+[store-noalias] #4 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #4 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=4 rip=0x7261172dbb pc=0x167530b00 addr=0x9b2 kr=1(INVALID_ADDRESS) entryprot=5 nowprot=5 region=0x1002d8000+0x20f8000 rev=ml555
+[mach_exc] UNHANDLED #4 pc=0x167530b00 addr=0x9b2 x18=0x71ffe10000 type=1 lr=0x16dff8354 sp=0x71f5380000 x16=0xfffffffffffff0b0 x17=0x71f537cc10
+[guest-code] rev=ml333 pool_rip=0x7261172dbb (PE 0x7261172dbb) -- NO pool copy for this address (identity translate)
+[mach_exc] insn_stream PC-12..PC+8: d4395fc0 aa0803e0 9126c906 [194000c8] 71000109 540002c1 bd403b20
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 RIP=0x167530b00 RX from -32, 64 of 64 bytes: d8 00 00 00 ea ff ff 10 8a 03 00 f9 8b eb 45 b9 4b 00 00 34 c0 5f 39 d4 e0 03 08 aa 06 c9 26 91 c8 00 40 19 09 01 00 71 c1 02 00 54 20 3b 40 bd 10 c0 22 1e 00 06 08 6e e6 21 80 92 a0 eb 26 fc 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #3 no RW alias for 0x167530b00 (not an anon-JIT page)
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 RIP=0x7261172dc1 RX from -32, 64 of 64 bytes: ff ff 49 ba b8 2d ce 40 72 00 00 00 90 49 bb 20 d2 45 b4 71 00 00 00 41 ff d3 48 8b c8 83 39 00 0f b6 80 b2 09 00 00 85 c0 0f 85 22 06 00 00 f3 0f 10 46 38 f3 0f 5a c0 f2 0f 11 85 f0 fe ff ff 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 rw=0x7013736dc1 alias=[0x7261170000,0x7261180000) RW  -32..+31: 0f b6 80 b2 09 00 00 85 c0 0f 85 22 06 00 00 f3 0f 10 46 38 f3 0f 5a c0 f2 0f 11 85 f0 fe ff ff 48 8d 64 24 00 49 bb 2c 36 17 61 72 00 00 00 41 ff d3 f3 0f 5a c8 f2 0f 10 85 f0 fe ff ff f2 0f 
+00b4:err:seh:prepare_exception_arm64ec [guest-bytes] ml631 #4 VERDICT: RX and RW **DIFFER** — alias coherency/finalisation
+[store-noalias] #5 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #5 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-noalias] #6 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #6 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-noalias] #7 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[store-noalias] #8 rev=ml348 addr=0x9b2 insn=0x194000c8 pc=0x167530b00 NO pool/anon alias | region 0x1002d8000+0x20f8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #19 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #20 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #21 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #22 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #23 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #24 p0=READ p1=0x9b2 hostpc=0x167530b00 hinsn=0x194000c8 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=4 base=0x164ff8000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[alloc-fail] ml814 #128 status=c0000018 hint=0x7272ab0000 size=0x10000 type=0x3000 protect=0x40 tid=00b4 | STAGE=none err=1 at 0x100000000+0x100000
+[rb-tex] madeira-bcd new readback #1: fmt 70 29x29 level 0 (texture 29x29, 1 mips)
+[hwinput] keyboard focus: program (responder)
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 233 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+D B4 Load module rtworkq.dll (rtworkq.dll-228d0194647d37d8): 73FCFF0000
+D B4 Load module mfreadwrite.dll (mfreadwrite.dll-ba21c9fb7c3151e0): 73FCF50000
+D B4 Load module Mf.dll (mf.dll-2bc51e1e469a3496): 73FCE70000
+D E8 Load module winegstreamer.dll (winegstreamer.dll-08f40f4568fa23da): 73FCD40000
+D E8 Load module msdmo.dll (msdmo.dll-9d75278473b53453): 73FCCA0000
+[rb-tex] madeira-bcd new readback #2: fmt 70 210x70 level 0 (texture 1408x648, 1 mips)
+[steer] #1 size=0x1ffff000 reserved_total=8703MB armed=8GB-total -> above ceiling 0x7cbca10000
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 468 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[06:30:00.257] [INFO] detach-wait: presents=1534 running=1 elapsed=60s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=116 resident=3152MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[steer] #2 size=0x1ffff000 reserved_total=9215MB armed=8GB-total -> above ceiling 0x7d0b410000
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml1060 fast phys=4415 MB compressed=360 MB
+[footprint] rev=ml1060 fast phys=4500 MB compressed=385 MB
+[footprint] rev=ml1060 fast phys=4536 MB compressed=386 MB
+[footprint] rev=ml1060 fast phys=4555 MB compressed=386 MB
+[footprint] rev=ml1060 fast phys=4572 MB compressed=382 MB
+[footprint] rev=ml1060 fast phys=4611 MB compressed=392 MB
+[06:30:30.315] [INFO] detach-wait: presents=2931 running=1 elapsed=90s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=112 resident=3161MB dbg=DEBUGGED rev=ml525
+[06:31:00.551] [INFO] detach-wait: presents=4726 running=1 elapsed=120s
+[freeze] alive t+120s beats=4 gaps=0 iter=477 gen=1 threads=112 resident=3163MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+D B4 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 73FC7B0000
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[06:31:30.767] [INFO] detach-wait: presents=6494 running=1 elapsed=150s
+[freeze] alive t+151s beats=5 gaps=0 iter=597 gen=1 threads=115 resident=3176MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 470 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 10.03 s of audio in 10.01 s (100.2%) over 234 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=4447 MB (peak 4614) internal=2917 MB compressed=383 MB external=243 MB reusable=3 MB (cycle=87)
+[footprint] rev=ml358 phys=4447 MB (peak 4614) internal=2917 MB compressed=383 MB external=243 MB reusable=3 MB (cycle=88)
+[ios_audio] ml1230 pacing stream=0x117ec7700 lead 60 ms: client wrote 9.98 s of audio in 10.01 s (99.8%) over 235 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 2752..4800 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=4447 MB (peak 4614) internal=2917 MB compressed=383 MB external=243 MB reusable=3 MB (cycle=89)
+[footprint] rev=ml358 phys=4449 MB (peak 4614) internal=2919 MB compressed=383 MB external=244 MB reusable=2 MB (cycle=90)
+[06:32:00.800] [INFO] detach-wait: presents=8296 running=1 elapsed=180s
+[freeze] alive t+181s beats=6 gaps=0 iter=717 gen=1 threads=115 resident=3167MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=4450 MB (peak 4614) internal=2920 MB compressed=383 MB external=244 MB reusable=2 MB (cycle=91)
+[frontend] graceful close requested
+[footprint] rev=ml358 phys=3255 MB (peak 4614) internal=2724 MB compressed=319 MB external=243 MB reusable=2 MB (cycle=92)
+[hwinput] keyboard focus: elsewhere (app inactive)

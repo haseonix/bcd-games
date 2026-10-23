@@ -12,10 +12,10 @@ on:
       - .github/workflows/altsource.yml
       - tools/update-altsource.py
       - tests/host/check-altsource.py
-  release:
-    types: [published, edited, deleted]
   schedule:
     - cron: '17 * * * *'
+  # No release trigger (2026-10-22): those runs ran on the tag's ref, which the github-pages environment does not
+  # allow, so each release mailed three failures. The hourly schedule and a dispatch on main after a release publish it.
   workflow_dispatch:
 
 permissions:

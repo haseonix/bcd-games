@@ -19,6 +19,21 @@ import SwiftUI
         history: [(title: "d9-surface-defer", detail: "reached play · stage 4 · 312 s · 18,420 frames · kept\ndxmt = d3d9.deferSurfaceCreation=1"),
                   (title: "First run", detail: "crashed · stage 2 · 14 s · 0 frames")])]
     private var recommendedApplied = Set<String>()
+    /// Steam DLC for the sample games (BCDGameDLC.swift): the DLC the sample account owns, which are installed and which the
+    /// switches say. The sample's offer before a first install is asked once, as the app asks it.
+    private static let dlcOwned: [String: [(id: UInt32, name: String, bytes: Int64)]] = [
+        "367520": [(1, "Character Pack", 410_000_000), (2, "Story Expansion", 1_900_000_000), (3, "Bonus Maps", 260_000_000),
+                   (4, "Soundtrack Edition Content", 95_000_000)],
+        // A long list, for the chooser (the real ones: The Witcher 3 has 18 DLC, X-Plane 12 several maps of many GB each).
+        "620": [(11, "Co-op Levels", 1_200_000_000), (12, "Bonus Campaign", 3_400_000_000), (13, "Europe Scenery", 6_800_000_000),
+                (14, "Asia Scenery", 5_100_000_000), (15, "Aircraft Pack: Classics", 2_300_000_000), (16, "Aircraft Pack: Airliners", 4_900_000_000),
+                (17, "Weather Add-on", 310_000_000), (18, "Hair and Beard Pack", 12_000_000), (19, "Soundtrack Content", 95_000_000),
+                (20, "Anniversary Skins", 41_000_000), (21, "Night Lights", 780_000_000), (22, "Winter Maps", 1_600_000_000),
+                (23, "Harbour Missions", 2_050_000_000), (24, "Director's Cut Extras", 530_000_000)],
+    ]
+    private var dlcInstalled: [String: Set<UInt32>] = ["367520": [1, 2]]
+    private var dlcWanted: [String: Set<UInt32>] = [:]
+    private var dlcAsked = Set<String>()
 
     private func value(_ game: BCDGame, _ id: String, _ fallback: String) -> String { values[game.id]?[id] ?? fallback }
 
@@ -26,6 +41,25 @@ import SwiftUI
         let steam = game.store == .steam
         var d = BCDGameDetails()
         if steam { d.storePage = URL(string: "https://store.steampowered.com/app/\(game.id)/") }
+        if steam, case .notInstalled = game.state, !dlcAsked.contains(game.id), let owned = Self.dlcOwned[game.id] {
+            // -BCDTab game-620-checking: the lookup is still running, so Install shows "Checking your DLC…".
+            if UserDefaults.standard.string(forKey: "BCDTab") == "game-\(game.id)-checking" {
+                d.dlcCheck = .checking
+            } else {
+                d.dlcOffer = BCDDLCOffer(items: owned.map { BCDDLCOfferItem(id: $0.id, name: $0.name, bytes: $0.bytes) })
+            }
+        }
+        // Epic: what BCD says before Install, in BCDEpicRules' words (the engine's file is not in the preview; check-epic.py holds these
+        // strings to the real ones). Milestone 2: an ownership-token game installs (BCD starts it signed in) with a note, a game that
+        // must be online says BCD signs it in, and GTA V's BattlEye is an explicit exception with its reason.
+        switch game.id {
+        case "epic.rally": d.installBlocker = "This game comes with anti-cheat software (Easy Anti-Cheat), which can't run in BCD."
+        case "epic.citadel": d.installWarning = "This game asks Epic to confirm you own it each time it starts. BCD does that when it starts the game signed in, so it needs an internet connection. Games like this often add copy protection of their own that may not run here."
+        case "epic.harbor": d.installBlocker = "This game starts through another company's launcher (Ubisoft), which BCD can't run yet."
+        case "epic.courier": d.installWarning = "Epic says this game must be online to start. BCD starts it signed in to your Epic account, so it needs an internet connection."
+        case "epic.gtav": d.installWarning = "This game's anti-cheat (BattlEye) guards only GTA Online. BCD starts the game with its own -nobattleye option, so Story Mode plays and GTA Online stays off."
+        default: break
+        }
         guard game.state.isInstalled else { return d }
         let keys = value(game, "controller", game.store == .local ? "keys" : "") == "keys"
         let bindsChanged = (values[game.id] ?? [:]).keys.filter { $0.hasPrefix("bind.") }.count
@@ -107,7 +141,7 @@ import SwiftUI
                 BCDGameSetting(id: "command", title: "What starts", kind: .info, value: "\(game.id).exe " + value(game, "arguments", "")),
             ], headline: "On its own"))
         }
-        let gog = game.store == .gog
+        let gog = game.store == .gog || game.store == .epic
         var library: [BCDGameSetting] = []
         if !gog {
             library.append(BCDGameSetting(id: "title", title: "Name", kind: .text(prompt: game.title), value: game.title, note: "The name your library shows."))
@@ -120,6 +154,12 @@ import SwiftUI
                                       note: "A picture from Files, shown in place of the store's."))
         library.append(BCDGameSetting(id: "path", title: "Program", kind: .info, value: "C:\\Games\\\(game.title)\\game.exe"))
         d.groups.append(BCDGameSettingGroup(id: "library", title: "Library", symbol: "books.vertical", settings: library, headline: game.title))
+        if steam, let owned = Self.dlcOwned[game.id] {
+            let installed = dlcInstalled[game.id] ?? [], wanted = dlcWanted[game.id] ?? installed
+            let rows = owned.map { BCDDLCRow(id: $0.id, name: $0.name, bytes: $0.bytes, installed: installed.contains($0.id), wanted: wanted.contains($0.id)) }
+            if let group = BCDGameDLC.group(BCDDLCState(rows: rows, withoutFiles: 1, notOwned: 3)),
+               let at = d.groups.firstIndex(where: { $0.id == "library" }) { d.groups.insert(group, at: at) }
+        }
         if !settings { d.groups = [] }
         d.sizeOnDisk = game.size
         d.lastPlayed = game.lastPlayed
@@ -151,7 +191,8 @@ import SwiftUI
             d.settings = changed ? "Your own" : "Standard"
         }
         if gog {
-            d.storeNote = "May need: Visual C++ 2017, DirectX (June 2010). BCD doesn't install these from GOG yet."
+            d.storeNote = game.store == .epic ? "This game uses Epic Online Services. BCD starts it signed in to your Epic account. If it still asks you to sign in on a web page, that part isn't supported yet."
+                : "May need: Visual C++ 2017, DirectX (June 2010). BCD doesn't install these from GOG yet."
             d.removal = .uninstall(frees: game.size)
         }
         if steam {
@@ -173,6 +214,26 @@ import SwiftUI
     func opened(_ game: BCDGame) {}
 
     func set(_ setting: String, to value: String, for game: BCDGame) {
+        if setting.hasPrefix("dlc.") {
+            let owned = Set((Self.dlcOwned[game.id] ?? []).map(\.id))
+            switch setting {
+            case BCDGameDLC.chooseID:
+                dlcAsked.insert(game.id)
+                dlcWanted[game.id] = BCDGameDLC.chosenSet(value).map { $0.intersection(owned) } ?? owned
+            case BCDGameDLC.allID:
+                dlcWanted[game.id] = owned
+                dlcInstalled[game.id] = owned
+            case BCDGameDLC.applyID:
+                dlcInstalled[game.id] = dlcWanted[game.id] ?? dlcInstalled[game.id] ?? []
+            default:
+                if let dlc = BCDGameDLC.dlcID(setting) {
+                    var wanted = dlcWanted[game.id] ?? dlcInstalled[game.id] ?? []
+                    if value == "1" { wanted.insert(dlc) } else { wanted.remove(dlc) }
+                    dlcWanted[game.id] = wanted
+                }
+            }
+            return
+        }
         if value == "run" { return }
         values[game.id, default: [:]][setting] = value
     }
@@ -332,11 +393,12 @@ struct BCDGamePreviewRoot: View {
         case "tuning": .tuning
         case "config": .config
         case "findstore": .storeSearch
-        case "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds": .group(what)
+        case "display", "direct3d", "compat", "controls", "launch", "steam", "library", "binds", "dlc": .group(what)
         case "resolution", "fps", "scaling", "arguments", "installrequest": .setting(what)
         default: what.hasPrefix("bind.") ? .setting(what) : nil
         }
-        let ask: BCDGameAction? = what == "uninstall" ? .uninstall : what == "remove" ? .removeFromLibrary : nil
+        let ask: BCDGameAction? = what == "uninstall" ? .uninstall : what == "remove" ? .removeFromLibrary
+            : what == "install" || what == "checking" ? .install(.device) : what == "choose" ? .chooseDLC(.device) : nil
         BCDGamePage(gameID: id, from: "Library", backend: BCDGameDetailSource.backend, panel: panel, ask: ask) {
             print("[preview] back")
         }

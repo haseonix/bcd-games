@@ -124,9 +124,13 @@ secrets = (CONTENT / "BCDContentSecrets.swift").read_text()
 check("kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly" in secrets and "kSecAttrSynchronizable as String: false" in secrets,
       "the Keychain item is this device's only, never synced, readable after the first unlock")
 sheet = code((CONTENT / "BCDWebSignIn.swift").read_text())
-check("configuration.websiteDataStore = .nonPersistent()" in sheet and "customUserAgent" not in sheet
+# 2026-10-22: the sheet is shared with Epic Games, whose page may name a user agent (Page.userAgent). GOG's page never does:
+# its Cloudflare check fails a custom one.
+check("configuration.websiteDataStore = .nonPersistent()" in sheet and sheet.count("customUserAgent") == 1
+      and "if let agent = page.userAgent, !agent.isEmpty { web.customUserAgent = agent }" in sheet
+      and "userAgent" not in code(sources["BCDGOG.swift"])
       and "createWebViewWith" in sheet and "UIApplication.shared.open(page.start)" in sheet,
-      "the sign-in sheet: WebKit's own user agent, a store that dies with it, provider windows, Safari and paste")
+      "the sign-in sheet: WebKit's own user agent unless the store's page names one (GOG's never does), a store that dies with it, provider windows, Safari and paste")
 catalog = (APP / "ConfigCatalog.generated.swift").read_text()
 check('ConfigOption(key: "env.BCD_GOG", title: "", kind: .bool, defaultValue: "1"' in catalog
       and 'ConfigOption(key: "env.BCD_GOG_SFC", title: "", kind: .bool, defaultValue: "0"' in catalog,

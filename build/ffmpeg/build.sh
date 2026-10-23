@@ -16,6 +16,14 @@
 #     -- and the mpegaudio parser the mp3 demuxer selects. No protocols: the
 #     parser reads through its own AVIOContext (the PE read thread's pull
 #     protocol), never a URL. No muxers.
+#   - ASF, for the opt-in Media Foundation ASF source (2026-10-22: Resident
+#     Evil 2's cutscenes are WMV in an ASF file): the asf demuxer (with the
+#     riff tables it selects) in libavformat, and the Windows Media Video
+#     decoders in libavcodec, wmv1, wmv2, wmv3 and vc1 (WMV9 Simple/Main/
+#     Advanced), behind build/ntdll-unix/winedmo_unixlib_ios.c (the demuxer)
+#     and winegstreamer_wmv_ios.c (the decoder transform). Both are reached
+#     only by a game whose file opts in (docs/MEDIA.md); the WMA decoders above
+#     are the audio half.
 #   - libswresample, libavutil.
 #
 # Deliberately NO H.264, HEVC or AAC decoder or parser: those streams are
@@ -112,7 +120,8 @@ CONFIG_ARGS=(
     --enable-decoder=wmav1,wmav2,wmapro,wmalossless,xma1,xma2
     --enable-decoder=mp1,mp2,mp3
     --enable-decoder=pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,pcm_f64le
-    --enable-demuxer=mp3,wav,mov
+    --enable-decoder=wmv1,wmv2,wmv3,vc1
+    --enable-demuxer=mp3,wav,mov,asf
     --enable-parser=mpegaudio
     --disable-programs
     --disable-doc

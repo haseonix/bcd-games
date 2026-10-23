@@ -1,0 +1,16 @@
+[10:00:00.000] [INFO] [build] v0.1.576 (576)
+[10:00:00.001] [INFO] [device] model=iPhone17,1 idiom=phone os=iOS Version 26.0 (Build 23A340) ram=7600MB available=5100MB cores=6
+[10:00:00.001] [INFO] [device] address-map=[0x104ea4000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[10:00:05.000] [INFO] [bcd] library launch Game.exe: avx=1 wine-vcrt=0 nvidia=1 game-config=1 metalfx=off
+[phase] wine-start             t+  0.639s rev=ml526
+[footprint] rev=ml358 phys=601 MB (peak 601) internal=523 MB compressed=0 MB external=72 MB reusable=12 MB (cycle=1)
+[mach-deliver] rev=ml540 NATIVE-THREAD DECLINE pc=0x195aa4a60 (/usr/lib/system/libsystem_platform.dylib`<redacted>) sp=0x16bd55f90 addr=0x16befdaa0 -> kernel default handler
+[native-bt] ml1054 x0=16befdaa0 x1=198ef034a x8=1f05ea000 x16=195aa49b0 x17=1f243eeb8 lr=198c28ba8
+[native-bt] ml1054   lr  198c28ba8 libicucore.A.dylib`_ZN3icu16SimpleDateFormat10initializeERKNS_6LocaleER10UErrorCode+0x68
+[native-bt] ml1054   #0 198c52154 libicucore.A.dylib`_ZN3icu16SimpleDateFormatC2ERKNS_6LocaleER10UErrorCode+0x1b4
+[native-bt] ml1054   #1 198c16eec libicucore.A.dylib`_ZN3icu10DateFormat6createENS0_6EStyleES1_RKNS_6LocaleE+0x12c
+[native-bt] ml1054   #2 198c16ca0 libicucore.A.dylib`udat_open+0x1a0
+[native-bt] ml1054   #3 189db2354 CoreFoundation`<redacted>+0x1cc
+[native-bt] ml1054   #9 104c40bc8 Madeira`$s7Madeira15BCDGamePageLiveC3day33_FDA873E7BDFF0F63176AED03C40FA3BFLLy10Foundation4DateVSgSSFZ+0x240
+[native-bt] ml1054   #12 104b10354 Madeira`$s7Madeira16BCDGamePageModelC6reloadyyF+0x2a4
+[mach_exc] UNHANDLED #3 pc=0x195aa4a60 addr=0x16befdaa0 x18=0x0 type=1 lr=0x198c28ba8 sp=0x16bd55f90 x16=0x195aa49b0 x17=0x1f243eeb8

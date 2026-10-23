@@ -182,7 +182,7 @@ struct BCDCloudConflict: Identifiable, Equatable {
 
     /// "Steam Cloud: 18 Oct 2026 at 14:05 · 2 MB · newer", and the same for this device.
     var lines: (cloud: String, device: String) {
-        func when(_ date: Date?) -> String { date.map { $0.formatted(date: .abbreviated, time: .shortened) } ?? "date unknown" }
+        func when(_ date: Date?) -> String { date.map { BCDFormat.dateTime($0) } ?? "date unknown" }
         let cloudNewer = deviceDate != nil && (cloudDate ?? .distantPast) > (deviceDate ?? .distantPast)
         let deviceNewer = deviceDate != nil && (deviceDate ?? .distantPast) > (cloudDate ?? .distantPast)
         let cloud = "Steam Cloud: \(when(cloudDate)) · \(BCDFormat.bytes(cloudBytes))" + (cloudNewer ? " · newer" : "")
@@ -264,7 +264,7 @@ struct BCDGameRecommendation: Equatable {
     /// "List 3 of 18 Oct 2026, built into this version of BCD. Checked online 2 h ago."
     var source: String {
         var line = version.map { "List \($0)" } ?? "The list"
-        if let made { line += " of " + made.formatted(date: .abbreviated, time: .omitted) }
+        if let made { line += " of " + BCDFormat.fullDate(made) }
         line += downloaded ? ", downloaded." : ", built into this version of BCD."
         if let checked { line += " Checked online \(BCDFormat.ago(checked))." }
         return line
@@ -341,9 +341,19 @@ struct BCDGameDetails: Equatable {
     var storePage: URL? = nil
     /// What the store says the game may need that BCD does not install for it (GOG's runtimes).
     var storeNote: String? = nil
+    /// Why BCD cannot install this game at all (Epic: anti-cheat, another company's launcher, a check BCD
+    /// cannot pass yet): Install gives way to the reason.
+    var installBlocker: String? = nil
+    /// What to know before installing a game that may not start (Epic: it must be online): shown beside Install.
+    var installWarning: String? = nil
     /// The game's last start failed because a .NET program found no Wine Mono, and this device
     /// still has none: the page says where to download it.
     var needsWineMono = false
+    /// A game that is not installed, and the owned DLC it has files for: what the question before its first install
+    /// asks (BCDGameDLC.swift). nil: nothing to ask (no DLC, DLC support off, or the player was asked already).
+    var dlcOffer: BCDDLCOffer? = nil
+    /// The lookup behind `dlcOffer` is still running (Install waits for it), or failed (Install does not wait or ask).
+    var dlcCheck: BCDDLCCheck = .none
 
     /// Check and repair files for this game: what the backend offers, and never for a GOG game
     /// (its file check comes with a later version of BCD, as its updates do).
@@ -439,12 +449,16 @@ enum BCDGameAction: Hashable {
     case saveConfig(String)
     case useStoreMatch(BCDStoreMatch)
     case setCover(URL)
+    /// Install after the question about the game's owned DLC (BCDGameDLC.swift), with exactly the DLC chosen (none: the game alone).
+    case installChoosingDLC(BCDInstallPlace, chosen: [UInt32])
+    /// The question's "Choose DLC…": opens the chooser for the game's owned DLC.
+    case chooseDLC(BCDInstallPlace)
 
     /// What shows something on the main screen (the game, an alert, a sign-in, JIT's steps):
     /// the page closes first, so BCD's live store can show it there.
     var closesPage: Bool {
         switch self {
-        case .play, .install, .repair, .enableJIT, .signIn, .uninstall, .removeFromLibrary: return true
+        case .play, .install, .installChoosingDLC, .repair, .enableJIT, .signIn, .uninstall, .removeFromLibrary: return true
         default: return false
         }
     }
@@ -456,6 +470,8 @@ struct BCDGameQuestion: Equatable {
     var message: String
     var confirm: String
     var destructive: Bool
+    /// A second way to say yes, shown between Cancel and the confirm button (the DLC question's "Game only").
+    var alternative: String? = nil
 }
 
 extension BCDGameAction {
@@ -773,11 +789,17 @@ struct BCDGamePagePlan: Equatable {
             playable = !repairable
             notes.append(Note(text: reason, warning: true))
         case .notInstalled:
+            if let blocker = details.installBlocker {
+                // The store's rules say BCD cannot install this game: no Install, and the reason in its place.
+                notes.append(Note(text: blocker, warning: true))
+                break
+            }
             main = Choice(action: .install(.device), title: "Install", symbol: "arrow.down.circle.fill")
             if system.freeExternalBytes != nil {
                 others.append(Choice(action: .install(.externalDrive), title: "External drive", symbol: "externaldrive"))
             }
-            var line = [game.size.map { BCDFormat.bytes($0) }, "on this device"].compactMap { $0 }.joined(separator: " ")
+            // A game whose size is not known yet (Epic's, until its first plan) starts the line with the place, capitalised.
+            var line = [game.size.map { BCDFormat.bytes($0) }, game.size == nil ? "On this device" : "on this device"].compactMap { $0 }.joined(separator: " ")
             if let free = system.freeDeviceBytes { line += ", \(BCDFormat.bytes(free)) free" }
             installLine = line
             if game.store != .local, let account = accounts.first(where: { $0.store == game.store }), account.name == nil {
@@ -787,6 +809,7 @@ struct BCDGamePagePlan: Equatable {
             if let size = game.size, let free = system.freeDeviceBytes, size > free {
                 notes.append(Note(text: "It needs \(BCDFormat.bytes(size)); this device has \(BCDFormat.bytes(free)) free.", warning: true))
             }
+            if let warning = details.installWarning { notes.append(Note(text: warning, warning: false)) }
         case .queued, .downloading, .installing:
             if download?.failed != nil {
                 main = Choice(action: .resume, title: "Try again", symbol: "arrow.clockwise")
@@ -812,13 +835,11 @@ struct BCDGamePagePlan: Equatable {
             }
             // Before the Cloud note: only two notes show, and on an install without the increased memory
             // limit most failures come from it (2026-10-20: 54 of 257 logs, none of the large games played).
-            // Without extended virtual addressing the address map is about 63 GB, too small for large games
-            // (2026-10-20: logs DCWTGJ, R138Z4, KDY8E6, DVXWGA, 4GQK0Y crashed in the game, then the app).
+            // Only the increased memory limit is named (owner, 2026-10-22): the address map follows that entitlement
+            // and the iOS version (iOS 18/26: 17 -> 63 GB, iOS 27: 454 -> 512 GB); extended virtual addressing changed
+            // it on no iOS version in the logs (126 logs on iOS 27, 6 on iOS 18.3/26.6.1), so a missing VA+ gets no note.
             if let limit = system.memoryLimitBytes, !system.increasedMemoryLimit {
-                let both = system.extendedAddressing ? "" : " and extended virtual addressing"
-                notes.append(Note(text: "iOS gives BCD only \(BCDFormat.bytes(limit)) here: this install lacks the increased memory limit\(both), so large games close early. Add \(system.extendedAddressing ? "it" : "them") with GetMoreRam, or sign BCD with a paid developer account.", warning: true))
-            } else if system.memoryLimitBytes != nil, !system.extendedAddressing {
-                notes.append(Note(text: "This install lacks extended virtual addressing, which large games need. Add it with GetMoreRam, or sign BCD with a paid developer account.", warning: true))
+                notes.append(Note(text: "iOS gives BCD only \(BCDFormat.bytes(limit)) here: this install lacks the increased memory limit, so large games close early. Add it with GetMoreRam, or sign BCD with a paid developer account.", warning: true))
             }
             if case .differ(let count)? = details.cloud {
                 notes.append(Note(text: "Steam Cloud and this device disagree on \(BCDGameText.saves(count)). Pick the copies to keep in Options.", warning: true))
@@ -892,6 +913,11 @@ struct BCDGameFact: Identifiable, Equatable {
 struct BCDGamePending: Equatable {
     var action: BCDGameAction
     var question: BCDGameQuestion
+    /// What the question's second yes does (`question.alternative` names it).
+    var alternative: BCDGameAction? = nil
+    /// Not a question yet: Install waits for the DLC lookup ("Checking your DLC…"); the card turns into the DLC question, or
+    /// goes and installs the game alone, when the lookup is done.
+    var checking = false
 }
 
 /// The page's state that is not layout: the details, the question asked, the lines that report
@@ -904,6 +930,9 @@ struct BCDGamePending: Equatable {
     @Published private(set) var busy: Set<String> = []
     /// Options is open: the details carry the game's settings.
     private(set) var settingsShown = false
+    /// The game config text being edited, kept here so it survives the page being rebuilt (the phone turned on its side,
+    /// Settings feedback AQF0EA: "when you lay the iPhone horizontally, the app deletes the saved text"). nil when not editing.
+    var configDraft: String?
 
     let gameID: String
     let backend: BCDGameDetailBackend?
@@ -911,6 +940,11 @@ struct BCDGamePending: Equatable {
     /// Closes the page: before an action that shows something on the main screen, for the
     /// engine's notices, and when the game leaves the library.
     var close: () -> Void = {}
+    /// How long Install waits for the DLC lookup (BCDGameDLC.checkSeconds; a test sets it short).
+    var checkSeconds = BCDGameDLC.checkSeconds
+    private var checkTimeout: Task<Void, Never>?
+    /// The DLC chooser ("Choose DLC…" on the question) while it is open.
+    @Published private(set) var chooser: BCDDLCChooser?
 
     init(gameID: String, backend: BCDGameDetailBackend?) {
         self.gameID = gameID
@@ -929,6 +963,9 @@ struct BCDGamePending: Equatable {
 
     /// The page closed: the backend lets go of it, and the page keeps nothing it read.
     func leave() {
+        checkTimeout?.cancel()
+        checkTimeout = nil
+        chooser = nil
         backend?.onChange = nil
         backend?.onNotice = nil
         store = nil
@@ -947,6 +984,67 @@ struct BCDGamePending: Equatable {
         guard let game else { return }
         let next = backend?.details(for: game, settings: settingsShown) ?? BCDGameDetails()
         if next != details { details = next }
+        resolveChecking()
+    }
+
+    /// Install is waiting for the DLC lookup: the lookup is done, so the card becomes the DLC question when the player owns DLC
+    /// with files, and otherwise the game installs alone (a failed lookup is logged by the backend).
+    private func resolveChecking() {
+        guard let asked = pending, asked.checking, let game, case .install(let place) = asked.action else { return }
+        if let offer = details.dlcOffer {
+            checkTimeout?.cancel()
+            pending = offerPending(place, offer, game)
+        } else if details.dlcCheck != .checking {
+            checkTimeout?.cancel()
+            pending = nil
+            if details.dlcCheck == .failed { backend?.set(BCDGameDLC.skipID, to: "lookup-failed", for: game) }
+            run(.install(place), game)
+        }
+    }
+
+    /// The question about the owned DLC: "Choose DLC…" opens the chooser, "Game only" installs the game alone.
+    private func offerPending(_ place: BCDInstallPlace, _ offer: BCDDLCOffer, _ game: BCDGame) -> BCDGamePending {
+        BCDGamePending(action: .chooseDLC(place), question: BCDGameDLC.offerQuestion(offer, title: game.title),
+                       alternative: .installChoosingDLC(place, chosen: []))
+    }
+
+    // MARK: The DLC chooser
+
+    func chooserToggle(_ id: UInt32) { chooser?.toggle(id) }
+    func chooserSelectAll() { chooser?.selectAll() }
+    func chooserSelectNone() { chooser?.selectNone() }
+
+    /// Install with exactly the DLC chosen (none chosen: the game alone). The choice is remembered for the game.
+    func chooserInstall() {
+        guard let open = chooser, let game else { return }
+        chooser = nil
+        run(.installChoosingDLC(open.place, chosen: open.chosen.map(\.id)), game)
+    }
+
+    /// Back to the question; nothing is stored.
+    func chooserBack() {
+        guard let open = chooser else { return }
+        chooser = nil
+        guard let game, let offer = details.dlcOffer else { return }
+        pending = offerPending(open.place, offer, game)
+    }
+
+    /// The wait ran out: the game installs alone.
+    private func checkingTimedOut() {
+        guard let asked = pending, asked.checking, let game, case .install(let place) = asked.action else { return }
+        pending = nil
+        backend?.set(BCDGameDLC.skipID, to: "timeout", for: game)
+        run(.install(place), game)
+    }
+
+    private func startChecking(_ place: BCDInstallPlace, _ game: BCDGame) {
+        pending = BCDGamePending(action: .install(place), question: BCDGameDLC.checkingQuestion(title: game.title), checking: true)
+        checkTimeout?.cancel()
+        checkTimeout = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64((self?.checkSeconds ?? 15) * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            self?.checkingTimedOut()
+        }
     }
 
     var plan: BCDGamePagePlan {
@@ -964,6 +1062,18 @@ struct BCDGamePending: Equatable {
             guard let setting = details.setting(id)?.setting, setting.locked == nil,
                   setting.kind == .action || setting.value != value else { return }
         }
+        // A first install of a game with owned DLC asks once whether to take the DLC too (BCDGameDLC.swift). While Steam is
+        // still being asked which DLC the player owns, Install waits for the answer ("Checking your DLC…").
+        if case .install(let place) = action {
+            if pending?.checking == true { return }
+            if chooser != nil { return }
+            if let offer = details.dlcOffer {
+                pending = offerPending(place, offer, game)
+                return
+            }
+            if details.dlcCheck == .checking { startChecking(place, game); return }
+            if details.dlcCheck == .failed { backend?.set(BCDGameDLC.skipID, to: "lookup-failed", for: game) }
+        }
         if let question = action.question(for: game, details: details) {
             pending = BCDGamePending(action: action, question: question)
             return
@@ -973,12 +1083,21 @@ struct BCDGamePending: Equatable {
 
     func answer(_ yes: Bool) {
         guard let asked = pending else { return }
+        if asked.checking { checkTimeout?.cancel() }
         pending = nil
         if yes, let game {
             run(asked.action, game)
         } else if case .applyRecommended(let changes) = asked.action {
             messages["recommended"] = "Not applied: \(changes) change\(changes == 1 ? "" : "s") waiting"
         }
+    }
+
+    /// The question's second yes ("Game only").
+    func answerAlternative() {
+        guard let asked = pending else { return }
+        if asked.checking { checkTimeout?.cancel() }
+        pending = nil
+        if let other = asked.alternative, let game { run(other, game) }
     }
 
     private func run(_ action: BCDGameAction, _ game: BCDGame) {
@@ -989,6 +1108,12 @@ struct BCDGamePending: Equatable {
         // Play, Install and Update are the store's actions and nothing else: BCD's live store starts them.
         case .play: store?.actions?.play(game)
         case .install(let place): store?.actions?.install(game, place: place)
+        case .chooseDLC(let place):
+            if let offer = details.dlcOffer { chooser = BCDDLCChooser(place: place, offer: offer, gameBytes: game.size ?? 0) }
+        case .installChoosingDLC(let place, let chosen):
+            // The choice is kept first, so the download that starts reads it.
+            backend?.set(BCDGameDLC.chooseID, to: BCDGameDLC.chooseValue(chosen), for: game)
+            store?.actions?.install(game, place: place)
         case .update: store?.actions?.update(game)
         case .pause: actions?.pauseDownload(game.id)
         case .resume: actions?.resumeDownload(game.id)
@@ -1220,7 +1345,14 @@ struct BCDGamePage: View {
                     }
                 }
                 if let asked = model.pending {
-                    BCDGameQuestionView(question: asked.question) { model.answer($0) }
+                    BCDGameQuestionView(question: asked.question, answerAlternative: { model.answerAlternative() }) { model.answer($0) }
+                        .transition(.opacity)
+                }
+                if let open = model.chooser, let game = model.game {
+                    BCDDLCChooserView(chooser: open, title: game.title, size: proxy.size, insets: proxy.safeAreaInsets, hints: m.hints,
+                                      toggle: { model.chooserToggle($0) }, selectAll: { model.chooserSelectAll() },
+                                      selectNone: { model.chooserSelectNone() }, install: { model.chooserInstall() },
+                                      back: { model.chooserBack() })
                         .transition(.opacity)
                 }
                 hintBar(m, beside: options != nil && !phoneUpright && model.pending == nil)
@@ -1244,6 +1376,16 @@ struct BCDGamePage: View {
             }
             installButtons()
         }
+        // The DLC chooser: it holds the controller (layer "game.dlc.") and starts with the ring on its first row.
+        .onChange(of: model.chooser != nil) { _, open in
+            if open {
+                focus.openLayer(Self.dlcLayer)
+                focus.focused = model.chooser?.rows.first.map { BCDDLCChooserView.rowID($0.id) } ?? "game.dlc.install"
+            } else {
+                focus.closeLayer(Self.dlcLayer)
+            }
+            installButtons()
+        }
         .onChange(of: model.game?.state) { _, _ in
             model.reload()
             installButtons()
@@ -1254,20 +1396,26 @@ struct BCDGamePage: View {
         .onChange(of: focus.focused) { _, _ in installButtons() }
         .onChange(of: options) { _, _ in installButtons() }
         .onChange(of: model.details) { _, _ in installButtons() }
+        // A game BCD finds it cannot install (a store's look at its files) loses Install while the page is open: the focus goes to Back.
+        .onChange(of: model.plan.main == nil) { _, none in
+            if none, focus.focused == "game.main" { focus.focused = "game.back" }
+        }
         .onChange(of: layout) { _, now in phoneUpright = now == .phonePortrait }
         .animation(.easeOut(duration: 0.2), value: model.pending)
+        .animation(.easeOut(duration: 0.2), value: model.chooser != nil)
     }
 
     static let layer = "game."
     static let panelLayer = "game.panel."
     static let askLayer = "game.ask."
+    static let dlcLayer = BCDDLCChooserView.layer
 
     private func appeared() {
         phoneUpright = layout == .phonePortrait
         model.close = close
         model.open(store)
         focus.openLayer(Self.layer)
-        if focus.focused == nil { focus.focused = "game.main" }
+        if focus.focused == nil { focus.focused = model.plan.main != nil ? "game.main" : "game.back" }
         installButtons()
         if preview.panel != nil || preview.ask != nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + preview.after) {
@@ -1283,6 +1431,14 @@ struct BCDGamePage: View {
     /// there is one, B back; in Options A chooses, Y puts a setting back to its default, B goes
     /// back or closes.
     private func installButtons() {
+        // The DLC chooser: A switches a row or presses a button, X selects all, Y none, B goes back to the question (short words: four hints must fit an upright phone).
+        if model.chooser != nil {
+            focus.setHandlers([(BCDHint(button: .a, title: "Switch"), {}),
+                               (BCDHint(button: .x, title: "All"), { model.chooserSelectAll() }),
+                               (BCDHint(button: .y, title: "None"), { model.chooserSelectNone() }),
+                               (BCDHint(button: .b, title: "Back"), { model.chooserBack() })])
+            return
+        }
         if model.pending != nil {
             focus.setHandlers([(BCDHint(button: .a, title: "Select"), {}),
                                (BCDHint(button: .b, title: "Cancel"), { model.answer(false) })])
@@ -1476,7 +1632,8 @@ struct BCDGamePage: View {
                     .padding(.bottom, m.bottomRoom)
                 }
                 .onChange(of: focus.focused) { _, id in
-                    guard let id, id.hasPrefix(Self.layer), !id.hasPrefix(Self.panelLayer), !id.hasPrefix(Self.askLayer) else { return }
+                    guard let id, id.hasPrefix(Self.layer), !id.hasPrefix(Self.panelLayer), !id.hasPrefix(Self.askLayer),
+                          !id.hasPrefix(Self.dlcLayer) else { return }
                     withAnimation(.easeOut(duration: 0.2)) { scroller.scrollTo(id, anchor: .center) }
                 }
             }
@@ -1772,6 +1929,8 @@ private struct BCDGameDangerStyle: ButtonStyle {
 struct BCDGameQuestionView: View {
     let question: BCDGameQuestion
     var prefix = "game.ask."
+    /// The question's second yes, when it has one (`question.alternative`).
+    var answerAlternative: (() -> Void)? = nil
     let answer: (Bool) -> Void
 
     var body: some View {
@@ -1785,6 +1944,11 @@ struct BCDGameQuestionView: View {
                     Button("Cancel") { answer(false) }
                         .buttonStyle(BCDOutlineButtonStyle())
                         .bcdFocusable(prefix + "no", cornerRadius: 25) { answer(false) }
+                    if let other = question.alternative, let alternative = answerAlternative {
+                        Button { alternative() } label: { Text(other).lineLimit(1).minimumScaleFactor(0.75) }
+                            .buttonStyle(BCDOutlineButtonStyle())
+                            .bcdFocusable(prefix + "alt", cornerRadius: 25) { alternative() }
+                    }
                     if question.destructive {
                         Button(question.confirm) { answer(true) }
                             .buttonStyle(BCDGameDangerStyle())
@@ -2482,8 +2646,8 @@ private struct BCDGameRowView: View {
     }
 }
 
-/// A switch drawn in BCD's colours; the row it sits in turns it.
-private struct BCDGameSwitch: View {
+/// A switch drawn in BCD's colours; the row it sits in turns it (the DLC chooser's rows too: BCDGameDLCChooser.swift).
+struct BCDGameSwitch: View {
     let on: Bool
     var body: some View {
         Capsule()
@@ -2558,6 +2722,8 @@ private struct BCDGameConfigPage: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Lines for this game alone, in the key = value form of BCD's own config. For this game they win over BCD's config, from its next start.")
                 .font(BCDStyle.body(14)).fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)
+            // A phone on its side: the keyboard covers the lower half, so Save and Cancel go above the text (feedback AQF0EA).
+            if vertical == .compact { buttons }
             TextEditor(text: $draft)
                 .font(.system(size: 14, design: .monospaced))
                 .textInputAutocapitalization(.never)
@@ -2569,27 +2735,39 @@ private struct BCDGameConfigPage: View {
                 .background(BCDStyle.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(BCDStyle.stroke, lineWidth: 1))
                 .accessibilityLabel("Game config")
-            HStack(spacing: 12) {
-                Button("Cancel", action: done)
-                    .buttonStyle(BCDOutlineButtonStyle())
-                    .bcdFocusable("game.panel.cancel", cornerRadius: 25, action: done)
-                Button("Save", action: save)
-                    .buttonStyle(BCDPrimaryButtonStyle())
-                    .bcdFocusable("game.panel.save", cornerRadius: 27, action: save)
-            }
+                .onChange(of: draft) { _, text in if loaded { model.configDraft = text } }
+            if vertical != .compact { buttons }
             Text("One setting a line; a line that starts with # is a note. For example: fence-chain = 6, dxmt = d3d11.mipClampBC=1, env.FEX_MULTIBLOCK = 1. An env.NAME = value line sets an environment variable for the game.")
                 .font(BCDStyle.body(12)).foregroundStyle(BCDStyle.textSoft)
                 .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 4)
         }
         .onAppear {
             guard !loaded else { return }
+            // The text being edited when the page was rebuilt (turned on its side) comes back; else the saved config.
+            draft = model.configDraft ?? model.backend?.configText(for: game) ?? ""
             loaded = true
-            draft = model.backend?.configText(for: game) ?? ""
+        }
+    }
+
+    private var buttons: some View {
+        HStack(spacing: 12) {
+            Button("Cancel", action: cancel)
+                .buttonStyle(BCDOutlineButtonStyle())
+                .bcdFocusable("game.panel.cancel", cornerRadius: 25, action: cancel)
+            Button("Save", action: save)
+                .buttonStyle(BCDPrimaryButtonStyle())
+                .bcdFocusable("game.panel.save", cornerRadius: 27, action: save)
         }
     }
 
     private func save() {
         model.request(.saveConfig(draft))
+        model.configDraft = nil
+        done()
+    }
+
+    private func cancel() {
+        model.configDraft = nil
         done()
     }
 }

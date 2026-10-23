@@ -1,0 +1,12 @@
+{
+ "dialogs": [
+  "Error list"
+ ],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "Shade: Wrath of Angels (a local 32-bit game, d3d9=native), build 578, iPhone13,4 (Send Logs TK5QJY, 2Y4GAX): the game presented for 75 s and the main thread ended the process with code 0 ([WineProc] Wine exited with code 0 (caught by longjmp), 'Wine process thread finished cleanly'). A worker thread then ran into the already unmapped modules (NoExec instruction in entry block, an unhandled c0000005 and the exit report 0xc0000005 after the clean exit) and the session was scored 'crashed' and matched small-map-window-refusals ('known: update BCD'). What follows a clean exit of the Wine process is teardown: AutoTuneLogFacts.cleanMainExit stops the unhandled/error-exit/exit-report counters there; the session is 'ran'.",
+ "outcome": "ran",
+ "stage": 4,
+ "status": "ok"
+}

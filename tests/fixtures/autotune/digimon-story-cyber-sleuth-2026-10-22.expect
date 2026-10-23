@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "oledlg-dll-optin"
+ ],
+ "next": [
+  "env.MADEIRA_OPTIN_DLLS = oledlg"
+ ],
+ "note": "Digimon Story Cyber Sleuth: Complete Edition (Steam 1042550), build 580, Send Log PGET5A: Digimon Story CS.exe imports oledlg.dll, which BCD's 64-bit set does not ship; c0000135 at once (Library oledlg.dll ... not found). env.MADEIRA_OPTIN_DLLS = oledlg (build 591) links Wine's DLL for the game; other imports of the exe may be missing too. Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

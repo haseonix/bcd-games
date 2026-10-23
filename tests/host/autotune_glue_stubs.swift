@@ -75,3 +75,15 @@ struct GameProfile {
 @MainActor enum WineMonoModel {
     nonisolated static var available: Bool { ProcessInfo.processInfo.environment["AUTOTUNE_TEST_MONO"] == "1" }
 }
+
+/// GameRecommendationsApply.swift's record of what BCD wrote from the recommended list: AUTOTUNE_TEST_FOLLOWS_LIST=1 says the game's file is exactly
+/// what the list wrote, 0 that the player changed it; absent: nothing was written for the game.
+enum GameRecommendations {
+    static func followsList(windowsPath: String) -> Bool? {
+        switch ProcessInfo.processInfo.environment["AUTOTUNE_TEST_FOLLOWS_LIST"] {
+        case "1": return true
+        case "0": return false
+        default: return nil
+        }
+    }
+}

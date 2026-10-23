@@ -1,0 +1,16 @@
+{
+ "dialogs": [
+  "Fatal error!????Unhandled Exception: 0xc06d007e????"
+ ],
+ "end": {},
+ "matched": [
+  "sensapi-dll-optin"
+ ],
+ "next": [
+  "env.MADEIRA_OPTIN_DLLS = sensapi"
+ ],
+ "note": "Borderlands 3 (Steam 397540), build 580, Send Log VFM84T: vivoxsdk.dll (Engine/Binaries/ThirdParty/Vivox) imports SensApi.dll, which BCD's 64-bit set does not ship; the failed load raised UE4's delay-load exception (c06d007e) and the game closed. env.MADEIRA_OPTIN_DLLS = sensapi (build 591) links Wine's DLL for the game. Whether anything else stops the game afterwards is not known. Not tried on a device.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "RAIDOU Remastered (Send Log DCXTB5, build 579, iPhone18,1): the run with env.MADEIRA_X64_IMAGE_NOCOPY = 1. GameAssembly.dll is mapped without a pool copy and the game runs 21 s of its own code before 'AV READ of 0' and a jump to 0x22a087b30 that no module holds (c0000005). The pool failure is gone but the scanner's stage is 2 (the failing baseline's error window counted as stage 3), so auto-tune reverted the line ('tried x64-image-nocopy: reverted', L12450) and the next start (B07FN7) failed to load again. AutoTuneEngine.better now counts a start without the pool failure that loaded its modules as further (tests/host/autotune_engine_checks.swift).",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "stuck"
+}

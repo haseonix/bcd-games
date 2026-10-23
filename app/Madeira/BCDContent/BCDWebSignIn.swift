@@ -5,17 +5,21 @@
 import UIKit
 import WebKit
 
-/// A store's own sign-in page in a sheet, shared by the stores (GOG now, Epic later).
+/// A store's own sign-in page in a sheet, shared by the stores (GOG and Epic Games).
 ///
 /// - The store's page runs in a web view with WebKit's own user agent (a custom one fails GOG's
-///   Cloudflare check) and a data store that lives only as long as the sheet: nothing of the
-///   sign-in stays on the device but the tokens the store's code keeps.
+///   Cloudflare check; a store's page may ask for one: `Page.userAgent`, nil for GOG) and a data
+///   store that lives only as long as the sheet: nothing of the sign-in stays on the device but the
+///   tokens the store's code keeps.
 /// - Sign-in providers that open a window (Steam, Discord, Xbox) open in a child view.
 /// - The store's matcher looks at every address the page goes to; when it finds the sign-in's code
 ///   the navigation is stopped, the sheet closes and the code goes to `completion` (never logged).
+/// - A store whose sign-in ends on a page that shows the code as text (Epic Games: a JSON text) says
+///   which addresses may be read (`readsPage`) and what the text means (`matchPage`); the page's text
+///   is read for those addresses only, never for the store's login pages.
 /// - "Use Safari" is the way around a page the web view cannot pass (Google refuses embedded web
-///   views; a challenge that loops): the page opens in Safari, and the address it ends on is
-///   pasted back here.
+///   views; a challenge that loops): the page opens in Safari, and the address it ends on (or the
+///   text it shows, `matchPasted`) is pasted back here.
 /// - Upright is allowed while the sheet is up (password managers' sheets need it).
 @MainActor final class BCDWebSignIn: UIViewController, WKNavigationDelegate, WKUIDelegate, UITextFieldDelegate {
     struct Page {
@@ -25,6 +29,23 @@ import WebKit
         var match: (URL) -> String?
         /// What to tell someone pasting the address from Safari.
         var pasteHint: String
+        /// The addresses whose page text may be read once they finish loading (nil: none).
+        var readsPage: ((URL) -> Bool)? = nil
+        /// What the text of such a page means.
+        var matchPage: ((URL, String) -> PageResult)? = nil
+        /// What a pasted text is, when it is more than an address (nil: an address `match` reads).
+        var matchPasted: ((String) -> String?)? = nil
+        var pastePlaceholder = "Paste the address here"
+        var pasteProblem = "That isn't the address the sign-in ends on. Copy the whole address from Safari's address bar after signing in."
+        /// A user agent for the page, when the store needs one (nil: WebKit's own).
+        var userAgent: String? = nil
+    }
+
+    /// What a page's text came to: the sign-in's code, another page to go on to, or nothing.
+    enum PageResult {
+        case code(String)
+        case load(URL)
+        case keepWaiting
     }
 
     private let page: Page
@@ -82,6 +103,7 @@ import WebKit
         web.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         web.navigationDelegate = self
         web.uiDelegate = self
+        if let agent = page.userAgent, !agent.isEmpty { web.customUserAgent = agent }
         view.addSubview(web)
         webView = web
         web.load(URLRequest(url: page.start))
@@ -106,6 +128,20 @@ import WebKit
 
     func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         if check(webView.url) { webView.stopLoading() }
+    }
+
+    /// A finished page the store reads the text of (Epic's redirect page): the text goes to the store's
+    /// matcher, which finds the code, or sends the sheet on to another page.
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard completion != nil, let read = page.matchPage, let url = webView.url, page.readsPage?(url) == true else { return }
+        webView.evaluateJavaScript("document.body ? document.body.innerText.slice(0, 65536) : ''") { [weak self] value, _ in
+            guard let self, self.completion != nil, let text = value as? String else { return }
+            switch read(url, text) {
+            case .code(let code): self.finish(code)
+            case .load(let next): webView.load(URLRequest(url: next))
+            case .keepWaiting: break
+            }
+        }
     }
 
     /// A provider's window (window.open): a child view over the page, closed when it closes.
@@ -141,11 +177,11 @@ import WebKit
         note.numberOfLines = 0
         note.font = .preferredFont(forTextStyle: .subheadline)
         note.text = page.pasteHint
-        pasteField.placeholder = "Paste the address here"
+        pasteField.placeholder = page.pastePlaceholder
         pasteField.borderStyle = .roundedRect
         pasteField.autocapitalizationType = .none
         pasteField.autocorrectionType = .no
-        pasteField.keyboardType = .URL
+        pasteField.keyboardType = page.matchPasted == nil ? .URL : .asciiCapable
         pasteField.returnKeyType = .done
         pasteField.delegate = self
         pasteNote.numberOfLines = 0
@@ -172,8 +208,10 @@ import WebKit
 
     private func usePasted() {
         let text = (pasteField.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        if !check(URL(string: text)) {
-            pasteNote.text = "That isn't the address the sign-in ends on. Copy the whole address from Safari's address bar after signing in."
+        if let matchPasted = page.matchPasted {
+            if let code = matchPasted(text) { finish(code) } else { pasteNote.text = page.pasteProblem }
+        } else if !check(URL(string: text)) {
+            pasteNote.text = page.pasteProblem
         }
     }
 

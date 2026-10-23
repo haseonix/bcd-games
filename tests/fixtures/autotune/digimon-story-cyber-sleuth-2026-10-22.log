@@ -1,0 +1,128 @@
+[13:07:30.234] [INFO] Checking entitlements...
+[13:07:30.235] [INFO] [build] v0.1.579 (579)
+[13:07:30.236] [INFO] [device] model=iPad13,16 idiom=pad os=iPadOS Version 27.0.1 (Build 24A446) ram=7644MB available=8174MB cores=8
+[13:07:30.236] [INFO] [device] address-map=[0x100194000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[13:07:30.267] [INFO] [device] gpu="Apple M1 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=1 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[13:07:33.785] [INFO] Requesting JIT with Built-in StikJIT...
+[13:08:07.328] [INFO] [bcd] library launch Digimon Story Cyber Sleuth Complete Edition: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[13:08:07.339] [INFO] [dock-launch] image-retire=1
+[13:08:07.339] [INFO] [dock-launch] image-map-guard=1
+[13:08:07.348] [INFO] [dock-installers] app=1042550 scripts=0 programs=0
+[13:08:07.361] [INFO] Running full Wine sequence...
+[13:08:07.361] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100194000,0x8000000000) 512GB available=8155MB low-power=0 thermal=nominal
+[13:08:07.365] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[13:08:07.365] [INFO] Allocating 896MB JIT pool via debugger...
+[13:08:07.365] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[13:08:07.365] [INFO] [jit-debugger] attached=1 at the pool request
+[13:08:07.367] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 576MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[13:08:08.734] [INFO] RX pool at 0x11b0d8000
+[13:08:08.760] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.457s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7563 MB + phys_footprint=628 MB = 8192 MB (hw.memsize says 7644 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x11b0dc000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11b150000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11b268000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11b310000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x11b490000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x11b564000)
+[footprint] rev=ml358 phys=639 MB (peak 639) internal=638 MB compressed=0 MB external=90 MB reusable=15 MB (cycle=1)
+[gdi-shared] session table 0x7024f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #5 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.983s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x11c9ac000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x11cae4000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x11cb7a000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  2.059s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x11df48000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 1154A0000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x7029540000+0x100000 held for 2000 ms (1 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x121f65000)
+[free-delay] #2 release of 0x70301e0000+0x400000 held for 2000 ms (2 in flight)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=894 MB (peak 894) internal=893 MB compressed=0 MB external=156 MB reusable=15 MB (cycle=2)
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[footprint] rev=ml358 phys=990 MB (peak 990) internal=989 MB compressed=0 MB external=161 MB reusable=15 MB (cycle=3)
+[footprint] rev=ml358 phys=1074 MB (peak 1074) internal=1073 MB compressed=0 MB external=165 MB reusable=15 MB (cycle=4)
+[footprint] rev=ml358 phys=1120 MB (peak 1120) internal=1119 MB compressed=0 MB external=165 MB reusable=15 MB (cycle=5)
+[footprint] rev=ml358 phys=1120 MB (peak 1120) internal=1119 MB compressed=0 MB external=165 MB reusable=15 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Digimon Story Cyber Sleuth Complete Edition\\app_digister\\Digimon Story CS.exe" t+ 14.102s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] rpcrt4.dll: OK, 19 .text pages executable (copy @0x1270d4000)
+00ac:err:module:import_dll Library oledlg.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Digimon Story Cyber Sleuth Complete Edition\\app_digister\\Digimon Story CS.exe") not found
+D AC Load module propsys.dll (propsys.dll-2e9532b8b98aeb4c): 71F1FB0000
+D AC Load module WINMM.dll (winmm.dll-115ae751355fb7b9): 71F1E90000
+D AC Load module msacm32.dll (msacm32.dll-6badd8b32a7d355b): 71F1E00000
+D AC Load module XINPUT1_3.dll (xinput1_3.dll-1e6b917460b9b9bf): 71F1D70000
+D AC Load module cg.dll (cg.dll-416c6342430f6f6d): 71F1550000
+D AC Load module cgGL.dll (cggl.dll-0e3262aed097b0ee): 71F14D0000
+00ac:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Digimon Story Cyber Sleuth Complete Edition\\app_digister\\Digimon Story CS.exe" failed, status c0000135
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=8306
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=395
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[13:08:22.362] [INFO] [dock-game-end] digimon story cs.exe ended with status 0xc0000135; the session goes on for now (grace)
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[13:08:23.764] [INFO] [dock-report] launch-game-running=1
+0050:err:module:load_dll [dll-missing] rev=ml336 #51 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #52 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #53 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #54 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=1252 MB (peak 1255) internal=1250 MB compressed=0 MB external=214 MB reusable=15 MB (cycle=11)
+[free-delay] #3 release of 0x702d0a0000+0x120000 held for 2000 ms (1 in flight)
+[free-delay] #4 release of 0x70255f0000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #5 release of 0x702b890000+0x800000 held for 2000 ms (3 in flight)
+[free-delay] #6 release of 0x702d1c0000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #7 release of 0x7030de0000+0x800000 held for 2000 ms (5 in flight)
+[free-delay] #8 release of 0x7031de0000+0x800000 held for 2000 ms (6 in flight)
+[13:08:29.756] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=8967
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=8974
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=101
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=132
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[13:08:30.370] [INFO] [dock-report] probe-result=0
+[store-noalias] #1 rev=ml348 addr=0x785a4d insn=0x00785a4d pc=0x11cb7a000 NO pool/anon alias | region 0x100194000+0x2048000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[footprint] rev=ml358 phys=1095 MB (peak 1255) internal=1094 MB compressed=0 MB external=210 MB reusable=15 MB (cycle=12)
+[hwinput] keyboard focus: program (responder)
+[13:08:32.375] [INFO] [dock-game-end] digimon story cs.exe ended with status 0xc0000135 after 0 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[13:08:32.873] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[footprint] rev=ml358 phys=1108 MB (peak 1255) internal=1106 MB compressed=0 MB external=212 MB reusable=14 MB (cycle=13)
+[13:08:34.395] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1108 MB (peak 1255) internal=1106 MB compressed=0 MB external=212 MB reusable=14 MB (cycle=14)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1108 MB (peak 1255) internal=1106 MB compressed=0 MB external=213 MB reusable=14 MB (cycle=15)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=25 resident=1334MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=1110 MB (peak 1255) internal=1109 MB compressed=0 MB external=213 MB reusable=14 MB (cycle=16)

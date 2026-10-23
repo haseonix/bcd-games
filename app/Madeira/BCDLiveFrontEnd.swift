@@ -102,6 +102,7 @@ struct BCDLiveFrontEnd: View {
             .alert("Steam", isPresented: Binding(get: { steam.error != nil }, set: { if !$0 { steam.error = nil } })) {
                 Button("OK", role: .cancel) { steam.error = nil }
             } message: { Text(steam.error ?? "") }
+            .modifier(BCDEpicPromptAlert())   // Epic's sign-in question when a start can't be signed in (BCDEpicStart.swift); nothing until one asks
             // An install without the increased memory limit (MemoryRights.swift): told, never blocked;
             // only over the library, OK is the only button.
             .alert("Memory limit", isPresented: Binding(

@@ -1309,6 +1309,9 @@ struct ContentView: View {
 
     /// The rest of Play, with JIT on: checks the entry's launch profile and starts it.
     private func startLibraryEntry(_ entry: LibraryEntry) {
+        // madeira-bcd (2026-10-22): an Epic game BCD installed starts signed in: its one-time code is fetched first and this start runs
+        // again with it (BCDEpicStart.swift). Any other entry, and Epic off (env.BCD_EPIC = 0), go straight on.
+        guard !BCDEpic.enabled || BCDEpic.shared.preLaunch(entry, retry: { startLibraryEntry(entry) }) else { return }
         do { if entry.desktop != true { _ = try LibraryModel.executable(entry.launchRelativePath) }; try entry.validate() }
         catch {
             library.error = error.localizedDescription
@@ -1321,10 +1324,12 @@ struct ContentView: View {
             library.error = "The program path or its launch arguments are longer than BCD allows."; return
         }
         entry.configureLaunch()
+        if BCDEpic.enabled { BCDEpic.shared.applyLaunch(entry) }   // madeira-bcd (2026-10-22): an Epic game's signed-in start goes through BCD Host (BCDEpicStart.swift)
         // madeira-bcd: the game's own options (LibraryBCD.swift); this run's
         // log is named below, by upstream's rule (the program a launch starts).
         BCDLaunch.applyLibrary(entry, sessionLog: false)
         exportBCDDesktopProfile(entry)
+        if let line = DesktopGDISection.apply(entry) { logStore.log(line) }
         // This run's log under the program's name too (Documents/logs). A Steam game started
         // through Madeira Dock above gets its own from ntdll, once Valve's client starts it.
         let program = entry.desktop == true ? "explorer.exe"
@@ -1441,6 +1446,7 @@ struct ContentView: View {
         // contention that blocks the main thread RunLoop, triggering iOS hang detection
         ws_log_quiet = 1
 
+        let epicSession = profile.map { BCDEpic.shared.owns(entryID: $0.id) } ?? false   // madeira-bcd (2026-10-22): read here, on the main thread (BCDEpic is main-actor); used for the msiexec line below
         DispatchQueue.global(qos: .userInitiated).async {
             // A library entry's launch profile (executable, arguments, x87
             // precision, frame limit).
@@ -1565,6 +1571,17 @@ struct ContentView: View {
                 setenv("MADEIRA_DOCK_SESSION", "1", 1)
             } else {
                 unsetenv("MADEIRA_DOCK_SESSION")
+            }
+            // madeira-bcd (2026-10-22): an Epic game's session gets msiexec in the 64-bit system32 (WineProcessBridge.m):
+            // Paradox's launcher stub (Cities: Skylines on Epic, dowser.exe) installs its launcher by running "msiexec"
+            // from PATH, and only the 32-bit msiexec is bundled ("executable file not found in %PATH%", build 585).
+            // Every other launch clears it and is unchanged; env.MADEIRA_MSIEXEC_SYSTEM32 = 1 in a game's config or
+            // bcd.cfg (exported later) asks for it in any session, = 0 refuses it for an Epic game.
+            if epicSession {
+                setenv("MADEIRA_MSIEXEC_SYSTEM32", "1", 1)
+                logStore.log("[msiexec64] Epic game: msiexec in system32 for this session")
+            } else {
+                unsetenv("MADEIRA_MSIEXEC_SYSTEM32")
             }
             // A Dock session runs Valve's client headless, with no Chromium, so
             // nothing claims the 8 GB V8 cage holdback (virtual_ios.c). Let ntdll
@@ -2775,5 +2792,35 @@ extension ControlAction {
         case "Y": return Color(red: 0.96, green: 0.76, blue: 0.16)
         default:  return nil
         }
+    }
+}
+
+/// madeira-bcd: the library's Desktop gets the section-backed GDI handle table (owner, 2026-10-21).
+/// The Desktop is where programs are installed and started by hand, and those are often 32-bit
+/// (Battle.net-Setup.exe, build 579). Its session starts 64-bit (explorer), and win32u decides once,
+/// when the first program initialises it, whether the GDI handle table is a section a 32-bit program
+/// can map inside its own guest window (wine dlls/win32u/gdiobj.c, gdi_shared_use_section). Left to
+/// that default the table is private host memory, and 32-bit gdi32 truncates its address and faults
+/// on its first GDI handle. The Dock asks for the section the same way (startDock). Only the
+/// library's Desktop: a game started "In a Wine desktop" keeps the default.
+/// env.MADEIRA_GDI_SHARED_SECTION = 0 in the Desktop's Game config or in bcd.cfg, which the bridge
+/// exports after this, turns it off.
+enum DesktopGDISection {
+    /// This app run's Desktop set the variable; another library start clears it again.
+    private static var setByDesktop = false
+
+    /// For every library start, before the session starts: the log line to write, or nil.
+    static func apply(_ entry: LibraryEntry) -> String? {
+        if entry.desktop == true {
+            setenv("MADEIRA_GDI_SHARED_SECTION", "1", 1)
+            setByDesktop = true
+            return "[bcd] Desktop: section-backed GDI table for the 32-bit programs started here "
+                + "(MADEIRA_GDI_SHARED_SECTION=1; env.MADEIRA_GDI_SHARED_SECTION = 0 in its Game config turns it off)"
+        }
+        if setByDesktop {
+            unsetenv("MADEIRA_GDI_SHARED_SECTION")
+            setByDesktop = false
+        }
+        return nil
     }
 }

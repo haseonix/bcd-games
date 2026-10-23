@@ -24,7 +24,7 @@ on sample data (docs/BCD-UI-ARCHITECTURE.md).
      file or the sample.
    - The live sign-in is the app's own SteamSignInModel: no Steam auth or Keychain
      code of its own.
-   - Epic Games and GOG say "Coming soon".
+   - Epic Games and GOG have their own cards: sign in on the store's own page, sign out only from a question.
 5. JIT:
    - The rules are compiled with swiftc and run. Per iOS version and environment
      they offer only the methods that work there, and ask for StikDebug's Always Run
@@ -163,7 +163,7 @@ ENGINE = ['LibraryModel', 'SteamSignInModel', 'SteamSignIn', 'SteamGuardPrompt',
           'StikJITHelper', 'OnDevicePairing', 'JITNetworkShortcut', 'JITShortcutFile', 'LocalDevVPN', 'LoopbackProbe',
           'MadeiraBuiltInJIT', 'SigningStatus', 'EntitlementStatus', 'OnboardingModel', 'WineProcessBridge',
           'MadeiraConfig', 'LogStore', 'ContentView', 'isDebuggerAttached', 'wine_process_is_running',
-          'BCDGOG', r'BCDGOG\w+', 'BCDLiveStore', r'BCDContent\w*', 'BCDWebSignIn', 'BCDKeychain',
+          'BCDGOG', r'BCDGOG\w+', r'BCDEpic\w*', 'BCDLiveStore', r'BCDContent\w*', 'BCDWebSignIn', 'BCDKeychain',
           'wineserver_is_running', r'jit_\w+', r'madeira_\w+']
 engine_re = re.compile(r'\b(' + '|'.join(ENGINE) + r')\b')
 for name in VIEWS + SAMPLES:
@@ -276,9 +276,19 @@ require(not re.search(r'\b(SteamCredentialAuth|SteamQRAuth|SteamTokenStore|Steam
         and 'SteamSignInModel.shared.submitGuardCode(code)' in live_accounts
         and 'SteamCloudSetting.shared.on = on' in live_accounts,
         'Accounts live: the app\'s own sign-in model, sign-out and Steam Cloud setting; no Steam auth or Keychain code of its own')
-coming = block(accounts, 'private func comingSoon(_ store: BCDStoreFront) -> some View')
-require('comingSoon(.epic)' in accounts and 'comingSoon(.gog)' not in accounts and 'Coming soon' in ''.join(strings['BCDAccounts.swift'])
-        and '""' in coming, 'Accounts: Epic Games is listed as coming soon; GOG has its own card')
+require('comingSoon' not in accounts and 'Coming soon' not in ''.join(strings['BCDAccounts.swift']) and 'epicCard' in block(accounts, 'private var main: some View'),
+        'Accounts: Epic Games has its own card (no "Coming soon" any more)')
+epic_card = block(accounts, 'private var epicCard: some View')
+epic_question = block(accounts, 'private var epicSignOutQuestion: some View')
+require('backend.signInEpic()' in epic_card and accounts.count('backend.signOutEpic()') == 1 and 'backend.signOutEpic()' in epic_question
+        and 'confirmingEpicSignOut = true' in epic_card and 'if confirmingEpicSignOut {' in block(accounts, 'private func closeInner() -> Bool'),
+        'Accounts: Epic Games signs in from its card and signs out only from its question; B closes the question')
+epic_words = ' '.join(strings['BCDAccounts.swift'])
+require('BCD ends its Epic sign-in on this ' in epic_words and 'forgets the list of your Epic games.' in epic_words
+        and 'Use Safari' in epic_words and 'Sign in to Epic Games' in epic_words and 'Signed in' in epic_words
+        and 'BCD never sees your password' in epic_words and "BCD installs the ones it can run, and says why when it can't." in epic_words
+        and 'Sign in to see the games you own on Epic Games and install them.' in epic_words and 'comes in a later update' not in epic_words,
+        "Accounts: Epic's card says what signing out does, that the password goes to Epic's page, that a Google sign-in may need Use Safari and that BCD installs what it can run")
 gog_card = block(accounts, 'private var gogCard: some View')
 gog_question = block(accounts, 'private var gogSignOutQuestion: some View')
 require('backend.signInGOG()' in gog_card and accounts.count('backend.signOutGOG()') == 1 and 'backend.signOutGOG()' in gog_question
@@ -292,6 +302,10 @@ require('BCDLiveStore.shared.signIn(.gog)' in live_accounts and 'BCDLiveStore.sh
         and 'BCDLiveStore.shared.gogAccount()' in live_accounts and 'BCDGOG.shared.objectWillChange' in live_accounts
         and not re.search(r'BCDGOG\.shared\.(signIn|signOut)|BCDWebSignIn|BCDKeychain|BCDGOGSession', live_accounts),
         "Accounts live: GOG's account, sign-in and sign-out go through the store's GOG hooks only")
+require('BCDLiveStore.shared.signIn(.epic)' in live_accounts and 'BCDLiveStore.shared.signOut(.epic)' in live_accounts
+        and 'BCDLiveStore.shared.epicAccount()' in live_accounts and 'BCDEpic.shared.objectWillChange' in live_accounts
+        and not re.search(r'BCDEpic\.shared\.(signIn|signOut)|BCDWebSignIn|BCDKeychain|BCDEpicSession', live_accounts),
+        "Accounts live: Epic's account, sign-in and sign-out go through the store's Epic hooks only")
 
 # 5. JIT: the rules, compiled and run.
 jit_text = source['BCDJIT.swift']

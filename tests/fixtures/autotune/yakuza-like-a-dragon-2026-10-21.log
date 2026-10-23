@@ -1,0 +1,133 @@
+[16:39:23.725] [INFO] Checking entitlements...
+[16:39:23.726] [INFO] [build] v0.1.578 (578)
+[16:39:23.726] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=6124MB cores=6
+[16:39:23.726] [INFO] [device] address-map=[0x100900000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[16:39:23.739] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:06:45.687] [INFO] [bcd] library launch Yakuza Like a Dragon: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[17:06:45.688] [INFO] Requesting JIT with Built-in StikJIT...
+[17:06:48.947] [INFO] [dock-launch] image-retire=1
+[17:06:48.947] [INFO] [dock-launch] image-map-guard=1
+[17:06:48.954] [INFO] [dock-installers] app=1235140 scripts=0 programs=0
+[17:06:48.962] [INFO] Running full Wine sequence...
+[17:06:48.962] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100900000,0x8000000000) 512GB available=8137MB low-power=0 thermal=nominal
+[17:06:48.967] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:06:48.967] [INFO] Allocating 896MB JIT pool via debugger...
+[17:06:48.967] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:06:48.967] [INFO] [jit-debugger] attached=1 at the pool request
+[17:06:48.970] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 624MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[17:06:49.721] [INFO] RX pool at 0x148000000
+[17:06:49.737] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.827s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=7513 MB + phys_footprint=678 MB = 8192 MB (hw.memsize says 11722 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x148004000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148078000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148190000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148238000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x1483b8000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x14848c000)
+[footprint] rev=ml358 phys=689 MB (peak 689) internal=684 MB compressed=4 MB external=65 MB reusable=53 MB (cycle=1)
+[gdi-shared] session table 0x7027f50000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #7 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  1.326s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] ?: OK, 2 .text pages executable (copy @0x149837000)
+[copy-verify] ntdll.dll: OK, 30 .text pages executable (copy @0x1498d4000)
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x149a0c000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x149aa2000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  1.403s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x14ae70000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11E350000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x702c5f0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x702c6f0000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x702c8f0000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x702ccf0000+0x800000 held for 2000 ms (4 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x14ee8d000)
+[swap] ml1077 backed 0x7032e40000+0x1010000 (file off 0 MB): 16 MB in 1 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x7033e50000+0x1010000 (file off 16 MB): 32 MB in 2 extents, peak 32 MB, 0 refused
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+[footprint] rev=ml358 phys=948 MB (peak 948) internal=943 MB compressed=4 MB external=133 MB reusable=53 MB (cycle=2)
+[swap] ml1077 stats: 0 MB file-backed now (peak 32), 0 extents, file used 32 of 4096 MB, backs 2 releases 2 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #41 L"libswscale-9.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:load_dll [dll-missing] rev=ml336 #42 L"video64.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=1106 MB (peak 1106) internal=1101 MB compressed=4 MB external=140 MB reusable=53 MB (cycle=3)
+[footprint] rev=ml358 phys=1126 MB (peak 1126) internal=1122 MB compressed=4 MB external=141 MB reusable=53 MB (cycle=4)
+[footprint] rev=ml358 phys=1162 MB (peak 1162) internal=1158 MB compressed=4 MB external=141 MB reusable=53 MB (cycle=5)
+[footprint] rev=ml358 phys=1163 MB (peak 1163) internal=1159 MB compressed=4 MB external=141 MB reusable=53 MB (cycle=6)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Yakuza Like a Dragon\\runtime\\media\\startup.exe" t+ 13.659s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+D AC Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71F4900000
+D AC Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71F4880000
+D AC Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71F4770000
+D AC Load module win32u.dll (win32u.dll-e45aa71e43175410): 71F46D0000
+[free-delay] #5 release of 0x7037e70000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #6 release of 0x703d010000+0x200000 held for 2000 ms (2 in flight)
+D AC Load module imm32.dll (imm32.dll-d32ec4d784d2a68d): 71F4630000
+D AC Load module cryptbase.dll (cryptbase.dll-e47fe560728c2647): 71F45B0000
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Yakuza Like a Dragon\\runtime\\media\\YakuzaLikeADragon.exe" t+ 13.848s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x18c91000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0 charact=0x23 limits=0x10000..0x73fffeffff
+ml985: preferred base 0x140000000+0x18c91000 REFUSED status=0xc0000018 image_flags=0 charact=0x23 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x18c94000 rev=ajan5-motor
+wine: failed to create main module for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Yakuza Like a Dragon\\runtime\\media\\YakuzaLikeADragon.exe", status c0000018
+00b4:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000018) syscalls=0 unix_calls=8156
+[Wine ntdll/server] process_exit_wrapper(-1073741800): closing child fd_socket=480
+00ac:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=8162
+[Wine ntdll/server] process_exit_wrapper(-1073741800)
+[Wine child thread] child exited with code -1073741800
+0050:err:module:load_dll [dll-missing] rev=ml336 #43 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #44 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=39 resident=2213MB dbg=DEBUGGED rev=ml525
+[17:07:19.846] [INFO] detach-wait: presents=0 running=1 elapsed=30s
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=39 resident=2209MB dbg=DEBUGGED rev=ml525
+[17:07:50.090] [INFO] detach-wait: presents=0 running=1 elapsed=60s
+[freeze] alive t+90s beats=3 gaps=0 iter=357 gen=1 threads=39 resident=2208MB dbg=DEBUGGED rev=ml525
+[17:08:20.130] [INFO] detach-wait: presents=0 running=1 elapsed=90s
+[freeze] alive t+120s beats=4 gaps=0 iter=476 gen=1 threads=39 resident=2208MB dbg=DEBUGGED rev=ml525
+[17:08:50.148] [INFO] detach-wait: presents=0 running=1 elapsed=120s
+[17:09:20.175] [INFO] detach-wait: presents=0 running=1 elapsed=150s
+[freeze] alive t+150s beats=5 gaps=0 iter=596 gen=1 threads=39 resident=2207MB dbg=DEBUGGED rev=ml525
+[17:09:50.199] [INFO] detach-wait: presents=0 running=1 elapsed=180s
+[freeze] alive t+180s beats=6 gaps=0 iter=715 gen=1 threads=39 resident=2207MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=2005 MB (peak 2010) internal=1999 MB compressed=4 MB external=155 MB reusable=53 MB (cycle=101)
+[footprint] rev=ml358 phys=2005 MB (peak 2010) internal=1999 MB compressed=4 MB external=155 MB reusable=53 MB (cycle=102)
+[footprint] rev=ml358 phys=2005 MB (peak 2010) internal=1999 MB compressed=4 MB external=155 MB reusable=53 MB (cycle=103)
+[footprint] rev=ml358 phys=2005 MB (peak 2010) internal=1999 MB compressed=4 MB external=155 MB reusable=53 MB (cycle=104)
+[footprint] rev=ml358 phys=2005 MB (peak 2010) internal=1999 MB compressed=4 MB external=155 MB reusable=53 MB (cycle=105)
+[hwinput] keyboard focus: program (responder)
+[launch-view] dismissed reason=show-desktop logs=0
+[freeze] alive t+210s beats=7 gaps=0 iter=834 gen=1 threads=40 resident=2207MB dbg=DEBUGGED rev=ml525
+[17:10:20.204] [INFO] detach-wait: presents=0 running=1 elapsed=210s
+[footprint] rev=ml358 phys=2004 MB (peak 2010) internal=1998 MB compressed=3 MB external=155 MB reusable=53 MB (cycle=106)
+[hwinput] keyboard focus: elsewhere (app inactive)

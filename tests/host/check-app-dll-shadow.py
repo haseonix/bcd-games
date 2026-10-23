@@ -20,6 +20,12 @@ Checks:
     refusal needs the list and a path outside \\windows\\;
   - the gate before both stays: plain x64 (not hybrid, not a Wine builtin) in
     an x64 (ARM64EC) process;
+  - build 580 (GTA IV Complete 13RSJQ/79ZMR7: Microsoft's x64 vcruntime140.dll in the
+    prefix's C:\\windows\\system32): a NAMED dll that lies directly in
+    \\windows\\system32\\ is refused too (ios_path_in_system32, compiled on the host:
+    any case, '/' too; sysx64, syswow64, a folder below system32, a lookalike
+    folder and a short path are not); a dll the switch does not name, or no
+    switch at all, changes nothing;
   - CI runs this check; the settings catalog documents the switch.
 The host compile is skipped when no C compiler is found.
 """
@@ -46,7 +52,8 @@ def cut(start, end_marker="\n}\n"):
     return src[i:src.index(end_marker, i) + len(end_marker)]
 
 
-helpers = cut("static BOOL ios_app_dll_listed(") + "\n" + cut("static BOOL ios_path_in_windows(")
+helpers = (cut("static BOOL ios_app_dll_listed(") + "\n" + cut("static BOOL ios_path_in_windows(") + "\n"
+           + cut("static BOOL ios_path_in_system32("))
 fn = cut("static BOOL ios_ucrt_shadow_refused(")
 
 cc = shutil.which("cc") or shutil.which("clang") or shutil.which("gcc")
@@ -71,6 +78,13 @@ static void inwin(const char *path, int want) {
     WCHAR w[256]; W(w, path);
     if (ios_path_in_windows(w, (USHORT)strlen(path)) != want) { printf("in_windows(%s) != %d\n", path, want); fails++; }
 }
+static void insys(const char *path, int want) {
+    WCHAR w[256]; W(w, path);
+    const char *last = strrchr(path, '\\'); const char *l2 = strrchr(path, '/');
+    if (l2 > last) last = l2;
+    USHORT off = (USHORT)(last ? last - path + 1 : 0);
+    if (ios_path_in_system32(w, off) != want) { printf("in_system32(%s) != %d\n", path, want); fails++; }
+}
 int main(void) {
     listed("vcruntime140.dll", "vcruntime140.dll", 1);
     listed("vcruntime140.dll", "VCRUNTIME140.DLL", 1);
@@ -92,6 +106,21 @@ int main(void) {
     inwin("\\??\\C:\\Program Files\\WindowsApps\\x\\vcruntime140.dll", 0);
     inwin("\\??\\C:\\Games\\mywindows\\vcruntime140.dll", 0);
     inwin("\\windows", 0);
+    /* build 580: directly in system32, and only there */
+    insys("\\??\\C:\\windows\\system32\\vcruntime140.dll", 1);
+    insys("\\??\\C:\\WINDOWS\\System32\\VCRUNTIME140.DLL", 1);
+    insys("\\??\\unix/private/var/x/drive_c/windows/system32/vcruntime140.dll", 1);
+    insys("\\windows\\system32\\a.dll", 1);
+    insys("\\??\\C:\\windows\\sysx64\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\windows\\syswow64\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\windows\\system32\\drivers\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\windows\\system32\\wbem\\a.dll", 0);
+    insys("\\??\\C:\\windows\\system\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\Games\\mywindows\\system32\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\Games\\windows\\system32x\\vcruntime140.dll", 0);
+    insys("\\??\\C:\\Program Files (x86)\\Steam\\steamapps\\common\\Crysis3Remastered\\Bin64\\vcruntime140.dll", 0);
+    insys("system32\\a.dll", 0);
+    insys("a.dll", 0);
     printf("%s\n", fails ? "HARNESS FAILED" : "harness ok");
     return fails != 0;
 }
@@ -124,9 +153,15 @@ check("the ucrtbase refusal is unchanged apart from its MADEIRA_APP_UCRT guard",
       "    if (!opt && name && len == sizeof(ucrt) - 1)\n" in fn and
       '"[ucrt-shadow] %s: plain x64 ucrtbase.dll outside the system farm' in fn)
 blk = fn[fn.index("if (!ret && shadow"):]
-check("the new refusal needs the list, a listed name and a path outside \\windows\\, and logs [app-dll-shadow]",
+check("the new refusal needs the list, a listed name and a path outside \\windows\\ (or directly in system32), and logs [app-dll-shadow]",
       blk.index("ios_app_dll_listed( shadow, name, len )") < blk.index("!ios_path_in_windows(") <
+      blk.index("ios_path_in_system32( nt_name.Buffer, name_off )") <
       blk.index("ret = TRUE;") < blk.index('"[app-dll-shadow] %s:'))
+check("the system32 case is part of the same listed-name condition, not a second refusal",
+      blk.count("ret = TRUE;") == 1 and "(!ios_path_in_windows( nt_name.Buffer, nt_name.Length / sizeof(WCHAR) )\n"
+      "            || ios_path_in_system32( nt_name.Buffer, name_off ))" in blk)
+check("name_off is the offset of the file name in the NT path (taken before len is shortened)",
+      "name_off = name ? (USHORT)(name - nt_name.Buffer) : 0;\n    if (name) len -= name - nt_name.Buffer;" in fn)
 wf = (R / ".github/workflows/build-ipa.yml").read_text()
 check("CI runs this check", "run: python3 tests/host/check-app-dll-shadow.py" in wf)
 cat = (R / "app/Madeira/ConfigCatalog.generated.swift").read_text()

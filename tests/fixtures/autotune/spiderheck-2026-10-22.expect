@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "fault-guard-rate-redeliv"
+ ],
+ "next": [
+  "env.MADEIRA_FAULT_GUARD_RATE = 1"
+ ],
+ "note": "Round 591 (ajan10/motor): SpiderHeck (Unity Mono) ended alive by ml461's 2000 identical redeliveries (44 a second, 92 fps); env.MADEIRA_FAULT_GUARD_RATE = 1.",
+ "outcome": "crashed",
+ "stage": 4,
+ "status": "trying"
+}

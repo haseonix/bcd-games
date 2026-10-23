@@ -19,6 +19,7 @@ import UIKit
 ///                                             section+state picks a sample's state (vcruntime+installed)
 ///   -BCDTab game[-<game id>[-<what>]]          a game's page (BCDGamePageSample.swift)
 ///   -BCDTab add[-games|-pick]                  Add a game (BCDAddGameSample.swift)
+///   -BCDTab epic-ask[-offline|-owned|-signin]  the question BCD asks when an Epic game's signed-in start can't be made (BCDPreviewEpicAsk.swift)
 @main
 struct BCDPreviewApp: App {
     @StateObject private var store: BCDStore
@@ -69,6 +70,8 @@ struct BCDPreviewApp: App {
             BCDControllerPreview(focus: focus)
         } else if tab.hasPrefix("game") {
             BCDGamePreviewRoot(spec: tab).environmentObject(store).environmentObject(focus)
+        } else if tab.hasPrefix("epic-ask") {
+            BCDEpicAskPreview(spec: tab, store: store, focus: focus)
         } else if tab.hasPrefix("add") {
             BCDAddGamePreviewRoot(spec: tab).environmentObject(store).environmentObject(focus)
         } else if tab.hasPrefix("touch") {

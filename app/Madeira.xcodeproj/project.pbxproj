@@ -64,6 +64,29 @@
 		A1000C0C /* BCDGOG/BCDGOGInstall.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C0C /* BCDGOGInstall.swift */; };
 		A1000C0D /* BCDGOG/BCDGOG.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C0D /* BCDGOG.swift */; };
 		A1000C0E /* BCDGOG/BCDLiveStoreGOG.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000C0E /* BCDLiveStoreGOG.swift */; };
+		A1000DA0 /* BCDGameDLC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA0 /* BCDGameDLC.swift */; };
+		A1000DA1 /* BCDSteamDLC/BCDSteamDLC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA1 /* BCDSteamDLC.swift */; };
+		A1000DA2 /* BCDSteamDLC/BCDSteamDLCDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA2 /* BCDSteamDLCDownload.swift */; };
+		A1000DA3 /* BCDSteamDLC/BCDSteamDLCService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA3 /* BCDSteamDLCService.swift */; };
+		A1000DA4 /* BCDSteamDLC/BCDGamePageLiveDLC.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA4 /* BCDGamePageLiveDLC.swift */; };
+		A1000DA5 /* BCDGameDLCChooser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000DA5 /* BCDGameDLCChooser.swift */; };
+		A1000D50 /* BCDEpic/BCDEpicLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D50 /* BCDEpicLog.swift */; };
+		A1000D51 /* BCDEpic/BCDEpicAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D51 /* BCDEpicAuth.swift */; };
+		A1000D52 /* BCDEpic/BCDEpicSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D52 /* BCDEpicSession.swift */; };
+		A1000D53 /* BCDEpic/BCDEpicCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D53 /* BCDEpicCatalog.swift */; };
+		A1000D54 /* BCDEpic/BCDEpic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D54 /* BCDEpic.swift */; };
+		A1000D55 /* BCDEpic/BCDLiveStoreEpic.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000D55 /* BCDLiveStoreEpic.swift */; };
+		A1000E50 /* BCDEpic/BCDEpicManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000E50 /* BCDEpicManifest.swift */; };
+		A1000E51 /* BCDEpic/BCDEpicContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000E51 /* BCDEpicContent.swift */; };
+		A1000E52 /* BCDEpic/BCDEpicRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000E52 /* BCDEpicRules.swift */; };
+		A1000E53 /* BCDEpic/BCDEpicInstall.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000E53 /* BCDEpicInstall.swift */; };
+		A1000E54 /* BCDEpic/BCDEpicDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000E54 /* BCDEpicDriver.swift */; };
+		A1000F50 /* BCDEpic/BCDEpicHostFiles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F50 /* BCDEpicHostFiles.swift */; };
+		A1000F51 /* BCDEpic/BCDEpicSigned.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F51 /* BCDEpicSigned.swift */; };
+		A1000F52 /* BCDEpic/BCDEpicCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F52 /* BCDEpicCredentials.swift */; };
+		A1000F53 /* BCDEpic/BCDEpicAudit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F53 /* BCDEpicAudit.swift */; };
+		A1000F54 /* BCDEpic/BCDEpicStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F54 /* BCDEpicStart.swift */; };
+		A1000F55 /* BCDAsk.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000F55 /* BCDAsk.swift */; };
 		A100060B /* SwiftSteam/Content/DepotManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200060B /* DepotManifest.swift */; };
 		A100060E /* SwiftSteam/Install/AppManifestWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200060E /* AppManifestWriter.swift */; };
 		A100060F /* SwiftSteam/chunk_zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A200060F /* chunk_zip.c */; };
@@ -340,6 +363,29 @@
 		A2000C0C /* BCDGOGInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDGOGInstall.swift"; sourceTree = "<group>"; };
 		A2000C0D /* BCDGOG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDGOG.swift"; sourceTree = "<group>"; };
 		A2000C0E /* BCDLiveStoreGOG.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDGOG/BCDLiveStoreGOG.swift"; sourceTree = "<group>"; };
+		A2000DA0 /* BCDGameDLC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDGameDLC.swift; sourceTree = "<group>"; };
+		A2000DA1 /* BCDSteamDLC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDSteamDLC.swift"; sourceTree = "<group>"; };
+		A2000DA2 /* BCDSteamDLCDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDSteamDLCDownload.swift"; sourceTree = "<group>"; };
+		A2000DA3 /* BCDSteamDLCService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDSteamDLCService.swift"; sourceTree = "<group>"; };
+		A2000DA4 /* BCDGamePageLiveDLC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDSteamDLC/BCDGamePageLiveDLC.swift"; sourceTree = "<group>"; };
+		A2000DA5 /* BCDGameDLCChooser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDGameDLCChooser.swift; sourceTree = "<group>"; };
+		A2000D50 /* BCDEpicLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicLog.swift"; sourceTree = "<group>"; };
+		A2000D51 /* BCDEpicAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicAuth.swift"; sourceTree = "<group>"; };
+		A2000D52 /* BCDEpicSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicSession.swift"; sourceTree = "<group>"; };
+		A2000D53 /* BCDEpicCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicCatalog.swift"; sourceTree = "<group>"; };
+		A2000D54 /* BCDEpic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpic.swift"; sourceTree = "<group>"; };
+		A2000D55 /* BCDLiveStoreEpic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDLiveStoreEpic.swift"; sourceTree = "<group>"; };
+		A2000E50 /* BCDEpicManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicManifest.swift"; sourceTree = "<group>"; };
+		A2000E51 /* BCDEpicContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicContent.swift"; sourceTree = "<group>"; };
+		A2000E52 /* BCDEpicRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicRules.swift"; sourceTree = "<group>"; };
+		A2000E53 /* BCDEpicInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicInstall.swift"; sourceTree = "<group>"; };
+		A2000E54 /* BCDEpicDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicDriver.swift"; sourceTree = "<group>"; };
+		A2000F50 /* BCDEpicHostFiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicHostFiles.swift"; sourceTree = "<group>"; };
+		A2000F51 /* BCDEpicSigned.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicSigned.swift"; sourceTree = "<group>"; };
+		A2000F52 /* BCDEpicCredentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicCredentials.swift"; sourceTree = "<group>"; };
+		A2000F53 /* BCDEpicAudit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicAudit.swift"; sourceTree = "<group>"; };
+		A2000F54 /* BCDEpicStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BCDEpic/BCDEpicStart.swift"; sourceTree = "<group>"; };
+		A2000F55 /* BCDAsk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BCDAsk.swift; sourceTree = "<group>"; };
 		A200060B /* DepotManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Content/DepotManifest.swift"; sourceTree = "<group>"; };
 		A200060E /* AppManifestWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftSteam/Install/AppManifestWriter.swift"; sourceTree = "<group>"; };
 		A200060F /* chunk_zip.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "SwiftSteam/chunk_zip.c"; sourceTree = "<group>"; };
@@ -669,6 +715,28 @@
 				A2000C0C /* BCDGOGInstall.swift */,
 				A2000C0D /* BCDGOG.swift */,
 				A2000C0E /* BCDLiveStoreGOG.swift */,
+				A2000DA0 /* BCDGameDLC.swift */,
+				A2000DA1 /* BCDSteamDLC.swift */,
+				A2000DA2 /* BCDSteamDLCDownload.swift */,
+				A2000DA3 /* BCDSteamDLCService.swift */,
+				A2000DA4 /* BCDGamePageLiveDLC.swift */,
+				A2000DA5 /* BCDGameDLCChooser.swift */,
+				A2000D50 /* BCDEpicLog.swift */,
+				A2000D51 /* BCDEpicAuth.swift */,
+				A2000D52 /* BCDEpicSession.swift */,
+				A2000D53 /* BCDEpicCatalog.swift */,
+				A2000D54 /* BCDEpic.swift */,
+				A2000D55 /* BCDLiveStoreEpic.swift */,
+				A2000E50 /* BCDEpicManifest.swift */,
+				A2000E51 /* BCDEpicContent.swift */,
+				A2000E52 /* BCDEpicRules.swift */,
+				A2000E53 /* BCDEpicInstall.swift */,
+				A2000E54 /* BCDEpicDriver.swift */,
+				A2000F50 /* BCDEpicHostFiles.swift */,
+				A2000F51 /* BCDEpicSigned.swift */,
+				A2000F52 /* BCDEpicCredentials.swift */,
+				A2000F53 /* BCDEpicAudit.swift */,
+				A2000F54 /* BCDEpicStart.swift */,
 				A200060B /* DepotManifest.swift */,
 				A200060E /* AppManifestWriter.swift */,
 				A200060F /* chunk_zip.c */,
@@ -775,6 +843,7 @@
 				A2000B60 /* BCDSectionKit.swift */,
 				A2000B61 /* BCDAccounts.swift */,
 				A2000B62 /* BCDAccountsLive.swift */,
+				A2000F55 /* BCDAsk.swift */,
 				A2000B63 /* BCDJIT.swift */,
 				A2000B64 /* BCDJITLive.swift */,
 				A2000B65 /* BCDDock.swift */,
@@ -1123,6 +1192,28 @@
 				A1000C0C /* BCDGOG/BCDGOGInstall.swift in Sources */,
 				A1000C0D /* BCDGOG/BCDGOG.swift in Sources */,
 				A1000C0E /* BCDGOG/BCDLiveStoreGOG.swift in Sources */,
+				A1000DA0 /* BCDGameDLC.swift in Sources */,
+				A1000DA1 /* BCDSteamDLC/BCDSteamDLC.swift in Sources */,
+				A1000DA2 /* BCDSteamDLC/BCDSteamDLCDownload.swift in Sources */,
+				A1000DA3 /* BCDSteamDLC/BCDSteamDLCService.swift in Sources */,
+				A1000DA4 /* BCDSteamDLC/BCDGamePageLiveDLC.swift in Sources */,
+				A1000DA5 /* BCDGameDLCChooser.swift in Sources */,
+				A1000D50 /* BCDEpic/BCDEpicLog.swift in Sources */,
+				A1000D51 /* BCDEpic/BCDEpicAuth.swift in Sources */,
+				A1000D52 /* BCDEpic/BCDEpicSession.swift in Sources */,
+				A1000D53 /* BCDEpic/BCDEpicCatalog.swift in Sources */,
+				A1000D54 /* BCDEpic/BCDEpic.swift in Sources */,
+				A1000D55 /* BCDEpic/BCDLiveStoreEpic.swift in Sources */,
+				A1000E50 /* BCDEpic/BCDEpicManifest.swift in Sources */,
+				A1000E51 /* BCDEpic/BCDEpicContent.swift in Sources */,
+				A1000E52 /* BCDEpic/BCDEpicRules.swift in Sources */,
+				A1000E53 /* BCDEpic/BCDEpicInstall.swift in Sources */,
+				A1000E54 /* BCDEpic/BCDEpicDriver.swift in Sources */,
+				A1000F50 /* BCDEpic/BCDEpicHostFiles.swift in Sources */,
+				A1000F51 /* BCDEpic/BCDEpicSigned.swift in Sources */,
+				A1000F52 /* BCDEpic/BCDEpicCredentials.swift in Sources */,
+				A1000F53 /* BCDEpic/BCDEpicAudit.swift in Sources */,
+				A1000F54 /* BCDEpic/BCDEpicStart.swift in Sources */,
 				A100060B /* SwiftSteam/Content/DepotManifest.swift in Sources */,
 				A100060E /* SwiftSteam/Install/AppManifestWriter.swift in Sources */,
 				A100060F /* SwiftSteam/chunk_zip.c in Sources */,
@@ -1226,6 +1317,7 @@
 				A1000B60 /* BCDSectionKit.swift in Sources */,
 				A1000B61 /* BCDAccounts.swift in Sources */,
 				A1000B62 /* BCDAccountsLive.swift in Sources */,
+				A1000F55 /* BCDAsk.swift in Sources */,
 				A1000B63 /* BCDJIT.swift in Sources */,
 				A1000B64 /* BCDJITLive.swift in Sources */,
 				A1000B65 /* BCDDock.swift in Sources */,

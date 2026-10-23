@@ -50,8 +50,25 @@ enum AutoTune {
         d[windowsPath.lowercased()] = on
         UserDefaults.standard.set(d, forKey: gamesKey)
     }
-    /// The Desktop is no game; everything else can be tuned (Steam games through Madeira Dock too).
-    static func eligible(_ entry: LibraryEntry) -> Bool { entry.desktop != true }
+    /// The Desktop is no game; everything else can be tuned (Steam games through Madeira Dock too), except a program that is plainly no
+    /// game: a Steam helper or a redistributable installer (nothing to learn from it, and the verdict was filed under a real game or under
+    /// "Steam": PJE6FT, 4W9GX4, QGEK8K, round 591).
+    static func eligible(_ entry: LibraryEntry) -> Bool { entry.desktop != true && !isNoGame(entry.windowsPath) }
+
+    /// A program that is no game, by its name and the folder it sits in: Steam's own helpers (the shader-cache replayer, the web helper,
+    /// the error reporter, the driver queries) and the installers of a game's redistributables (the "~Common Redist" folders, the Microsoft
+    /// .NET, Visual C++, DirectX and OpenAL setups). Nothing else is guessed: an installer under another name is tuned as before.
+    static func isNoGame(_ windowsPath: String) -> Bool {
+        let path = windowsPath.lowercased().replacingOccurrences(of: "/", with: "\\")
+        let parts = path.split(separator: "\\").map(String.init)
+        guard let name = parts.last, name.hasSuffix(".exe") else { return false }
+        let helpers = ["fossilize-replay", "steamwebhelper", "steamerrorreporter", "gldriverquery", "vulkandriverquery"]
+        if helpers.contains(where: { name.hasPrefix($0) }) { return true }
+        let setups = ["ndp3", "ndp4", "vc_redist", "vcredist", "dotnetfx", "dxsetup", "dxwebsetup", "oalinst"]
+        if setups.contains(where: { name.hasPrefix($0) }) { return true }
+        let folders: Set<String> = ["~common redist", "_commonredist", "commonredist", "redist", "redistributable", "redistributables", "vcredist", "dotnetfx"]
+        return parts.dropLast().contains { folders.contains($0) }
+    }
 
     // MARK: Files
 
@@ -87,12 +104,26 @@ enum AutoTune {
         AutoTuneRules.load(builtIn: AutoTuneBuiltInRules.json, override: overrideURL)
     }
 
-    /// Keys this game already gets from the user: its own file, the entry's lines, bcd.cfg.
+    /// Keys this game already gets from the user: its own file, the entry's lines, bcd.cfg. Not the lines of the recommended list while
+    /// the file is exactly what BCD wrote from it (listValues).
     static func userKeys(_ entry: LibraryEntry) -> Set<String> {
         var keys = Set(GameProfile(windowsPath: entry.windowsPath).values.keys)
+        keys.subtract(listValues(entry).keys)
         keys.formUnion(MadeiraConfig.parse(entry.gameConfigText ?? "").keys)
         keys.formUnion(MadeiraConfig.all().keys)
         return keys
+    }
+
+    /// The recommended list's own lines in the game's file: while the file is exactly what BCD wrote from the list (nobody changed it;
+    /// GameRecommendations.followsList), its values are the list's, not the user's. The engine lets a rule that is marked as an upgrade
+    /// replace one of them after a memory kill, with a larger number (GTA V Enhanced's list swap-mb = 3072 under the 12 GB tier's
+    /// swap-mb = 6144, A24ES3). A key the entry's own lines or bcd.cfg also set is the user's.
+    static func listValues(_ entry: LibraryEntry) -> [String: String] {
+        guard GameRecommendations.followsList(windowsPath: entry.windowsPath) == true else { return [:] }
+        var values = GameProfile(windowsPath: entry.windowsPath).values
+        for key in MadeiraConfig.parse(entry.gameConfigText ?? "").keys { values[key] = nil }
+        for key in MadeiraConfig.all().keys { values[key] = nil }
+        return values
     }
 
     /// The game's settings as the user made them; a change starts a new baseline.
@@ -114,7 +145,20 @@ enum AutoTune {
         let lines = s.layerLines.filter { !blocked.contains(AutoTuneRules.key($0)) }
         guard !lines.isEmpty, let launch = launchURL else { return }
         let profile = GameProfile(windowsPath: path)
-        let own = profile.text
+        var own = profile.text
+        // The game's own file comes after the layer and wins. A list line a layer line raises (swap-mb = 3072 -> 6144) must not win over it:
+        // that line leaves the launch file's copy of the game's file (the file itself is not touched).
+        let listed = listValues(entry)
+        let raised = Set(lines.filter { line in
+            guard let had = listed[AutoTuneRules.key(line)], let old = Int(had), let new = Int(AutoTuneRules.value(line)) else { return false }
+            return new > old
+        }.map(AutoTuneRules.key))
+        if !raised.isEmpty {
+            own = own.split(separator: "\n", omittingEmptySubsequences: false).filter { raw in
+                let t = raw.trimmingCharacters(in: .whitespaces)
+                return t.hasPrefix("#") || !raised.contains(AutoTuneRules.key(t))
+            }.joined(separator: "\n")
+        }
         var text = "# BCD auto-tune, attempt \(s.attempts.count) for \(entry.title)\n"
         text += lines.joined(separator: "\n") + "\n"
         if !own.isEmpty {
@@ -139,6 +183,8 @@ enum AutoTune {
         var limitMB: Int?
         var fingerprint: String
         var userKeys: [String]
+        /// The recommended list's lines in the game's file (listValues); optional: a marker written before it existed still decodes.
+        var listValues: [String: String]?
         /// Set once the session ended normally, before the analysis; a marker with it
         /// survived only a kill during the analysis.
         var end: AutoTuneSessionEnd?
@@ -159,7 +205,8 @@ enum AutoTune {
         let m = Marker(windowsPath: entry.windowsPath, title: entry.title, startedAt: Date(),
                        build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "",
                        logInode: inode, limitMB: memoryLimitMB(),
-                       fingerprint: fingerprint(entry), userKeys: Array(userKeys(entry)).sorted(), end: nil)
+                       fingerprint: fingerprint(entry), userKeys: Array(userKeys(entry)).sorted(),
+                       listValues: listValues(entry), end: nil)
         if let d = try? JSONEncoder().encode(m) { try? d.write(to: url, options: .atomic) }
         armed = m
     }
@@ -283,7 +330,7 @@ enum AutoTune {
             return
         }
         let after = AutoTuneEngine.advance(before, report: report, rules: rules, userKeys: Set(m.userKeys),
-                                           fingerprint: m.fingerprint, log: log.lastPathComponent)
+                                           fingerprint: m.fingerprint, log: log.lastPathComponent, listValues: m.listValues ?? [:])
         save(after, m.windowsPath)
         let next = after.candidate.map { $0.isEmpty ? "the same settings once more" : $0.joined(separator: "; ") } ?? "nothing"
         // What became of the line this session tried, and which lines stay (text only): a kept line is never taken back
@@ -320,7 +367,7 @@ struct AutoTuneOffer: Equatable {
         case "ok": return "\(title) played"
         case "stuck": return "\(title): no known fix fits this failure (tried: \(state.triedSummary))"
         case "gave-up": return "\(title): auto-tune stopped after \(AutoTuneEngine.maxAttempts) attempts"
-        case "known": return "\(title): a crash in BCD, not a setting"
+        case "known": return state.knownNoFix == true ? "\(title): no setting changes this failure" : "\(title): a crash in BCD, not a setting"
         default: return "\(title) \(AutoTuneOffer.outcomeText(report.outcome))"
         }
     }

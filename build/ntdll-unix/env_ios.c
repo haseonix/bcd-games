@@ -95,6 +95,26 @@ const WCHAR system_dir[] = {'\\','?','?','\\','C',':','\\','w','i','n','d','o','
 
 static CPTABLEINFO unix_cp = { CP_UTF8, 4, '?', 0xfffd, '?', '?' };
 
+/* madeira-bcd, modified by BCD 2026-10-23: env.MADEIRA_NLS_EXTRA = 1 lets a code page table that is not in nls/ come from
+ * nls/extra/ (Wine's own c_932, c_936, c_949, c_950, c_874 and c_1250 ... c_1258, which BCD ships there). Without the
+ * switch a request for such a table fails exactly as before (STATUS_OBJECT_NAME_NOT_FOUND from NtGetNlsSectionPtr, so
+ * GetCPInfo and MultiByteToWideChar fail for that code page): working games, among them Steam's own client, ask for these
+ * pages and run without them, so the tables are only visible to a game whose file asks for them (Sword and Fairy 3 asks
+ * for 936 and dereferences the missing table). The switch is read at every request, not cached: it ends with the session. */
+static char *nls_extra_path( const char *dir, const char *name, char *path )
+{
+    static unsigned int reports;
+    const char *e = getenv( "MADEIRA_NLS_EXTRA" );
+    char *extra;
+
+    if (!e || strcmp( e, "1" ) || !access( path, R_OK )) return path;
+    if (asprintf( &extra, "%s/nls/extra/%s.nls", dir, name ) == -1) return path;
+    if (access( extra, R_OK )) { free( extra ); return path; }
+    if (reports++ < 16) dprintf( 2, "[nls-extra] %s.nls comes from nls/extra (MADEIRA_NLS_EXTRA=1)\n", name );
+    free( path );
+    return extra;
+}
+
 static char *get_nls_file_path( UINT type, UINT id )
 {
     const char *dir = build_dir ? build_dir : data_dir;
@@ -119,6 +139,7 @@ static char *get_nls_file_path( UINT type, UINT id )
     }
     if (!name) return NULL;
     if (asprintf( &path, "%s/nls/%s.nls", dir, name ) == -1) return NULL;
+    if (type == NLS_SECTION_CODEPAGE) path = nls_extra_path( dir, name, path );
     return path;
 }
 
@@ -2613,7 +2634,15 @@ NTSTATUS WINAPI NtGetNlsSectionPtr( ULONG type, ULONG id, void *unknown, void **
         if (!path) return STATUS_OBJECT_NAME_NOT_FOUND;
         status = open_nls_data_file( path, type == NLS_SECTION_SORTKEYS ? sortdirW : system_dir, &file );
         free( path );
-        if (status) return status;
+        if (status)
+        {
+            /* madeira-bcd: log only. Which code page tables were asked for and not found (a few lines per session). */
+            static unsigned int missing_reports;
+            if (type == NLS_SECTION_CODEPAGE && missing_reports++ < 8)
+                dprintf( 2, "[nls-missing] code page %u has no table (status %08x); env.MADEIRA_NLS_EXTRA = 1 supplies the extra tables\n",
+                         id, (unsigned int)status );
+            return status;
+        }
         attr.Attributes = OBJ_OPENIF | OBJ_PERMANENT;
         status = NtCreateSection( &handle, SECTION_MAP_READ, &attr, NULL, PAGE_READONLY, SEC_COMMIT, file );
         NtClose( file );

@@ -6,8 +6,8 @@ import SwiftUI
 import UIKit
 
 // Settings › Accounts: the stores BCD signs in to. Steam (the signed-in account, sign out
-// after a question, BCD's own sign-in page, Steam Cloud saves) and GOG (sign in on GOG's own
-// page, sign out after a question); Epic Games is planned and says so. The section names no engine type: it reads and asks through
+// after a question, BCD's own sign-in page, Steam Cloud saves), Epic Games and GOG (sign in on
+// the store's own page, sign out after a question). The section names no engine type: it reads and asks through
 // BCDAccountsBackend, which BCDAccountsLive.swift carries out on the app's own Steam sign-in
 // and the preview app on sample data (docs/BCD-UI-ARCHITECTURE.md).
 
@@ -70,6 +70,11 @@ struct BCDSteamSignIn: Equatable {
     /// Opens GOG's own sign-in page.
     func signInGOG()
     func signOutGOG()
+    /// Epic Games' account: `name` nil while signed out, `available` false when this copy has no Epic.
+    var epicAccount: BCDAccount { get }
+    /// Opens Epic's own sign-in page.
+    func signInEpic()
+    func signOutEpic()
 }
 
 enum BCDAccountsPage: Equatable {
@@ -93,6 +98,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
     @State private var page: BCDAccountsPage
     @State private var confirmingSignOut = false
     @State private var confirmingGOGSignOut = false
+    @State private var confirmingEpicSignOut = false
 
     init(backend: Backend, showsTitle: Bool = true, scrolls: Bool = true, startOn page: BCDAccountsPage = .main,
          back: (() -> Void)? = nil, backHook: BCDSectionKit.BackHook? = nil) {
@@ -117,7 +123,7 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
                 }
             }
         }
-        .modifier(BCDSectionKit.Buttons(focus: focus, key: "\(page)-\(confirmingSignOut)-\(confirmingGOGSignOut)",
+        .modifier(BCDSectionKit.Buttons(focus: focus, key: "\(page)-\(confirmingSignOut)-\(confirmingGOGSignOut)-\(confirmingEpicSignOut)",
                                         inner: closeInner, back: back, hook: backHook))
         .onAppear { backend.refresh() }
         .onChange(of: backend.steam.accountName) { _, name in
@@ -126,10 +132,18 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
         .onChange(of: backend.gogAccount.name) { _, name in
             if name == nil { confirmingGOGSignOut = false }
         }
+        .onChange(of: backend.epicAccount.name) { _, name in
+            if name == nil { confirmingEpicSignOut = false }
+        }
     }
 
     /// B inside the section: the question closes, then the sign-in page. False: nothing was open.
     private func closeInner() -> Bool {
+        if confirmingEpicSignOut {
+            confirmingEpicSignOut = false
+            if focus.controllerActive { focus.focused = Self.prefix + "epic.signout" }
+            return true
+        }
         if confirmingGOGSignOut {
             confirmingGOGSignOut = false
             if focus.controllerActive { focus.focused = Self.prefix + "gog.signout" }
@@ -161,8 +175,8 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
             BCDSectionKit.Columns {
                 steamCard
             } right: {
+                epicCard
                 gogCard
-                moreStores
                 keptNote
             }
         }
@@ -345,35 +359,72 @@ struct BCDAccountsSection<Backend: BCDAccountsBackend>: View {
             ])
     }
 
-    // MARK: The other stores
+    // MARK: Epic Games
 
-    private var moreStores: some View {
-        BCDSectionKit.Card(eyebrow: "More stores", symbol: "square.stack") {
-            comingSoon(.epic)
+    private var epicCard: some View {
+        BCDSectionKit.Card(eyebrow: "Epic Games", symbol: "gamecontroller") {
+            let epic = backend.epicAccount
+            if !epic.available {
+                BCDSectionKit.Note(text: "Epic Games is switched off in this copy of BCD.", symbol: "nosign")
+            } else if let name = epic.name {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack(spacing: 14) {
+                        avatar(nil, name: name)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(name).bcdFont(.heading, 19).lineLimit(1)
+                            Text("Epic account").bcdFont(.body, 14).foregroundStyle(BCDStyle.textSoft).lineLimit(1)
+                        }
+                        Spacer(minLength: 8)
+                        BCDStatusChip(text: "Signed in", color: BCDStyle.mint)
+                    }
+                    .accessibilityElement(children: .combine)
+                    BCDSectionKit.Note(text: "Your Epic games are in the Library. BCD installs the ones it can run, and says why when it can't.", symbol: "info.circle")
+                    if confirmingEpicSignOut {
+                        epicSignOutQuestion
+                    } else {
+                        BCDSectionKit.ActionButton(title: "Sign out", symbol: "rectangle.portrait.and.arrow.right", kind: .danger,
+                                                   id: Self.prefix + "epic.signout") {
+                            confirmingEpicSignOut = true
+                            if focus.controllerActive { focus.focused = Self.prefix + "epic.signout.cancel" }
+                        }
+                    }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack(spacing: 14) {
+                        avatar(nil, name: nil)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Not signed in").bcdFont(.heading, 19)
+                            Text("Sign in to see the games you own on Epic Games and install them.")
+                                .bcdFont(.body, 14).foregroundStyle(BCDStyle.textSoft)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    BCDSectionKit.ActionButton(title: "Sign in to Epic Games", symbol: "person.crop.circle.badge.plus", kind: .primary,
+                                               fill: true, id: Self.prefix + "epic.signin") { backend.signInEpic() }
+                    BCDSectionKit.Note(text: "You sign in on Epic's own page: BCD never sees your password. Signing in with Google, Apple or a console account? Epic's page may turn it away inside BCD; then tap Use Safari at the top of Epic's sign-in page.",
+                                       symbol: "safari")
+                }
+            }
         }
     }
 
-    private func comingSoon(_ store: BCDStoreFront) -> some View {
-        HStack(alignment: .top, spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous).fill(BCDStyle.surfaceRaised)
-                Text(String(store.title.prefix(1))).font(.system(size: 19, weight: .heavy, design: .rounded))
-                    .foregroundStyle(BCDStyle.textSoft)
-            }
-            .frame(width: 44, height: 44)
-            .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 10) {
-                    Text(store.title).bcdFont(.heading, 17)
-                    BCDStatusChip(text: "Coming soon", color: BCDStyle.lavender)
-                }
-                Text("Signing in to \(store.title) is on its way. Its games will join your library when it arrives.")
-                    .bcdFont(.body, 13).foregroundStyle(BCDStyle.textSoft)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .accessibilityElement(children: .combine)
+    /// Epic's sign-out happens only from here, after the question.
+    private var epicSignOutQuestion: some View {
+        BCDSectionKit.Confirm(
+            title: "Sign out of Epic Games?",
+            message: "BCD ends its Epic sign-in on this \(BCDSectionKit.deviceWord) and forgets the list of your Epic games.",
+            choices: [
+                .init(title: "Sign out", kind: .danger, id: Self.prefix + "epic.signout.confirm") {
+                    confirmingEpicSignOut = false
+                    backend.signOutEpic()
+                    if focus.controllerActive { focus.focused = Self.prefix + "epic.signin" }
+                },
+                .init(title: "Cancel", kind: .outline, id: Self.prefix + "epic.signout.cancel") {
+                    confirmingEpicSignOut = false
+                    if focus.controllerActive { focus.focused = Self.prefix + "epic.signout" }
+                },
+            ])
     }
 
     private var keptNote: some View {

@@ -203,28 +203,121 @@ enum BCDFormat {
         default: return shortDate(date, now: now)
         }
     }
-    // shortDate-begin
-    /// "12 Oct" (this year) or "12 Oct 2025", from numbers only. `Date.formatted` builds an ICU date formatter on
-    /// every call and the Home and Library cards call this on every draw: one of those calls crashed the interface
-    /// the moment a game started (a tester's log, KDY8E6, 2026-10-19). The screens are English, so a fixed table does.
-    static func shortDate(_ date: Date, now: Date = Date()) -> String {
-        func civil(_ d: Date) -> (year: Int, month: Int, day: Int) {
-            let local = d.timeIntervalSince1970 + Double(TimeZone.current.secondsFromGMT(for: d))
-            let z = Int((local / 86400).rounded(.down)) + 719_468
-            let era = (z >= 0 ? z : z - 146_096) / 146_097
-            let doe = z - era * 146_097
-            let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365
-            let doy = doe - (365 * yoe + yoe / 4 - yoe / 100)
-            let mp = (5 * doy + 2) / 153
-            let month = mp < 10 ? mp + 3 : mp - 9
-            return (yoe + era * 400 + (month <= 2 ? 1 : 0), month, doy - (153 * mp + 2) / 5 + 1)
-        }
-        let months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-        let then = civil(date), today = civil(now)
-        let text = "\(then.day) \(months[then.month - 1])"
-        return then.year == today.year ? text : text + " \(then.year)"
+    // dates-begin
+    // Every date the interface or a file name shows is made here, from numbers. `DateFormatter`, `Date.formatted(date:)`
+    // and `ISO8601DateFormatter` each build an ICU date formatter (`udat_open`), and that call killed BCD itself in three
+    // tester logs (KDY8E6 on build 574, A7V9T2 and DFSTWB on 576: the interface died while it drew a date). The screens are English, so a fixed table of month names does. tests/host/check-bcd-game-page.py
+    // forbids those calls in the files that used them; the numbers are checked against Foundation in
+    // tests/host/bcd_game_page_checks.swift.
+
+    /// A moment as the calendar numbers a person reads (Gregorian, whatever the device's calendar and digits).
+    struct Civil: Equatable {
+        var year = 1970, month = 1, day = 1, hour = 0, minute = 0, second = 0, millisecond = 0
     }
-    // shortDate-end
+
+    /// `date` in the device's time zone (or in UTC), from arithmetic only. Dates outside any real calendar
+    /// (an infinite or NaN interval, or one beyond the year 300,000) come out as 1970-01-01, not as a trap.
+    static func civil(_ date: Date, utc: Bool = false) -> Civil {
+        let seconds = date.timeIntervalSince1970
+        guard seconds.isFinite, abs(seconds) < 1e13 else { return Civil() }
+        let offset = utc ? 0 : Double(TimeZone.current.secondsFromGMT(for: date))
+        // To the nearest millisecond, as a date formatter does (a moment 0.4 ms short of a second belongs to that second).
+        let local = ((seconds + offset) * 1000).rounded() / 1000
+        let whole = local.rounded(.down)
+        let days = Int((whole / 86400).rounded(.down))
+        let secondOfDay = Int(whole) - days * 86400
+        let z = days + 719_468
+        let era = (z >= 0 ? z : z - 146_096) / 146_097
+        let doe = z - era * 146_097
+        let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365
+        let doy = doe - (365 * yoe + yoe / 4 - yoe / 100)
+        let mp = (5 * doy + 2) / 153
+        let month = mp < 10 ? mp + 3 : mp - 9
+        return Civil(year: yoe + era * 400 + (month <= 2 ? 1 : 0), month: month, day: doy - (153 * mp + 2) / 5 + 1,
+                     hour: secondOfDay / 3600, minute: secondOfDay % 3600 / 60, second: secondOfDay % 60,
+                     millisecond: min(999, Int(((local - whole) * 1000).rounded())))
+    }
+
+    private static let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    private static func two(_ value: Int) -> String { value < 10 ? "0\(value)" : "\(value)" }
+
+    /// "12 Oct" (this year) or "12 Oct 2025".
+    static func shortDate(_ date: Date, now: Date = Date()) -> String {
+        let then = civil(date)
+        let text = "\(then.day) \(monthNames[then.month - 1])"
+        return then.year == civil(now).year ? text : text + " \(then.year)"
+    }
+    /// "12 Oct 2025": the date with its year, as the game page's list line and the log lists show it.
+    static func fullDate(_ date: Date) -> String {
+        let then = civil(date)
+        return "\(then.day) \(monthNames[then.month - 1]) \(then.year)"
+    }
+    /// "12 Oct 2025 at 14:05", in 24-hour time.
+    static func dateTime(_ date: Date) -> String {
+        let then = civil(date)
+        return fullDate(date) + " at \(two(then.hour)):\(two(then.minute))"
+    }
+    /// "Today", "Yesterday" or "12 Oct 2025": a day compared with today, as Steam's "Last played" says it.
+    static func dayWord(_ date: Date, now: Date = Date()) -> String {
+        // Whole days since 1970 in the device's time zone; a clock change cannot move a day to its neighbour.
+        func dayNumber(_ d: Date) -> Int {
+            let seconds = d.timeIntervalSince1970
+            guard seconds.isFinite, abs(seconds) < 1e13 else { return 0 }
+            return Int(((seconds + Double(TimeZone.current.secondsFromGMT(for: d))) / 86400).rounded(.down))
+        }
+        let ago = dayNumber(now) - dayNumber(date)
+        return ago == 0 ? "Today" : ago == 1 ? "Yesterday" : fullDate(date)
+    }
+    /// "2026-10-18 14:05": a line of a report.
+    static func reportTime(_ date: Date) -> String {
+        let c = civil(date)
+        return "\(c.year)-\(two(c.month))-\(two(c.day)) \(two(c.hour)):\(two(c.minute))"
+    }
+    /// File-name stamps, in the device's time zone: "2026-10-18_14-05-07" (with seconds) or "2026-10-18_14-05".
+    static func fileStamp(_ date: Date, seconds: Bool = true) -> String {
+        let c = civil(date)
+        let day = "\(c.year)-\(two(c.month))-\(two(c.day))_\(two(c.hour))-\(two(c.minute))"
+        return seconds ? day + "-\(two(c.second))" : day
+    }
+    /// "20261018-140507": a backup folder's name.
+    static func compactStamp(_ date: Date) -> String {
+        let c = civil(date)
+        return "\(c.year)\(two(c.month))\(two(c.day))-\(two(c.hour))\(two(c.minute))\(two(c.second))"
+    }
+    /// "2026-10-18T14-05-07Z": UTC, as an ISO 8601 stamp with the colons replaced (a folder name).
+    static func utcFolderStamp(_ date: Date) -> String {
+        let c = civil(date, utc: true)
+        return "\(c.year)-\(two(c.month))-\(two(c.day))T\(two(c.hour))-\(two(c.minute))-\(two(c.second))Z"
+    }
+    /// "14:05:07.123": the time that starts a log line.
+    static func logClock(_ date: Date) -> String {
+        let c = civil(date)
+        let ms = c.millisecond < 10 ? "00\(c.millisecond)" : c.millisecond < 100 ? "0\(c.millisecond)" : "\(c.millisecond)"
+        return "\(two(c.hour)):\(two(c.minute)):\(two(c.second)).\(ms)"
+    }
+    /// "2026-10-18" (exactly that shape, a real day) as noon of that day in the device's time zone; nil otherwise.
+    /// Noon, not midnight: a clock change near midnight cannot move it to the next or the last day.
+    static func day(_ text: String) -> Date? {
+        let bytes = Array(text.utf8)
+        guard bytes.count == 10, bytes[4] == 0x2D, bytes[7] == 0x2D else { return nil }
+        func number(_ range: Range<Int>) -> Int? {
+            var value = 0
+            for byte in bytes[range] { guard byte >= 0x30, byte <= 0x39 else { return nil }; value = value * 10 + Int(byte - 0x30) }
+            return value
+        }
+        guard let year = number(0..<4), let month = number(5..<7), let day = number(8..<10), year >= 1, month >= 1, month <= 12, day >= 1 else { return nil }
+        let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+        guard day <= [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1] else { return nil }
+        let y = month <= 2 ? year - 1 : year
+        let era = y / 400
+        let yoe = y - era * 400
+        let doy = (153 * (month > 2 ? month - 3 : month + 9) + 2) / 5 + day - 1
+        let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy
+        let utcNoon = Double((era * 146_097 + doe - 719_468) * 86_400 + 43_200)
+        let guess = Date(timeIntervalSince1970: utcNoon)
+        return Date(timeIntervalSince1970: utcNoon - Double(TimeZone.current.secondsFromGMT(for: guess)))
+    }
+    // dates-end
     static func playtime(_ minutes: Int) -> String {
         minutes < 60 ? "\(minutes) min" : String(format: "%.1f h", Double(minutes) / 60)
     }

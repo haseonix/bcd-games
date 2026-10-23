@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "fex-avx-on"
+ ],
+ "next": [
+  "env.MADEIRA_FEX_AVX = 1"
+ ],
+ "note": "The Last of Us Part I (Steam through BCD Dock), build 576, iPhone17,2 (Send Logs JP833A and R2NFT1, identical): the proven case of fex-avx-on. About 1 s in the game executes an instruction FEX does not decode with AVX off: [mach_exc] UNHANDLED #1 ... insn word 0xd4400000 (HLT, what FEX plants), ill_handler ILL at pc=0x16bffc4e8, c000001d. With env.MADEIRA_FEX_AVX = 1 (24TC8Y, build 579) the c000001d is gone and the game goes on to its own stop. Kept so that the rule's none signals (store-undecoded, a UDF data word) never take this case.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

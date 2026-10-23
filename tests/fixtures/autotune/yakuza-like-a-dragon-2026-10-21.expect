@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "exe-window-fixed-base"
+ ],
+ "next": [
+  "exe-window-mb = 512"
+ ],
+ "note": "Yakuza: Like a Dragon (Steam 1235140 through BCD Dock), build 578, iPhone18,1 (Send Logs F4V6BQ = 2YY2MW; 7Z2V68 build 579): YakuzaLikeADragon.exe is a 397 MiB program with its relocations stripped that must load at 0x140000000 ('preferred base 0x140000000+0x18c91000 REFUSED status=0xc0000018', 'failed to create main module'); the window there is 128 MB. exe-window-fixed-base keeps matching (a program under 512 MiB: exeMaxMB 511 does not touch it) and proposes exe-window-mb = 512; the recommended list gives this game 416.",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "trying"
+}

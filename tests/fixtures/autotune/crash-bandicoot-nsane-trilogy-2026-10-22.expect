@@ -1,0 +1,13 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "dock-game-named-crash-session-open",
+  "dock-game-died-session-open"
+ ],
+ "next": [],
+ "note": "",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "known"
+}

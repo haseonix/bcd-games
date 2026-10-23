@@ -163,6 +163,13 @@ enum StikJITHelper {
     /// Why the last allocatePool() returned nil, in words for the person playing
     /// (the library shows it); nil after a success.
     private(set) static var poolFailure: String?
+    /// madeira-bcd (round 580): the game's `exe-window-mb` (in MB) when this run tried to widen the executable window
+    /// and could not (something already held the range above it, DBKP8Z: a libmalloc region inside the range); nil
+    /// when it was not asked or it worked. A program that needs the wider window then ends with c0000018 (0xC0000018,
+    /// "failed to create main module"); a program that fits in 128 MB runs (Darksiders II, FFRS demo, builds 576:
+    /// the line was there and the window stayed 128 MB), so the session is never held back. Text only: the library
+    /// says so when the game ends with that status (LibraryModel.exitReport).
+    private(set) static var exeWindowWidenFailedMB: Int?
     /// JIT is on (CS_DEBUGGED) but nothing can make the pool: what to do on this device
     /// (madeira-bcd ios18-jit: StikDebug's Always Run Scripts where it treats the device as
     /// non-TXM, Built-in on iOS 26 TXM devices; iOS 27 keeps the text it had).
@@ -315,6 +322,7 @@ enum StikJITHelper {
     static func allocatePool(poolSize requestedPoolSize: Int = 128 * 1024 * 1024) -> (rx: UnsafeMutableRawPointer, rw: UnsafeMutableRawPointer, size: Int)? {
         var poolSize = requestedPoolSize      // ml1036: may shrink to fit, see the hole census below
         poolFailure = nil
+        exeWindowWidenFailedMB = nil
         // madeira-bcd ios18-jit (2026-10-18): P_TRACED, not CS_DEBUGGED, says whether anything
         // can answer the pool request's BRK. With no debugger attached the pool is built without
         // one where TXM does not police code (JITNoDebuggerPool, after its one-page self-test);
@@ -599,7 +607,9 @@ enum StikJITHelper {
                 LogStore.shared.log("[exe-window] executable window widened to [0x140000000,+\(mb)MB) for this game (exe-window-mb)", level: .success)
             } else {
                 if kr == KERN_SUCCESS { vm_deallocate(mach_task_self_, extra, vm_size_t(want - exeWinSize)) }
-                LogStore.shared.log("[exe-window] could not widen the executable window to \(mb)MB (kr=\(kr)): something holds the range above it; the window stays 128MB", level: .error)
+                exeWindowWidenFailedMB = mb
+                LogStore.shared.log("[exe-window] could not widen the executable window to \(mb)MB (kr=\(kr)): something holds the range above it; the window stays 128MB. "
+                    + "A game whose program needs more than that stops with c0000018: quit BCD and open it again for a new memory layout", level: .error)
             }
         }
         if reservePlan == nil {   // madeira-bcd pool-reserve: no census or plugs for a pool placed in the reservation

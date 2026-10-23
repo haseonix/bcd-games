@@ -37,6 +37,17 @@ enum LogUploadCore {
         (#"\b(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}\b"#, "<ip6>"),
         (#"(?i)\b(?:fe80|f[cd][0-9a-f]{2}|[23][0-9a-f]{3})(?::[0-9a-f]{1,4})*::(?:[0-9a-f]{1,4}(?::[0-9a-f]{1,4})*)?"#, "<ip6>"),
         (#"[^\s'’"\\/]{1,40}['’]s (?=(?:[A-Za-z0-9-]+ )?(?:iPhone|iPad|Mac|MacBook|AirPods|Keyboard|Mouse|Trackpad|Controller|DualSense|DualShock|Xbox|Joy-Con)\b)"#, "<name>'s "),
+        // 2026-10-22, Epic Games sign-in (BCDEpic): Epic's two token families and the sign-in page's code.
+        (#"\beg1~[A-Za-z0-9._~+/=-]+"#, "eg1~<token>"),
+        (#"\begoc1~[A-Za-z0-9._~+/=-]+"#, "egoc1~<token>"),
+        (#"("authorizationCode"\s*:\s*")[0-9A-Za-z]{16,64}"#, "$1<code>"),
+        // 2026-10-22, Epic Games milestone 2 (BCDEpicStart): a game started signed in has Epic's one-time code, the account's ID and its
+        // name on its command line, and a sign-in page may have a code in an address. The runtime masks the first three ("*") before they
+        // are logged; these rules are the second line (a value is replaced, a mask or placeholder is left as it is).
+        (#"(?i)(-AUTH_PASSWORD=)(?![*<])[^\s"'\\]+"#, "$1<code>"),
+        (#"(?i)(-epicuserid=)(?![*<])[0-9A-Za-z]{8,64}"#, "$1<id>"),
+        (#"(?i)(-epicusername=)(?![*<])(?:\\?"[^"]*?\\?"|[^\s"'\\]+)"#, "$1<name>"),
+        (#"(?i)((?:exchangeCode|userCode)=|[?&]code=)(?![*<])[^&\s"'\\]+"#, "$1<code>"),
     ].map { (try! NSRegularExpression(pattern: $0.0), $0.1) }
 
     static func scrub(_ line: String) -> String {
@@ -52,7 +63,9 @@ enum LogUploadCore {
     /// "/Users/", no "users" or "userdata" in any case, no "@", fewer than three digit.digit
     /// dots (an IP address has three), fewer than four "-" (a UUID or a MAC has them), no run
     /// of 40 hex digits or of 17 decimal ones (a SteamID64), fewer than five ":" and no "::"
-    /// (MAC and IPv6 addresses), no "'s " (a person's device name).
+    /// (MAC and IPv6 addresses), no "'s " (a person's device name), no "eg1~" or "egoc1~" (Epic's tokens),
+    /// no `authorizationCode":` (the Epic sign-in page's JSON) and no "=" after -AUTH_PASSWORD, -epicuserid,
+    /// -epicusername, exchangeCode, userCode or ?code / &code (Epic's start arguments and a code in an address).
     static func mayNeedScrub(_ b: UnsafeRawBufferPointer) -> Bool {
         let n = b.count
         if n < 7 { return false }
@@ -61,9 +74,15 @@ enum LogUploadCore {
             let c = b[i]
             switch c {
             case 0x40: return true                                   // @
-            case 0x3A:                                               // : and ::
+            case 0x3A:                                               // : and ::, and authorizationCode":
                 colons += 1
                 if i + 1 < n, b[i + 1] == 0x3A { return true }
+                if i >= 18, matches(b, i - 18, "authorizationCode\"") { return true }
+            case 0x3D:                                               // = after one of Epic's start arguments or a code in an address
+                if endsLower(b, i, "-auth_password") || endsLower(b, i, "-epicuserid") || endsLower(b, i, "-epicusername")
+                    || endsLower(b, i, "exchangecode") || endsLower(b, i, "usercode") || endsLower(b, i, "?code") || endsLower(b, i, "&code") { return true }
+            case 0x7E:                                               // ~ after eg1 or egoc1
+                if (i >= 3 && matches(b, i - 3, "eg1~")) || (i >= 5 && matches(b, i - 5, "egoc1~")) { return true }
             case 0x27:                                               // 's
                 if i + 2 < n, b[i + 1] == 0x73, b[i + 2] == 0x20 { return true }
             case 0xE2:                                               // ’s (U+2019)
@@ -83,6 +102,14 @@ enum LogUploadCore {
             if c >= 0x30 && c <= 0x39 { digitRun += 1; digitRunMax = max(digitRunMax, digitRun) } else { digitRun = 0 }
         }
         return dots >= 3 || dashes >= 4 || hexRunMax >= 40 || digitRunMax >= 17 || colons >= 5
+    }
+
+    /// The bytes just before `end` are `word` (lower case), in any letter case.
+    private static func endsLower(_ b: UnsafeRawBufferPointer, _ end: Int, _ word: StaticString) -> Bool {
+        let n = word.utf8CodeUnitCount
+        guard end >= n else { return false }
+        for j in 0..<n where lower(b[end - n + j]) != word.utf8Start[j] { return false }
+        return true
     }
 
     private static func isDigit(_ c: UInt8) -> Bool { c >= 0x30 && c <= 0x39 }

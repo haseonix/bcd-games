@@ -1,0 +1,156 @@
+[22:05:57.617] [INFO] Checking entitlements...
+[22:05:57.618] [INFO] [build] v0.1.579 (579)
+[22:05:57.618] [INFO] [device] model=iPhone18,1 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=11722MB available=6120MB cores=6
+[22:05:57.619] [INFO] [device] address-map=[0x1044a8000,0x8000000000) 512GB increased-memory=1 extended-va=1
+[22:05:57.631] [INFO] [device] gpu="Apple A19 Pro GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[22:12:43.146] [INFO] Requesting JIT with Built-in StikJIT...
+[22:12:46.316] [INFO] [bcd] library launch SPEED2.EXE: avx=0 wine-vcrt=1 nvidia=1 game-config=1 metalfx=off
+[22:12:46.340] [INFO] Running full Wine sequence...
+[22:12:46.340] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x1044a8000,0x8000000000) 512GB available=8150MB low-power=0 thermal=fair
+[22:12:46.346] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[22:12:46.346] [INFO] Allocating 896MB JIT pool via debugger...
+[22:12:46.347] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[22:12:46.347] [INFO] [jit-debugger] attached=1 at the pool request
+[22:12:46.350] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[22:12:47.085] [INFO] RX pool at 0x148000000
+[22:12:47.102] [INFO] Detaching debugger...
+[phase] wine-start             t+  1.685s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[Wine init_process] waiting for request_fd from wineserver...
+[22:12:48.641] [Wine init_process] waiting for request_fd from wineserver...
+[Wine init_process] reply_pipe=42, sending init_first_thread...
+[22:12:48.641] [Wine init_process] reply_pipe=42, sending init_first_thread...
+ml992: os_proc_available_memory=7579 MB + phys_footprint=612 MB = 8192 MB (hw.memsize says 11722 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148008000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x148120000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148195000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148558000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x14867c000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148724000)
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1488a4000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148928000)
+[free-delay] #1 release of 0x70a3a40000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70a3b40000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70a3d40000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x70a4140000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x70a4940000+0xfd0000 held for 2000 ms (5 in flight)
+[free-delay] #6 release of 0x70a5910000+0xfd0000 held for 2000 ms (6 in flight)
+[free-delay] #7 release of 0x70a68e0000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x70a78b0000+0xfd0000 held for 2000 ms (8 in flight)
+D 24 Load module SPEED2.EXE (speed2.exe-a8057de82094f8f2): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83f298b6): 71FFF40000
+[footprint] rev=ml358 phys=631 MB (peak 631) internal=628 MB compressed=1 MB external=85 MB reusable=9 MB (cycle=1)
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ef6c4d): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728a977e9e): 717BC40000
+D 24 Load module advapi32.dll (advapi32.dll-e40424e11a215ea3): 717BBF0000
+D 24 Load module sechost.dll (sechost.dll-b367444c079867ec): 717BBC0000
+[gdi-shared] session table 0x70ab940000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"modloader\\modloader.asi" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[stp-emul] ml629 #1 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7102770000 rw=0x70009dc000 base 0x7102770000 -> 0x7102770020 (writeback)
+[stp-emul] ml629 #2 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7102770020 rw=0x70009dc020 base 0x7102770020 -> 0x7102770040 (writeback)
+[stp-emul] ml629 #3 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7102770040 rw=0x70009dc040 base 0x7102770040 -> 0x7102770060 (writeback)
+[stp-emul] ml629 #4 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7102770060 rw=0x70009dc060 base 0x7102770060 -> 0x7102770080 (writeback)
+[stp-emul] ml629 #5 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x7102770080 rw=0x70009dc080 base 0x7102770080 -> 0x71027700a0 (writeback)
+[stp-emul] ml629 #6 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71027700bc rw=0x70009dc0bc base 0x71027700bc -> 0x71027700dc (writeback)
+[stp-emul] ml629 #7 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71027700dc rw=0x70009dc0dc base 0x71027700dc -> 0x71027700fc (writeback)
+[stp-emul] ml629 #8 insn=0xac810420 mode=post off=+32 Rt=q0 Rt2=q1 Rn=x1 addr=0x71027700fc rw=0x70009dc0fc base 0x71027700fc -> 0x710277011c (writeback)
+[win-name] #3 hwnd=0x10034 class='' text="Default IME" rev=ml853
+[win-name] #4 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+[guest-log] #1 tid=0024 20:12:49:842 [00036] | INFO  | Redirecting IDirect3D9::CreateDevice(this = 01CA4F50, Adapter = 0, DeviceType = 1, hFocusWindow = 0002002E, BehaviorFlags = 0x50, pPresentationParameters = 0086F870, ppReturnedDeviceInterface = 00870974) ...
+[swap] ml1077 backed 0x7109d90000+0x810000 (file off 0 MB): 8 MB in 1 extents, peak 8 MB, 0 refused
+[swap] ml1077 backed 0x710a5a0000+0x810000 (file off 8 MB): 16 MB in 2 extents, peak 16 MB, 0 refused
+[swap] ml1077 backed 0x710adb0000+0x810000 (file off 16 MB): 24 MB in 3 extents, peak 24 MB, 0 refused
+[swap] ml1077 backed 0x710b5c0000+0x810000 (file off 24 MB): 32 MB in 4 extents, peak 32 MB, 0 refused
+[swap] ml1077 backed 0x710bdd0000+0x810000 (file off 32 MB): 40 MB in 5 extents, peak 40 MB, 0 refused
+[swap] ml1077 backed 0x710c5e0000+0x810000 (file off 40 MB): 48 MB in 6 extents, peak 48 MB, 0 refused
+[win-name] #10 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+[win-name] #11 hwnd=0x2002e class='' text="NFS Underground 2" rev=ml853
+D 24 Load module crypt32.dll (crypt32.dll-6b71bb9bfc436753): 7178D20000
+D 24 Load module bcrypt.dll (bcrypt.dll-5a6646eeb13c7915): 7178CF0000
+D 24 Load module rsaenh.dll (rsaenh.dll-6cdd9371ffb1567c): 7178C90000
+[win-name] #13 hwnd=0x1003e class='' text="DIEmWin" rev=ml853
+[footprint] rev=ml358 phys=918 MB (peak 918) internal=861 MB compressed=1 MB external=90 MB reusable=4 MB (cycle=2)
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbc616ef): 7178C50000
+D 24 Load module version.dll (version.dll-f3fe55759b0999a7): 7178C30000
+[22:12:50.808] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[swap] ml1077 stats: 117 MB file-backed now (peak 117), 10 extents, file used 117 of 4096 MB, backs 10 releases 0 unbacks 0 refused 0 | coverage classic: disk 0 MB of 4096 cap, reservations 0, holes 0, disk-full refusals 0 | ml1258 churn: 0 sizes, 0 blocks left anonymous
+[swap] ml1150 pool: 0 MB in use (peak 0), 0 takes, 10 guarded, 0 MB lost to a full free list
+[swap] ml1077 backed 0x71196c0000+0x810000 (file off 117 MB): 125 MB in 11 extents, peak 125 MB, 0 refused
+[swap] ml1077 backed 0x711d7f0000+0x810000 (file off 125 MB): 133 MB in 12 extents, peak 133 MB, 0 refused
+[swap] ml1077 backed 0x711efd0000+0x11a0000 (file off 133 MB): 151 MB in 13 extents, peak 151 MB, 0 refused
+[swap] ml1077 backed 0x7120170000+0x3dd0000 (file off 151 MB): 212 MB in 14 extents, peak 212 MB, 0 refused
+[swap] ml1077 backed 0x7124740000+0xb70000 (file off 212 MB): 224 MB in 15 extents, peak 224 MB, 0 refused
+[swap] ml1077 backed 0x7125c20000+0x810000 (file off 224 MB): 232 MB in 16 extents, peak 232 MB, 0 refused
+D 24 Load module d3dcompiler_47.dll (d3dcompiler_47.dll-e0c1d8ea40496d20): 7178BF0000
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml358 phys=1257 MB (peak 1257) internal=1036 MB compressed=2 MB external=336 MB reusable=0 MB (cycle=3)
+[rb-tex] madeira-bcd new readback #1: fmt 80 640x480 level 0 (texture 640x480, 1 mips)
+[footprint] rev=ml358 phys=1259 MB (peak 1259) internal=1039 MB compressed=2 MB external=336 MB reusable=0 MB (cycle=4)
+[footprint] rev=ml358 phys=1262 MB (peak 1262) internal=1042 MB compressed=2 MB external=297 MB reusable=0 MB (cycle=5)
+[footprint] rev=ml358 phys=1261 MB (peak 1262) internal=1042 MB compressed=2 MB external=228 MB reusable=0 MB (cycle=6)
+[rb-tex] madeira-bcd new readback #2: fmt 80 512x512 level 0 (texture 512x512, 1 mips)
+[rb-tex] madeira-bcd new readback #5: fmt 80 256x256 level 1 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #6: fmt 80 128x128 level 2 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #7: fmt 80 64x64 level 3 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #8: fmt 80 32x32 level 4 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #9: fmt 80 16x16 level 5 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #10: fmt 80 8x8 level 6 (texture 512x512, 7 mips)
+[rb-tex] madeira-bcd new readback #18: fmt 80 128x128 level 0 (texture 128x128, 1 mips)
+[ios_audio] ml1230 pacing stream=0x131974800 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 1187 wakes; device short 34.0 ms in 2 of 468 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.0 ms; clamped 0 samples
+[footprint] rev=ml358 phys=1285 MB (peak 1285) internal=1056 MB compressed=2 MB external=241 MB reusable=0 MB (cycle=7)
+[stp-emul] ml629 #1 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710ee13fe4 rw=0x7000a2bfe4 rw_end=0x0)
+[store-undecoded] #1 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #1 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x1620c6044 addr=0x710ee13fe4 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x710ee10000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x1620c6044 addr=0x710ee13fe4 x18=0x0 type=1 lr=0x162014010 sp=0x70a391f350 x16=0x14806de94 x17=0x70a391f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d5cc (PE 0xfff8d5cc) -- NO pool copy for this address (identity translate)
+[fault-host] 1620c5f44: d503201f 110020b4 8b344278 b8bfc30a d503201f 0b05014a 6b04015f 540003c1
+[fault-host] 1620c5f64: 11002094 8b344278 b8bfc30a d503201f 110020b4 8b344278 b8bfc314 d503201f
+[fault-host] 1620c5f84: 0b14014a 110020b4 8b344278 d503201f 889fff0a 8b244278 b8bfc30a d503201f
+[fault-host] 1620c5fa4: aa0403eb 11001094 8b344278 b8bfc304 d503201f 8b244278 d503201f 889fff0a
+[fault-host] 1620c5fc4: 11001154 8b344278 d503201f 889fff04 aa0503e6 1100e134 8b344278 38bfc314
+[fault-host] 1620c5fe4: b3401e84 72001c9f 54000f60 4b0b00e7 aa0703e5 53027ce7 52800014 3203ebe4
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[stp-emul] ml629 #2 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710ee13fe4 rw=0x7000a2bfe4 rw_end=0x0)
+[store-undecoded] #2 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #2 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x1620c6044 addr=0x710ee13fe4 kr=2(PROTECTION_FAILURE) entryprot=5 nowprot=5 region=0x710ee10000+0x4000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x1620c6044 addr=0x710ee13fe4 x18=0x0 type=1 lr=0x162014010 sp=0x70a391f350 x16=0x14806de94 x17=0x70a391f2b0
+[guest-code] rev=ml333 pool_rip=0xfff8d5cc (PE 0xfff8d5cc) -- NO pool copy for this address (identity translate)
+[fault-host] 1620c5fa4: aa0403eb 11001094 8b344278 b8bfc304 d503201f 8b244278 d503201f 889fff0a
+[fault-host] 1620c5fc4: 11001154 8b344278 d503201f 889fff04 aa0503e6 1100e134 8b344278 38bfc314
+[fault-host] 1620c5fe4: b3401e84 72001c9f 54000f60 4b0b00e7 aa0703e5 53027ce7 52800014 3203ebe4
+[fault-host] 1620c6004: b943d395 f9459f81 710002bf 1a9f07e0 f860303f 398feb96 aa0703e0 8b0b02a1
+[fault-host] 1620c6024: 8b214261 37080336 b40002c0 d1002000 b7f801e0 4e040c81 d1002000 b7f800a0
+[fault-host] 1620c6044: ac810421 ac810421 d1004000 b6ffffa0 00000000 00000000 00000000 00000000
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+ml998: [wr-strip-declined] 0x710ee13fe4 vprot=0x25 { COMMITTED READ EXEC  } unix_prot=5
+ml998: [wr-strip-declined]   view 0x710ec20000+0x410000 protect=0x3 {  } page_off=0x1f0000
+ml998: [wr-strip-declined]   neighbours prev=0x23 this=0x25 next=0x23
+[stp-emul] ml629 #3 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710ee13fe4 rw=0x7000a2bfe4 rw_end=0x0)
+[store-undecoded] #3 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #3 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[stp-emul] ml629 #4 REFUSING: 32B span leaves the alias (insn=0xac810421 addr=0x710ee13fe4 rw=0x7000a2bfe4 rw_end=0x0)
+[store-undecoded] #4 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #4 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-undecoded] #5 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #5 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-undecoded] #6 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #6 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[store-undecoded] #7 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[store-undecoded] #8 rev=ml350 insn=0xac810421 pc=0x1620c6044 addr=0x710ee13fe4 rw_addr=0x7000a2bfe4 — alias OK, ADD THIS ENCODING to the case-4 emulator
+[av-detail] ml613 #19 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #20 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #21 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #22 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #23 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[av-detail] ml613 #24 p0=WRITE p1=0x710ee13fe4 hostpc=0x1620c6044 hinsn=0xac810421 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=2 base=0x161ffc000 size=0x8000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[redeliv] 256 identical redeliveries pc=0x1620c6044 addr=0x710ee13fe4 — storm forming rev=ml461
+[redeliv] 2000 identical redeliveries pc=0x1620c6044 addr=0x710ee13fe4 — unrecoverable host fault misdelivered to guest rev=ml461
+[redeliv] terminating process rev=ml465

@@ -1,0 +1,17 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true,
+  "userSaid": "froze"
+ },
+ "matched": [
+  "anon-cas-flush"
+ ],
+ "next": [
+  "env.MADEIRA_ANON_CAS_FLUSH = 1"
+ ],
+ "note": "Round 591 (ajan10/motor): Jetboard Joust after the 580 CAS emulation (one [anon-cas], then the [spin] report: 11M calls a second, never presents; the user reported a freeze); env.MADEIRA_ANON_CAS_FLUSH = 1 hands the CAS to FEX (an attempt, not proven).",
+ "outcome": "hung",
+ "stage": 3,
+ "status": "trying"
+}

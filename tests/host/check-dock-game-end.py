@@ -200,6 +200,37 @@ let conhost = ended("C:\\windows\\system32\\conhost.exe", 0, ago: 7)
         require(verdict([ended(installer, 0xC000001D, ago: 395), ended(dying, 0, ago: 20)]) == .none,
                 "an installer's crash earlier and the game's normal end later: nothing")
 
+        // ---- a launch that failed and no game ran (round 580): Spec Ops 2FRXXM / NEXHHM and Risen 2 9DBDZ6, probe-result 49
+        func failed(_ processes: [DockProcess], untracked: Int = 0, complete: Bool = true,
+                    host: R.DockHostResult = R.DockHostResult(result: 49, gameRan: false)) -> R.FailedLaunch? {
+            hostAsked = 0
+            return R.failedLaunch(DockProcessTable(processes: processes, untracked: untracked, complete: complete), places: places) {
+                hostAsked += 1; return host
+            }
+        }
+        let cegService = "C:\\Program Files (x86)\\Common Files\\Steam\\SteamService.exe"
+        let steamClient = "C:\\Program Files (x86)\\Steam\\steam.exe"
+        // the processes of 2FRXXM after the host finished: Wine's own programs, Valve's client and its service, nothing of the game
+        let ceg = [conhost, ended("C:\\windows\\system32\\dockhost.exe", 49, ago: 20), runs(client), runs(service), runs(steamClient)]
+        require(failed(ceg) == R.FailedLaunch(result: 49, blocked: nil), "CEG error 49, no game process: a failed launch")
+        require(hostAsked == 1, "the report is read once, when nothing of the game runs")
+        require(R.failedLaunchGrace == 20, "the failure must stand 20 s")
+        require(failed(ceg, host: R.DockHostResult(result: 34, gameRan: false)) == R.FailedLaunch(result: 34, blocked: nil)
+                && failed(ceg, host: R.DockHostResult(result: 42, gameRan: false)) == R.FailedLaunch(result: 42, blocked: nil),
+                "any non-zero result of a host that finished and never saw the game run (a sign-in, a registry step)")
+        require(failed(ceg, host: R.DockHostResult(result: nil, gameRan: false)) == nil, "the host has not finished: nothing")
+        require(failed(ceg, host: R.DockHostResult(result: 0, gameRan: false)) == nil, "the host finished well: nothing")
+        require(failed(ceg, host: R.DockHostResult(result: 46, gameRan: true)) == nil && failed(ceg, host: R.DockHostResult(result: 0, gameRan: true)) == nil,
+                "the game ran: that is the crash rule's, never this one")
+        require(failed([runs(game)] + ceg) == nil && hostAsked == 0, "a program of the game runs: nothing, and the report is not read")
+        require(failed([runs(game, helper: true)] + ceg) == R.FailedLaunch(result: 49, blocked: nil), "a running crash handler is not the game")
+        require(failed([runs("")] + ceg) == nil, "a running program whose folder is unknown may be the game: nothing")
+        require(failed([ended(dying, 0xC0000005, ago: 1)] + ceg, host: R.DockHostResult(result: 49, gameRan: false)) == R.FailedLaunch(result: 49, blocked: nil),
+                "a program of the game that ended does not stop the rule (it is the host's report that decides)")
+        require(failed(ceg, untracked: 1) == R.FailedLaunch(result: 49, blocked: "untracked-process"), "a spawn past the table: blocked")
+        require(failed(ceg, complete: false) == R.FailedLaunch(result: 49, blocked: "table-incomplete"), "a cut table: blocked")
+        require(failed([]) == R.FailedLaunch(result: 49, blocked: nil), "an empty table with a failed host: the failure stands")
+
         // ---- the engine's text, end to end (the file comes from the C table below)
         if CommandLine.arguments.count > 1, let text = try? String(contentsOfFile: CommandLine.arguments[1], encoding: .utf8) {
             let table = R.parse(text)
@@ -299,6 +330,33 @@ int main(int argc, char **argv)
            "an R line: the helper flag, the seconds since the start and the image path as it was spawned");
     expect(strstr(text, "R\t1\t") && strstr(text, "CrashReportClient.exe"), "the helper flag is set by the file-name rule");
 
+    /* build 580 (Crash Bandicoot N. Sane Trilogy 3CH670): "crash" at the start of a game's name does not make it a crash reporter */
+    {
+        /* every helper name found in the 1421 intake logs, and the common ones of other engines (lower case, as stored) */
+        static const char *const helpers[] = { "crashpad_handler.exe", "crashpad_handler.dll", "unitycrashhandler64.exe", "unitycrashhandler32.exe",
+            "steamerrorreporter64.exe", "steamerrorreporter.exe", "crs-handler.exe", "rockstarerrorhandler.exe", "socialclubhelper.exe",
+            "rockstarsteamhelper.exe", "crashreportclient.exe", "ue4crashreportclient.exe", "crash_reporter.exe", "crashreporter.exe",
+            "crash.exe", "foo_crash.exe", "crashpad.exe", "crash_service.exe", "crashservice.exe", "crash-sender.exe", "crashsender1403.exe",
+            "crashrpt.exe", "crashdump.exe", "crashdumper.exe", "crashlogger.exe", "crashmonitor.exe", "crashuploader.exe", "crash handler.exe",
+            "steamwebhelper.exe", "chrome_helper.exe", "bugreporter.exe", "eacrashreporter.exe", "webhelper.exe", "gamehelper.exe", "errorhandler.exe" };
+        static const char *const games[] = { "crashbandicootnsanetrilogy.exe", "crashlands.exe", "crashteamracingnitrofueled.exe", "crashday.exe",
+            "crashbash.exe", "crashdive.exe", "crashforce.exe", "crash bandicoot.exe", "crash_bandicoot_n._sane_trilogy.exe", "dyinglightgame.exe",
+            "game.exe", "cultofthelamb.exe", "bluecrashes.exe", "launcher.exe", "dockhost.exe", "conhost.exe" };
+        unsigned k;
+        for (k = 0; k < sizeof helpers / sizeof helpers[0]; k++)
+        {
+            char msg[128];
+            snprintf(msg, sizeof msg, "%s is still a helper", helpers[k]);
+            expect(ios_child_is_helper(helpers[k]), msg);
+        }
+        for (k = 0; k < sizeof games / sizeof games[0]; k++)
+        {
+            char msg[128];
+            snprintf(msg, sizeof msg, "%s is not a helper", games[k]);
+            expect(!ios_child_is_helper(games[k]), msg);
+        }
+    }
+
     /* the game ends with c0000005 on its boot thread: the status is kept even after the slot is released */
     finish_child(3, (int)0xC0000005u);
     lines = madeira_child_report(text, sizeof text);
@@ -348,6 +406,25 @@ int main(int argc, char **argv)
         slot2 = spawn_w(wide, 400);
         expect(strlen(ios_child_slots[slot2].path) == IOS_CHILD_PATH - 1, "a path longer than the field is cut to fit, terminated");
         ios_child_slot_release(slot2);
+    }
+
+    /* the Crash Bandicoot session of 3CH670: the game ends with c0000005 and is seen as the game (helper flag 0) in the report */
+    {
+        int s_cb = start("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Crash Bandicoot - N Sane Trilogy\\CrashBandicootNSaneTrilogy.exe", 5);
+        lines = madeira_child_report(text, sizeof text);
+        {
+            const char *cb = strstr(text, "CrashBandicootNSaneTrilogy.exe");
+            const char *ls = cb;
+            while (ls && ls > text && ls[-1] != '\n') ls--;
+            expect(cb && ls && !strncmp(ls, "R\t0\t", 4), "a running Crash Bandicoot is an R line with the helper flag 0");
+        }
+        { char names[256]; expect(madeira_live_user_processes(names, sizeof names) == 1 && strstr(names, "crashbandicoot"),
+                                  "madeira_live_user_processes counts the running Crash Bandicoot as a program of the session"); }
+        finish_child(5, (int)0xC0000005u);
+        lines = madeira_child_report(text, sizeof text);
+        expect(strstr(text, "E\t0\tc0000005\t") && strstr(strstr(text, "E\t0\tc0000005\t"), "CrashBandicootNSaneTrilogy.exe"),
+               "its end is an E line with the helper flag 0 and c0000005 (DockGameEnd.verdict now sees it)");
+        ios_child_slot_release(s_cb);
     }
 
     /* the ring: the last IOS_CHILD_ENDED ends, in order, however many */
@@ -545,6 +622,25 @@ if SWIFTC and fixture_dl.exists():
             e2 = replay('e', no_exit, {'killed': True})
             require('dock-game-died-session-open' not in e2.get('matched', []), 'without a process that ended with an error the rule does not match')
 
+            # a Dock launch that failed with no game (Spec Ops NEXHHM, build 579)
+            fixture_fl = FIX / 'spec-ops-the-line-dock-launch-failed-2026-10-21.log'
+            require(fixture_fl.exists(), 'the fixture (NEXHHM) is there')
+            if fixture_fl.exists():
+                fl = fixture_fl.read_text()
+                f1 = replay('f1', fl, {'killed': True})
+                require(f1.get('matched') == ['dock-launch-failed-session-open'] and f1.get('status') == 'known',
+                        'a Dock session whose host failed and no game ran: "known", fixed in 580, update BCD (%s %s)' % (f1.get('matched'), f1.get('status')))
+                f2 = replay('f2', fl + '[12:00:30.000] [INFO] [dock-game-end] the host reported the launch failed (code 49) and no game process ran: ending the session\n', {'killed': True})
+                require('dock-launch-failed-session-open' not in f2.get('matched', []), 'a log that shows the new path ran does not match the rule')
+                f3 = replay('f3', fl + '[12:00:30.000] [INFO] [dock-report] launch-game-running=1\n', {'killed': True})
+                require('dock-launch-failed-session-open' not in f3.get('matched', []), 'a game that ran is the crash rule\'s, not this one')
+                f4 = replay('f4', fl.replace('probe-result=49', 'probe-result=0'), {'killed': True})
+                require('dock-launch-failed-session-open' not in f4.get('matched', []), 'a host that finished well does not match')
+                f5 = replay('f5', ''.join(l for l in fl.splitlines(True) if '[dock-report] probe-result=' not in l), {'killed': True})
+                require('dock-launch-failed-session-open' not in f5.get('matched', []), 'without the host\'s result the rule does not match')
+                f6 = replay('f6', fl + '[frontend] returned to library\n', {'killed': True})
+                require('dock-launch-failed-session-open' not in f6.get('matched', []), 'a session that returned to the library on its own does not match')
+
 # ------------------------------------------------------------------ 5. source checks
 require(rules_src.startswith('// SPDX-License-Identifier: GPL-3.0-only\n// Copyright 2026 thebcd69 (BCD)\n// BCD Material:'),
         'DockGameEnd.swift: BCD licence header')
@@ -574,6 +670,20 @@ require('DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock
         and 'endedByDockGame = true' in watch and '[dock-game-end]' in watch, 'it ends the session off the main queue, once, and logs [dock-game-end]')
 require('endedByDockGame = false; dockEndNote = ""' in block(library, 'func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil)'),
         'a new session forgets the last one\'s watch state')
+failed_watch = block(library, 'private func watchDockFailedLaunch(_ table: DockProcessTable)')
+require('DockGameEndRules.failedLaunch(table, places: .standard)' in failed_watch and 'report.fields["launch-game-running"] == "1"' in failed_watch
+        and 'report.result' in failed_watch and 'DockGameEndRules.failedLaunchGrace' in failed_watch,
+        'the failed-launch watch asks the rule, reads the host\'s result and whether the game ran, and waits the grace')
+require(failed_watch.index(' s unless one starts') < failed_watch.index('endedByDockGame = true')
+        < failed_watch.index('DispatchQueue.global(qos: .userInitiated).async { _ = wine_session_dock_game_ended(Int32(failed.result)) }'),
+        'it says so when the failure is first seen, then ends the session once, off the main queue')
+require(watch.count('watchDockFailedLaunch(table)') == 2 and watch.index('case .none:') < watch.index('watchDockFailedLaunch(table)') < watch.index('case .end('),
+        'the watch asks the failed-launch rule when the crash rule has nothing to end (none, wait), never after its own end')
+require('endedByDockGame = false; dockEndNote = ""; dockFailedAt = nil; endedByDockFailure = nil' in block(library, 'func begin(_ entry: LibraryEntry, remember: Bool = true, dock: DockGame? = nil)'),
+        'a new session forgets the failed-launch state too')
+require('if let words = endedByDockFailure {' in block(library, 'private func exitReport() -> String?')
+        and block(library, 'private func exitReport() -> String?').index('guard !quitRequested') < block(library, 'private func exitReport() -> String?').index('endedByDockFailure'),
+        'the exit report shows the host\'s words for a session the library ended for a failed launch (not after the user quit)')
 report = block(library, 'private func exitReport() -> String?')
 require('wine_crash_exit_status(&status)' in report and 'The game quit with Windows error' in report,
         'the exit report is the 578 one: it reads wine_crash_exit_status, which the Dock end fills')
@@ -608,6 +718,11 @@ for rid in ('dock-game-died-session-open',):
     chunk = rules_py[rules_py.index('"id": "%s"' % rid):]
     chunk = chunk[:chunk.index('\n    },\n')]
     require('"lines": []' in chunk and '"fixedIn": 579' in chunk and '"none"' in chunk, 'rule %s: a code fix (no lines, fixedIn 579) with a guard for the new path' % rid)
+for rid in ('dock-launch-failed-session-open',):
+    chunk = rules_py[rules_py.index('"id": "%s"' % rid):]
+    chunk = chunk[:chunk.index('\n    },\n')]
+    require('"lines": []' in chunk and '"fixedIn": 580' in chunk and '"none"' in chunk and '"session": "dock"' in chunk,
+            'rule %s: a code fix for Dock sessions (no lines, fixedIn 580) with a guard for the new path' % rid)
 require('"session": "dock"' in rules_py[rules_py.index('"id": "dock-game-died-session-open"'):][:3500].split('\n    },\n')[0]
         and '"priority": 13' in rules_py[rules_py.index('"id": "dock-game-died-session-open"'):][:3500].split('\n    },\n')[0],
         'the Dock rule is for Dock sessions and comes after the locale experiment (priority 12)')

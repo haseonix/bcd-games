@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "Portal (non-Steam folder C:\\Games\\Portal, d3d9=native), build 579, iPhone13,4 (Send Logs CQEQJX, Q3SG8T, one session twice): the program starts cmd.exe for a .bat, the 32-bit child in its own second 4 GB window completes an async write with an unrebased 32-bit IOSB (UNHANDLED #1 addr=0x10004 in invoke_system_apc), and the thread later executes the data word 0x00000036 in kernelbase.dll ([mach_exc] insn_stream ... [00000036], then ill_handler ILL at pc=0x301131358): the process ends with c000001d. fex-avx-on matched on that exit code (header: 'adds env.MADEIRA_FEX_AVX = 1', then 'tried fex-avx-on: reverted'); the rule now has a none signal for a bracketed instruction word of 16 leading zero bits (a UDF encoding), which FEX's own HLT (d44xxxxx, The Last of Us Part I) never is. No line fixes this crash.",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "stuck"
+}

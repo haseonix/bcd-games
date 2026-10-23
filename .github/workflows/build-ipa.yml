@@ -130,6 +130,12 @@ jobs:
       - name: Check the memory limit notice
         run: python3 tests/host/check-memory-rights-notice.py
 
+      # The GDI handle table a 32-bit program can map: the Dock and the library's Desktop ask for the
+      # section-backed table, games keep the default, bcd.cfg can turn it off, and ntdll says when a
+      # 32-bit program meets a private table (ContentView.swift, build/ntdll-unix/virtual_ios.c).
+      - name: Check the section-backed GDI table
+        run: python3 tests/host/check-dock-gdi-section.py
+
       # BCD's in-game layer (BCDSession.swift and its views, BCDSessionLive.swift): the starting
       # screen, menu button, overlay, in-game menu and key bar in BCD's look, the classic engine
       # calls behind every function, nothing alive while closed, the preview build.
@@ -147,6 +153,23 @@ jobs:
       # end to end, the play task as a library entry. Synthetic replies only: GOG is never contacted.
       - name: Check GOG
         run: python3 tests/host/check-gog.py --require-swift
+
+      # Epic Games in BCD, milestone 0 (app/Madeira/BCDEpic/): sign-in on Epic's own page, the owned
+      # games and their pictures, the Keychain-only token rule, the masks on every [epic-*] log line,
+      # the tokens sent to Epic's hosts only, the preview build. Synthetic replies only: Epic is never contacted.
+      - name: Check Epic Games
+        run: python3 tests/host/check-epic.py --require-swift --require-preview
+
+      # BCD Host (bcd-host/): the helper that starts an Epic game signed in, inside Wine (milestone 2). Its
+      # request reader under AddressSanitizer and a fuzz, the report's bounds; with llvm-mingw also the PE itself
+      # (x86-64, GUI, relocatable, kernel32 only, no secret text). Without the toolchain only the host part runs.
+      - name: Check BCD Host
+        run: python3 tests/host/check-bcd-host.py
+
+      # Epic's start arguments (the one-time code, the account's ID and name) are masked in the two places the runtime and
+      # the bridge print a command line (build/bcd_epic_mask.h): both forms compiled and fuzzed, both call sites read.
+      - name: Check Epic's masks
+        run: python3 tests/host/check-epic-mask.py
 
       # madeira-bcd FORK-ONLY: the public alpha IPA is unsigned and carries nothing about the
       # owner (tools/make-alpha-ipa.py, owner 2026-10-17).
@@ -169,6 +192,11 @@ jobs:
       # in-session installer failed over RPC 1726 in 3 of 5 logged sessions (DockCEGService).
       - name: Check Valve's client service for a CEG Dock start
         run: python3 tests/host/check-dock-ceg-service.py --require-swift
+
+      # madeira-bcd (round 591): the "Registry" values of a game's Steam install script, written before a Dock
+      # start (env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1; Fallout: New Vegas' launcher needs its Installed Path).
+      - name: Check the Dock's install-script registry values
+        run: python3 tests/host/check-dock-script-registry.py --require-swift
 
       # Every Play and download of BCD's interface goes the classic library's way (the same
       # launch function and checks for Steam via BCD Dock or directly, programs from Files and the
@@ -689,6 +717,15 @@ jobs:
       - name: Patch wine CPU-error diagnostics
         run: python3 tools/patch-wine-cpu-error-diag.py wine
 
+      # madeira-bcd (build 580): the [steam-api] report for 64-bit processes. A 64-bit process handles OutputDebugString
+      # inside the PE ntdll (a committed binary), so NtRaiseException never saw steam_api's "no running Steam" message there;
+      # unixcall_wine_dbg_write (debug.c) now calls thread_ios.c's ios_steam_api_dbg_hook after it has written a log line.
+      # Logging only; the line that triggers it is the PE ntdll's own "[exc] ml812 OutputDebugStringA" line.
+      - name: Patch wine with the 64-bit [steam-api] hook
+        run: |
+          python3 tests/host/check-steam-api-diag.py
+          python3 tools/patch-ntdll-unix-dbg-write-hook.py wine/dlls/ntdll/unix/debug.c
+
       - name: Patch wine with fault-safe waiter diagnostics
         run: python3 tools/patch-wine-waiter-read.py wine/dlls/ntdll/unix/sync.c
 
@@ -753,7 +790,7 @@ jobs:
           echo "defined external symbols in libntdll_unix.a: $(wc -l < defined-syms.txt | tr -d ' ')"
           MISSING=""
           for s in bcrypt_unix_call_funcs secur32_unix_call_funcs crypt32_unix_call_funcs \
-                   ws2_32_unix_call_funcs dwrite_unix_call_funcs; do
+                   ws2_32_unix_call_funcs dwrite_unix_call_funcs winedmo_unix_call_funcs; do
             if grep -qx "_$s" defined-syms.txt; then
               echo "  OK   $s (defined)"
             else
@@ -761,7 +798,7 @@ jobs:
             fi
           done
           echo "-- object sizes (an empty object means its #ifdef guard was off) --"
-          for o in ws2_32_unixlib bcrypt_unixlib secur32_unixlib crypt32_unixlib dwrite_unixlib; do
+          for o in ws2_32_unixlib bcrypt_unixlib secur32_unixlib crypt32_unixlib dwrite_unixlib winedmo_unixlib; do
             if [ -f "$OBJ/$o.o" ]; then
               printf '  %-18s %8s bytes, %s external defs\n' "$o" \
                 "$(wc -c < "$OBJ/$o.o" | tr -d ' ')" \
@@ -782,6 +819,14 @@ jobs:
             done
             exit 1
           fi
+
+      # madeira-bcd: Windows Media Video through Media Foundation's ASF source (Resident Evil 2 and 7: c0000135 for
+      # mfasfsrcsnk.dll, then a NULL read). The keyed wiring (FFmpeg, the 64-bit table only, winedmo for 64-bit callers,
+      # the opt-in DLLs and the mfasfsrcsnk patch), then the unix sides on the host: pixel conversions, the WMV transform
+      # through the unix call entries, the winedmo demuxer with the PE callbacks emulated. Builds a host FFmpeg from the
+      # tracked tarball (a few minutes, cached in ~/.cache/madeira-host-ffmpeg).
+      - name: Check ASF and WMV
+        run: python3 tests/host/check-wmv-asf.py
 
       # Windows thread priorities must not demote USER_INTERACTIVE guest
       # threads onto the efficiency cores (Crysis's main thread ran there).
@@ -1656,6 +1701,16 @@ jobs:
         if: env.MINGW_OK == '1'
         run: bash bcd-smoke/build.sh
 
+      # BCD Host (bcd-host/, BCD's own, Epic Games milestone 2): bcdhost.exe, a ~17 KB x86-64 program with
+      # kernel32 only that the app starts for an Epic game it starts signed in. A build output staged in
+      # arm64ec-windows (gitignored); without it a signed-in start is not offered and every game starts as
+      # before, so a failure here only warns (as the Dock host's does).
+      - name: Build BCD Host
+        if: env.MINGW_OK == '1'
+        continue-on-error: true
+        run: |
+          bash build/bcd-host/build.sh || echo "::warning::BCD Host not built: Epic games start without the Epic sign-in"
+
       - name: Build dxmt-ios
         shell: bash
         run: |
@@ -1780,6 +1835,29 @@ jobs:
       # app-local x64 DLLs like ucrtbase.dll (Crysis 3 Remastered's vcruntime140.dll).
       - name: Check app-local DLL shadow
         run: python3 tests/host/check-app-dll-shadow.py
+
+      # madeira-bcd (build 580), engine fixes from the 580 log wave: CAS/CASAL on an anonymous RWX alias (Jetboard Joust), a
+      # 32-byte STP Q across a 16 KB page (NFS Underground 2), a zero-size D3D12 texture (Spider-Man Remastered), the
+      # [alloc-fail] log past 65536 failures (Spelunky 2).
+      - name: Check the build 580 engine fixes
+        run: |
+          python3 tests/host/check-anon-cas.py
+          python3 tests/host/check-stp-straddle.py
+          python3 tests/host/check-d3d12-zero-extent.py
+          python3 tests/host/check-alloc-fail-throttle.py
+
+      # madeira-bcd (build 591), engine fixes from the 580 log wave: env.MADEIRA_FAULT_GUARD_RATE (fault-storm guards that ended live Unity
+      # Mono games), env.MADEIRA_USER_VA_GB (FINAL FANTASY TACTICS asks for 256 GiB), create_view's assert, env.MADEIRA_ANON_CAS_FLUSH
+      # (Jetboard Joust), and the log-only diagnostics: [stp-split] read-back, [cxx-type], [smc-loop].
+      - name: Check the build 591 engine fixes
+        run: |
+          python3 tests/host/check-fault-guard-rate.py
+          python3 tests/host/check-user-va-gb.py
+          python3 tests/host/check-create-view-conflict.py
+          python3 tests/host/check-anon-cas-flush.py
+          python3 tests/host/check-stp-split-readback.py
+          python3 tests/host/check-cxx-type-diag.py
+          python3 tests/host/check-smc-loop-diag.py
 
       # madeira-bcd: env.MADEIRA_JUMBO_HALF (off by default) gives a failed 8 GB probe
       # reservation its 4 GB arena (Ratchet & Clank: Rift Apart).
@@ -1913,6 +1991,16 @@ jobs:
       - name: Check opt-in DLLs
         run: python3 tests/host/check-optin-dlls.py
 
+      # ajan10/wine: Wine's bcrypt unix side answers STATUS_INVALID_BUFFER_SIZE for an unaligned AES/3DES-CBC length instead of
+      # letting nettle's assert end the app (A Plague Tale: Innocence, build 580); the guard is compiled on the host.
+      - name: Check bcrypt CBC length guard
+        run: python3 tests/host/check-bcrypt-cbc-guard.py
+
+      # ajan10/wine: env.MADEIRA_NLS_EXTRA = 1 makes Wine's c_932 / c_936 / c_949 / c_950 / c_874 / c_1250 ... c_1258 (app/Madeira/nls/extra)
+      # visible to a game that asks for them (Sword and Fairy 3 asks for 936); the lookup is cut out of env_ios.c and compiled on the host.
+      - name: Check extra code page tables
+        run: python3 tests/host/check-nls-extra.py
+
       # madeira-bcd: setupapi-optin.dll (env.MADEIRA_OPTIN_DLLS = setupapi): a lock round Wine's device node
       # table, for Dying Light's controller library racing the main thread (build 576).
       - name: Check setupapi device node lock
@@ -1931,6 +2019,11 @@ jobs:
       # madeira-bcd: a paused first-time Steam install survives closing BCD.
       - name: Check Steam paused download restore
         run: python3 tests/host/check-steam-restore-paused.py
+
+      # madeira-bcd: Steam DLC for the games BCD downloads (BCDSteamDLC/, BCDGameDLC.swift): owned-DLC detection, depot
+      # selection with and without DLC, the install record, removal, the choice file, the [steam-dlc] log lines.
+      - name: Check Steam DLC
+        run: python3 tests/host/check-steam-dlc.py --require-swift
 
       # madeira-bcd: exe-window-mb: room at 0x140000000 for a large fixed-address program (Hogwarts Legacy).
       - name: Check exe window
@@ -2268,6 +2361,16 @@ jobs:
           else
             echo "::warning::setupapi-optin.dll missing: env.MADEIRA_OPTIN_DLLS = setupapi does nothing in this IPA"
           fi
+          # And the ASF source of env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod (Resident Evil 2/7): never ship the
+          # handler without the winedmo patch (an unpatched one hands the game to the generic handler, which cannot read ASF).
+          if [ -f app/Madeira/arm64ec-windows/mfasfsrcsnk-optin.dll ]; then
+            python3 tools/patch-wine-mfasfsrcsnk-winedmo.py --verify app/Madeira/arm64ec-windows/mfasfsrcsnk-optin.dll
+          else
+            echo "::warning::mfasfsrcsnk-optin.dll missing: env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk does nothing in this IPA"
+          fi
+          for d in winedmo.dll wmvdecod-optin.dll wmadmod-optin.dll; do
+            [ -f "app/Madeira/arm64ec-windows/$d" ] || echo "::warning::$d missing: Resident Evil 2's cutscenes still end the game in this IPA"
+          done
           # And its ntdll-sync.dll, which the unix loader maps by default: never
           # ship one whose SRW and critical-section exports are not the x64 bodies
           # or whose exports are not the shipped ntdll.dll's plus madeira_sync_x64_off.
@@ -2300,6 +2403,10 @@ jobs:
       # cabinet headers rather than trusting its container format.
       - name: Check the VC++ runtime list and the MFC switch
         run: python3 tests/host/check-vcruntime-mfc.py
+
+      # madeira-bcd (round 591): MFC for a game BCD Dock starts (env.MADEIRA_MFC_DOCK = 1), linked into sysx64.
+      - name: Check MFC in a BCD Dock session
+        run: python3 tests/host/check-mfc-dock.py
 
       - name: Fetch the VC++ runtime DLLs from Microsoft
         shell: bash

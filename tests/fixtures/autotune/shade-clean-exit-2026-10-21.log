@@ -1,0 +1,153 @@
+[19:55:32.532] [INFO] Checking entitlements...
+[19:55:32.533] [INFO] [build] v0.1.578 (578)
+[19:55:32.534] [INFO] [device] model=iPhone13,4 idiom=phone os=iOS Version 18.6.2 (Build 22G100) ram=5693MB available=4080MB cores=6
+[19:55:32.534] [INFO] [device] address-map=[0x100f28000,0xfc0000000) 63GB increased-memory=1 extended-va=0
+[19:55:32.534] [INFO] [jit-nodebug] debugger-less JIT pool: allowed (iOS 18: TXM restricts JIT memory only from iOS 26); env.MADEIRA_JIT_NO_DEBUGGER_POOL=1
+[19:55:32.551] [INFO] [device] gpu="Apple A14 GPU" family=apple7 argument-buffers=tier2 mesh=1 bc=0 atomics64=0 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[19:55:39.843] [INFO] [bcd] library launch Shade.EXE: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[19:55:39.874] [INFO] Running full Wine sequence...
+[19:55:39.874] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x100f28000,0xfc0000000) 63GB available=4070MB low-power=0 thermal=nominal
+[19:55:39.880] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[19:55:39.880] [INFO] Allocating 896MB JIT pool via debugger...
+[19:55:39.881] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[19:55:39.881] [INFO] [jit-debugger] attached=1 at the pool request
+[19:55:41.778] [INFO] RX pool at 0x300000000
+[19:55:41.871] [INFO] Detaching debugger...
+[19:55:41.893] [INFO] Starting wineserver...
+[phase] wine-start             t+  2.051s rev=ml526
+[wow-window] small address map: it ends at 0xfc0000000, below the normal guest-window band -- candidates come from [0x400000000,0xb00000000), at most 2 window(s) at once
+[wow-window] reserved B=0x400000000..0x500000000 (slot 0) guard=owned
+ml992: os_proc_available_memory=3134 MB + phys_footprint=961 MB = 4096 MB (hw.memsize says 5693 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x300008000)
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x300128000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x30019d000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x300560000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x300684000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x30072c000)
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x3008ac000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x300930000)
+D 24 Load module Shade.EXE (shade.exe-50a38cba78e7a406): 400400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83f2d450): 4FFF40000
+[footprint] rev=ml358 phys=977 MB (peak 977) internal=975 MB compressed=0 MB external=67 MB reusable=5 MB (cycle=1)
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ef20d0): 47BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728a973278): 47BC40000
+D 24 Load module advapi32.dll (advapi32.dll-e40424e11a21123a): 47BBF0000
+D 24 Load module sechost.dll (sechost.dll-b367444c07982b5b): 47BBC0000
+[reserved-area] #1 MAP_FIXED over our own reservation refused: 0x401310000+0x14000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x10000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #2 MAP_FIXED over our own reservation refused: 0x401310000+0x8000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x8000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[gdi-shared] session table 0x11c920000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"engine_d.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[reserved-area] #3 MAP_FIXED over our own reservation refused: 0x401310000+0x30000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x8000 prot=0/0 shared=0 | the retry placed it (7 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #4 MAP_FIXED over our own reservation refused: 0x401310000+0x10000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x8000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #5 MAP_FIXED over our own reservation refused: 0x401310000+0x8000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x8000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #6 MAP_FIXED over our own reservation refused: 0x401310000+0x10000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x8000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #7 MAP_FIXED over our own reservation refused: 0x401310000+0x4000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x4000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[reserved-area] #8 MAP_FIXED over our own reservation refused: 0x401310000+0x4000 errno=12 (Cannot allocate memory) | OCCUPIED 0x401310000+0x4000 prot=0/0 shared=0 | the retry placed it (9 refused in all; small address map retry on) rev=ajan5-motor
+[win-name] #5 hwnd=0x10036 class='' text="Default IME" rev=ml853
+[win-name] #6 hwnd=0x2002e class='' text="Shade - Wrath of angels" rev=ml853
+[win-name] #7 hwnd=0x2002e class='' text="Shade - Wrath of angels" rev=ml853
+D 24 Load module MiscMath.dll (miscmath.dll-77a1f65f73b55644): 406B60000
+[win-name] #11 hwnd=0x2002e class='' text="Shade - Wrath of angels" rev=ml853
+[win-name] #12 hwnd=0x2002e class='' text="Shade - Wrath of angels" rev=ml853
+D 24 Load module dsound.dll (dsound.dll-541344d6eb35e6bd): 47FD80000
+D 24 Load module mmdevapi.dll (mmdevapi.dll-57d37935cbc65a7b): 47A520000
+D 24 Load module oleaut32.dll (oleaut32.dll-ed26e11610f7a720): 47A460000
+D 24 Load module version.dll (version.dll-f3fe55759b09d519): 47A440000
+[19:55:44.456] [INFO] Game is presenting (#1, splash) — early detach in 20s
+[footprint] rev=ml358 phys=1095 MB (peak 1095) internal=1057 MB compressed=0 MB external=72 MB reusable=5 MB (cycle=2)
+[hwinput] keyboard focus: program (program cursor)
+[launch-view] dismissed reason=present logs=0
+[footprint] rev=ml358 phys=1119 MB (peak 1119) internal=1085 MB compressed=0 MB external=71 MB reusable=5 MB (cycle=3)
+0024:err:file:ios_video_track_open [video-io] ml733 OPEN slot=0 handle=0x104 ...\??\C:\Games\swoa\sound\fs\wood1.ogg
+0024:err:file:ios_video_track_open [video-io] ml733 OPEN slot=1 handle=0x104 ...\??\C:\Games\swoa\sound\fs\wood2.ogg
+0024:err:file:ios_video_track_open [video-io] ml733 OPEN slot=2 handle=0x104 ...\??\C:\Games\swoa\sound\fs\wood3.ogg
+0024:err:file:ios_video_track_open [video-io] ml733 OPEN slot=3 handle=0x104 ...\??\C:\Games\swoa\sound\fs\wood4.ogg
+[footprint] rev=ml358 phys=1138 MB (peak 1138) internal=1108 MB compressed=0 MB external=71 MB reusable=5 MB (cycle=4)
+[win-name] #14 hwnd=0x10040 class='' text="DIEmWin" rev=ml853
+D 24 Load module iccvid.dll (iccvid.dll-18c680a1e4a557c2): 47A420000
+[rb-tex] madeira-bcd new readback #1: fmt 80 480x360 level 0 (texture 480x360, 1 mips)
+[footprint] rev=ml358 phys=1195 MB (peak 1195) internal=1140 MB compressed=0 MB external=73 MB reusable=5 MB (cycle=5)
+[rb-tex] madeira-bcd new readback #9: fmt 80 256x256 level 0 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #10: fmt 80 128x128 level 1 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #11: fmt 80 64x64 level 2 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #12: fmt 80 32x32 level 3 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #13: fmt 80 16x16 level 4 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #14: fmt 80 8x8 level 5 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #15: fmt 80 4x4 level 6 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #16: fmt 80 2x2 level 7 (texture 256x256, 9 mips)
+[rb-tex] madeira-bcd new readback #17: fmt 80 1x1 level 8 (texture 256x256, 9 mips)
+[footprint] rev=ml358 phys=1330 MB (peak 1330) internal=1256 MB compressed=0 MB external=73 MB reusable=6 MB (cycle=6)
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 10.04 s of audio in 10.00 s (100.4%) over 1187 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 0..1440 frames; worst late wake 0.1 ms; clamped 0 samples
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 9.98 s of audio in 10.00 s (99.8%) over 1174 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.0 ms; clamped 0 samples
+[19:56:04.623] [OK] Early detach: game presenting and settled
+[19:56:06.629] [INFO] Detaching debugger...
+[laa] ml1070 SPILL #1: no room below guest 2 GB for 0x2f0000 bytes (bottom-up, start=guest 0x110000) — falling back to the whole window
+[laa] ml1070 SPILL #2: no room below guest 2 GB for 0x2f0000 bytes (bottom-up, start=guest 0x110000) — falling back to the whole window
+[va-scan] FAILED window=0x400110000..0x500000000 size=0x2f0000 align=0x10000 bottom-up tries=107 skips=37 | seen=0x400112000..0x500000000 views=118 maxgap=0x7ff40000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x40fe10000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x500000000 for 0x2f0000 (align 0x10000): the free-range table holds 3 range(s) that fit (first 0x40fe10000), largest free 0x7ff40000 over 46 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[alloc-fail] ml814 #1 status=c0000017 hint=0x0 size=0x2f0000 type=0x2000 protect=0x4 tid=0024 | STAGE=fixed-map err=3 at 0x40fe10000+0x2f0000
+[laa] ml1070 SPILL #3: no room below guest 2 GB for 0x2f0000 bytes (bottom-up, start=guest 0x110000) — falling back to the whole window
+[va-scan] FAILED window=0x400110000..0x500000000 size=0x2f0000 align=0x10000 bottom-up tries=107 skips=37 | seen=0x400112000..0x500000000 views=118 maxgap=0x7ff40000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x40fe10000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x500000000 for 0x2f0000 (align 0x10000): the free-range table holds 3 range(s) that fit (first 0x40fe10000), largest free 0x7ff40000 over 46 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[alloc-fail] ml814 #2 status=c0000017 hint=0x0 size=0x2f0000 type=0x2000 protect=0x4 tid=0024 | STAGE=fixed-map err=3 at 0x40fe10000+0x2f0000
+[laa] ml1070 SPILL #4: no room below guest 2 GB for 0x2f0000 bytes (bottom-up, start=guest 0x110000) — falling back to the whole window
+[va-scan] FAILED window=0x400110000..0x500000000 size=0x2f0000 align=0x10000 bottom-up tries=107 skips=37 | seen=0x400112000..0x500000000 views=118 maxgap=0x7ff40000 tailgap=0x0 stop=gaps-exhausted(bottom-up) | firstfail=0x40fe10000 errno=17(File exists)   <-- STATUS_NO_MEMORY (callers see a NULL alloc)
+[va-scan] window room 0x400110000..0x500000000 for 0x2f0000 (align 0x10000): the free-range table holds 3 range(s) that fit (first 0x40fe10000), largest free 0x7ff40000 over 46 range(s); reserved area at the start: yes [0x400000000+0x100004000 fex_only=0] -- fit 0: the search found nothing; fit > 0: MAP_FIXED was refused rev=ajan5-motor
+[alloc-fail] ml814 #3 status=c0000017 hint=0x0 size=0x2f0000 type=0x2000 protect=0x4 tid=0024 | STAGE=fixed-map err=3 at 0x40fe10000+0x2f0000
+[win-name] #16 hwnd=0x10046 class='' text="Error list" rev=ml853
+[win-name] #22 hwnd=0x10046 class='' text="Error list" rev=ml853
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=29 resident=1393MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 9.91 s of audio in 10.00 s (99.1%) over 1157 wakes; device short 98.0 ms in 5 of 468 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 3 samples
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1154 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 7 samples
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1154 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 36 samples
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=27 resident=1402MB dbg=DEBUGGED rev=ml525
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1158 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 17 samples
+[ios_audio] ml1230 pacing stream=0x1357faf00 lead 60 ms: client wrote 10.01 s of audio in 10.00 s (100.0%) over 1172 wakes; device short 0.0 ms in 0 of 469 passes (largest pass 1024 frames); ring 416..1440 frames; worst late wake 0.1 ms; clamped 17 samples
+[footprint] rev=ml358 phys=1440 MB (peak 1444) internal=1342 MB compressed=0 MB external=75 MB reusable=8 MB (cycle=37)
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=1046
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=1047
+[Wine ntdll/server] process_exit_wrapper(0)
+[WineProc] Wine exited with code 0 (caught by longjmp)
+[WineProc] stopping wineserver...
+[store-noalias] #1 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x337ffc2b4 NO pool/anon alias | region 0x100f28000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x0 hostpc=0x337ffc2b4 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x337ffc2b4 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x337ffc2b4 addr=0x0 x18=0x407660000 type=1 lr=0x337ffc190 sp=0x122c0f350 x16=0x30006ec60 x17=0x122c0eb70
+[guest-code] rev=ml333 pool_rip=0x157b3ad (PE 0x157b3ad) -- NO pool copy for this address (identity translate)
+[fault-host] 337ffc1b4: a9452f8a 29426f9a d61f0000 d53b4200 b9040b80 a9021f84 a9031b85 a9042788
+[fault-host] 337ffc1d4: a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14 5800fc20 aa1c03e1 5800fca4
+[fault-host] 337ffc1f4: d63f0080 d2c00093 b9440b84 d51b4204 91070384 4cdf2c90 4cdf2c94 a9421f84
+[fault-host] 337ffc214: a9431b85 a9442788 a9452f8a 29426f9a d61f0000 d4400000 d4400000 d53b4200
+[fault-host] 337ffc234: b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10
+[fault-host] 337ffc254: 4c9f2c14 d4400000 d53b4200 b9040b80 a9021f84 a9031b85 a9042788 a9052f8a
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4200 b9040b80 a9021f84
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x407660000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x337ffc2b4 NO pool/anon alias | region 0x100f28000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x0 hostpc=0x337ffc2b4 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x337ffc2b4 addr=0x0 kr=1(INVALID_ADDRESS) entryprot=-1 nowprot=-1 region=0x0+0x0  <== UNMAPPED AT ENTRY (wild pointer) rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x337ffc2b4 addr=0x0 x18=0x407660000 type=1 lr=0x337ffc190 sp=0x122c0f350 x16=0x30006ec60 x17=0x122c0eb70
+[guest-code] rev=ml333 pool_rip=0x157b3ad (PE 0x157b3ad) -- NO pool copy for this address (identity translate)
+[fault-host] 337ffc214: a9431b85 a9442788 a9452f8a 29426f9a d61f0000 d4400000 d4400000 d53b4200
+[fault-host] 337ffc234: b9040b80 a9021f84 a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10
+[fault-host] 337ffc254: 4c9f2c14 d4400000 d53b4200 b9040b80 a9021f84 a9031b85 a9042788 a9052f8a
+[fault-host] 337ffc274: 29026f9a 91070380 4c9f2c10 4c9f2c14 d4200000 d53b4200 b9040b80 a9021f84
+[fault-host] 337ffc294: a9031b85 a9042788 a9052f8a 29026f9a 91070380 4c9f2c10 4c9f2c14 52800001
+[fault-host] 337ffc2b4: f9400021 d53b4200 b9040b80 a9021f84 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: 4c9f2c10 4c9f2c14 52800001 [f9400021] d53b4200 b9040b80 a9021f84
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x407660000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #3 rev=ml348 addr=0x0 insn=0xf9400021 pc=0x337ffc2b4 NO pool/anon alias | region 0x100f28000+0x8000 prot=5 max=5 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #3 p0=READ p1=0x0 hostpc=0x337ffc2b4 hinsn=0xf9400021 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=0 base=0x337ffc000 size=0x4000 state=live p1_in_carve=0 regs=0 rev=ml613
+0034:err:seh:NtRaiseException Unhandled exception code c0000005 flags 0 addr 0x40195f188
+0034:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=1059
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[19:56:57.394] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=1253 MB (peak 1444) internal=1218 MB compressed=0 MB external=77 MB reusable=10 MB (cycle=38)
+[footprint] rev=ml358 phys=1253 MB (peak 1444) internal=1218 MB compressed=0 MB external=77 MB reusable=10 MB (cycle=39)
+[footprint] rev=ml358 phys=1253 MB (peak 1444) internal=1218 MB compressed=0 MB external=77 MB reusable=10 MB (cycle=40)
+[footprint] rev=ml358 phys=1253 MB (peak 1444) internal=1218 MB compressed=0 MB external=77 MB reusable=10 MB (cycle=41)
+[footprint] rev=ml358 phys=1254 MB (peak 1444) internal=1218 MB compressed=0 MB external=78 MB reusable=10 MB (cycle=42)

@@ -1,0 +1,128 @@
+[00:49:15.701] [INFO] Checking entitlements...
+[00:49:15.702] [INFO] [build] v0.1.579 (579)
+[00:49:15.702] [INFO] [device] model=iPad17,1 idiom=pad os=iPadOS Version 27.0 (Build 24A437) ram=11524MB available=12270MB cores=9
+[00:49:15.702] [INFO] [device] address-map=[0x102fe4000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[00:49:15.720] [INFO] [device] gpu="Apple M5 GPU" family=apple10 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[00:49:18.378] [INFO] [bcd] library launch FINAL FANTASY XV PLAYABLE DEMO: avx=0 wine-vcrt=0 nvidia=0 game-config=1 metalfx=off
+[00:49:18.379] [INFO] Requesting JIT with Built-in StikJIT...
+[00:49:19.946] [INFO] [dock-launch] image-retire=1
+[00:49:19.947] [INFO] [dock-launch] image-map-guard=1
+[00:49:19.951] [INFO] [dock-installers] app=671210 scripts=0 programs=0
+[00:49:19.959] [INFO] Running full Wine sequence...
+[00:49:19.959] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x102fe4000,0x8000000000) 512GB available=12254MB low-power=0 thermal=nominal
+[00:49:19.961] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[00:49:19.961] [INFO] Allocating 896MB JIT pool via debugger...
+[00:49:19.962] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[00:49:19.962] [INFO] [jit-debugger] attached=1 at the pool request
+[00:49:19.963] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 512MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[00:49:20.513] [INFO] RX pool at 0x11f32c000
+[00:49:20.528] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.608s rev=ml526
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+ml992: os_proc_available_memory=11730 MB + phys_footprint=557 MB = 12288 MB (hw.memsize says 11524 MB)
+ml985: preferred base 0x140000000+0x70000 REFUSED status=0xc0000018 image_flags=0x4 charact=0x22 map_addr=0 info_base=0x140000000 | STAGE=fixed-map err=3 at 0x140000000+0x70000 rev=ajan5-motor
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ?: OK, 4 .text pages executable (copy @0x11f330000)
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x11f3a4000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x11f4bc000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x11f564000)
+[copy-verify] rpcrt4.dll: OK, 18 .text pages executable (copy @0x11f6e4000)
+[copy-verify] advapi32.dll: OK, 9 .text pages executable (copy @0x11f7b8000)
+[footprint] rev=ml358 phys=568 MB (peak 568) internal=565 MB compressed=0 MB external=86 MB reusable=7 MB (cycle=1)
+[gdi-shared] session table 0x7020f30000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winemac.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"winemac.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winex11.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #2 L"winex11.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0024:err:module:load_dll [dll-missing] ml718 UNCAPPED L"winewayland.drv" status=c0000135 (subsystem dependency)
+0024:err:module:load_dll [dll-missing] rev=ml336 #3 L"winewayland.drv" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[win-name] #3 hwnd=0x10020 class='' text="madeira - Wine Desktop" rev=ml853
+[win-name] #5 hwnd=0x10032 class='' text="WineAppBar" rev=ml853
+[win-name] #11 hwnd=0x1003e class='' text="Default IME" rev=ml853
+[phase] spawn:L"C:\\windows\\system32\\dockhost.exe" t+  0.929s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] actxprxy.dll: OK, 1 .text pages executable (copy @0x120d38000)
+[copy-verify] libarm64ecfex.dll: OK, 131 .text pages executable (copy @0x120dce000)
+[phase] spawn:L"C:\\windows\\system32\\conhost.exe" t+  0.991s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x12219c000)
+D 38 Load module dockhost.exe (dockhost.exe-09dbbefb7c42a67b): 11A010000
+D 38 Load module ntdll.dll (ntdll.dll-391ab96a83e82f14): 71FE610000
+D 38 Load module ADVAPI32.dll (advapi32.dll-e40c14e1190b1df2): 71FC190000
+D 38 Load module sechost.dll (sechost.dll-b36ef44c04b21a0b): 71FC110000
+D 38 Load module msvcrt.dll (msvcrt.dll-237acf236e8130e9): 71FC000000
+D 38 Load module rsaenh.dll (rsaenh.dll-6cd5b371ff05d55f): 71FBF40000
+[free-delay] #1 release of 0x70255b0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x70256b0000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x70258b0000+0x400000 held for 2000 ms (3 in flight)
+[free-delay] #4 release of 0x7025cb0000+0x800000 held for 2000 ms (4 in flight)
+[alloc-fail] ml814 #1 status=c000000d hint=0xffeeffeeffeeffee size=0x1 type=0x2000 protect=0x1 tid=0038 | STAGE=none err=3 at 0x73fff60000+0x90000
+[copy-verify] dxgi.dll: OK, 50 .text pages executable (copy @0x1261b9000)
+0050:err:seh:ios_exc_dump_str [exc] ml812   OutputDebugStringW: ".......................l"
+0050:err:module:import_dll Library libavcodec-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavfilter-11.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavformat-62.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libavutil-60.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswresample-6.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+0050:err:module:import_dll Library libswscale-9.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\video64.dll") not found
+[hwinput] keyboard focus: program (responder)
+[footprint] rev=ml358 phys=1000 MB (peak 1000) internal=996 MB compressed=0 MB external=162 MB reusable=7 MB (cycle=2)
+[footprint] rev=ml358 phys=1036 MB (peak 1036) internal=1033 MB compressed=0 MB external=162 MB reusable=7 MB (cycle=3)
+[footprint] rev=ml358 phys=1040 MB (peak 1040) internal=1038 MB compressed=0 MB external=162 MB reusable=7 MB (cycle=4)
+[phase] spawn:L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY XV PLAYABLE DEMO\\ffxv_s.exe" t+  8.226s rev=ml526
+[Wine child thread] calling wine_ios_child_main...
+ml985: map_image_view size=0x5491000 base=0x140000000 info_base=0x140000000 map_addr=0 flags=0x4 charact=0x22 limits=0x10000..0x73fffeffff
+[free-delay] #5 release of 0x7026390000+0x100000 held for 2000 ms (1 in flight)
+[copy-verify] shell32.dll: OK, 34 .text pages executable (copy @0x12f6ac000)
+00a8:err:module:import_dll Library fwpuclnt.dll (which is needed by L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY XV PLAYABLE DEMO\\ffxv_s.exe") not found
+D A8 Load module cfgmgr32.dll (cfgmgr32.dll-9e975325c50ed383): 71F1000000
+D A8 Load module XINPUT9_1_0.dll (xinput9_1_0.dll-356a14f2ff866963): 71F0F70000
+D A8 Load module VCOMP140.DLL (vcomp140.dll-665a78d58eccfd80): 71F0EF0000
+D A8 Load module CONCRT140.dll (concrt140.dll-7f7bd0536697a14b): 71F0E60000
+[copy-verify] winhttp.dll: OK, 8 .text pages executable (copy @0x132b6c000)
+D A8 Load module winhttp.dll (winhttp.dll-940743fb9f87d8d4): 71F0DB0000
+D A8 Load module jsproxy.dll (jsproxy.dll-cf964b9ca28dbd5b): 71F0D10000
+00a8:err:module:loader_init Importing dlls for L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\FINAL FANTASY XV PLAYABLE DEMO\\ffxv_s.exe" failed, status c0000135
+00a8:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000135) syscalls=0 unix_calls=7911
+[Wine ntdll/server] process_exit_wrapper(-1073741515): closing child fd_socket=426
+[Wine ntdll/server] process_exit_wrapper(-1073741515)
+[Wine child thread] child exited with code -1073741515
+[footprint] rev=ml358 phys=1335 MB (peak 1335) internal=1332 MB compressed=0 MB external=205 MB reusable=7 MB (cycle=5)
+[00:49:28.965] [INFO] [dock-game-end] ffxv_s.exe ended with status 0xc0000135; the session goes on for now (grace)
+[footprint] rev=ml1060 fast phys=1334 MB compressed=0 MB
+0050:err:module:load_dll [dll-missing] rev=ml336 #45 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #46 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[00:49:29.961] [INFO] [dock-report] launch-game-running=1
+[footprint] rev=ml358 phys=1345 MB (peak 1345) internal=1343 MB compressed=0 MB external=205 MB reusable=7 MB (cycle=6)
+0050:err:module:load_dll [dll-missing] rev=ml336 #47 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #48 L"C:\\Program Files (x86)\\Steam\\bin\\steamservice.dll" status=c000007b -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #49 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+0050:err:module:load_dll [dll-missing] rev=ml336 #50 L"steamservice.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[footprint] rev=ml358 phys=1345 MB (peak 1345) internal=1343 MB compressed=0 MB external=204 MB reusable=7 MB (cycle=8)
+[free-delay] #6 release of 0x702ace0000+0x120000 held for 2000 ms (1 in flight)
+[free-delay] #7 release of 0x7021660000+0x800000 held for 2000 ms (2 in flight)
+[free-delay] #8 release of 0x70294d0000+0x800000 held for 2000 ms (3 in flight)
+[00:49:35.961] [INFO] [dock-report] launch-game-ended=1
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0x0) syscalls=0 unix_calls=8527
+0038:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0x0) syscalls=0 unix_calls=8534
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=101
+[Wine ntdll/server] process_exit_wrapper(0): closing child fd_socket=132
+[Wine ntdll/server] process_exit_wrapper(0)
+[Wine ntdll/server] process_exit_wrapper(0)
+[00:49:36.460] [INFO] [dock-report] probe-result=0
+[footprint] rev=ml358 phys=1177 MB (peak 1345) internal=1175 MB compressed=0 MB external=201 MB reusable=7 MB (cycle=9)
+[00:49:38.965] [INFO] [dock-game-end] ffxv_s.exe ended with status 0xc0000135 after 0 s, the host finished and nothing of the game runs: ending the session
+[WineProc] stopping wineserver...
+[footprint] rev=ml358 phys=1176 MB (peak 1345) internal=1175 MB compressed=0 MB external=201 MB reusable=7 MB (cycle=10)
+[00:49:39.466] [INFO] [exit-report] status=0xc0000135
+[frontend] returned to library
+[00:49:41.040] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=1183 MB (peak 1345) internal=1179 MB compressed=0 MB external=204 MB reusable=6 MB (cycle=11)
+[hwinput] keyboard focus: elsewhere (responder)
+[footprint] rev=ml358 phys=1183 MB (peak 1345) internal=1180 MB compressed=0 MB external=204 MB reusable=6 MB (cycle=12)
+[footprint] rev=ml358 phys=1183 MB (peak 1345) internal=1180 MB compressed=0 MB external=204 MB reusable=6 MB (cycle=13)

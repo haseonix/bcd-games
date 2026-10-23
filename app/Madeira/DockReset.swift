@@ -507,10 +507,7 @@ enum DockReset {
                       baseline: String?, now: Date = Date()) -> Summary {
         var summary = Summary()
         let fm = FileManager.default
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
-        let name = formatter.string(from: now) + "-app\(appID)"
+        let name = BCDFormat.compactStamp(now) + "-app\(appID)"
         let backup = documents.appendingPathComponent("bcd-reset-backup", isDirectory: true)
             .appendingPathComponent(name, isDirectory: true)
         summary.backup = "bcd-reset-backup/" + name
@@ -594,11 +591,8 @@ enum DockReset {
         let file = drive.appendingPathComponent(path)
         guard let attributes = try? fm.attributesOfItem(atPath: file.path),
               let type = attributes[.type] as? FileAttributeType, type == .typeRegular else { return nil }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
         let destination = documents.appendingPathComponent("bcd-reset-backup", isDirectory: true)
-            .appendingPathComponent(formatter.string(from: now) + "-vulkan-loader", isDirectory: true)
+            .appendingPathComponent(BCDFormat.compactStamp(now) + "-vulkan-loader", isDirectory: true)
             .appendingPathComponent("drive_c", isDirectory: true).appendingPathComponent(path)
         do {
             try fm.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)

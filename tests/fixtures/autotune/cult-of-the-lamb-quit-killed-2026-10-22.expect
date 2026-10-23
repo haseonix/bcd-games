@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true
+ },
+ "matched": [],
+ "next": [],
+ "note": "Cult of the Lamb (Dock) build 580: 8,296 frames over 180 s, the user asked the game to close, and the app was killed before it came back to the library: played (quit), not hung",
+ "outcome": "quit",
+ "stage": 5,
+ "status": "ok"
+}

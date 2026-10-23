@@ -154,6 +154,148 @@ static int ios_sig_storm_gate( unsigned long *n )
     return (c % 100000) == 0;
 }
 
+#ifdef WINE_IOS
+/* madeira-bcd (build 591): env.MADEIRA_FAULT_GUARD_RATE = 1, off by default. The two fault-storm guards (ml461's 2000
+ * identical redeliveries in the Mach path, SEGV LOOP FATAL's 5 repeats in the BSD path) count a RUN of identical faults and
+ * end the process (or fake a return value) at a count, whatever the run's speed. A game that throws a managed
+ * NullReferenceException through a Mono null-check trap (`cmp dword [rax],0` is meant to fault) reaches the same count slowly
+ * while it keeps drawing frames: SpiderHeck at 44/s (92 fps), ROUNDS at 460/s, PlateUp, RDR2 at 27/s (7 fps) were ended alive.
+ * With the switch a run only counts as a storm when it is dense, and in the Mach path also while the presenter makes no
+ * progress; a real storm (tens of thousands of faults a second, the guard's own history) ends exactly as before. Unset, none of
+ * this code runs. */
+#define IOS_FGR_DENSE_NS   500000000ull   /* Mach path: 2000 identical deliveries inside 0.5 s (4000/s) are dense */
+#define IOS_FGR_FRAMES     3              /* ... and a sparse run is alive only if this many frames were presented meanwhile */
+#define IOS_FGR_BSD_RUN_NS 5000000ull     /* BSD path: the 5 repeats must lie within 5 ms of the first */
+extern uint64_t madeira_get_present_count( void ) __attribute__((weak_import));   /* winemetal: every Present of the process */
+static int ios_fault_guard_rate = -1;
+
+static int ios_fault_guard_rate_on( void )
+{
+    int v = __atomic_load_n( &ios_fault_guard_rate, __ATOMIC_RELAXED );
+
+    if (v < 0)
+    {
+        const char *e = getenv( "MADEIRA_FAULT_GUARD_RATE" );   /* env.MADEIRA_FAULT_GUARD_RATE = 1 */
+        v = (e && e[0] && e[0] != '0') ? 1 : 0;
+        __atomic_store_n( &ios_fault_guard_rate, v, __ATOMIC_RELAXED );
+    }
+    return v;
+}
+
+static uint64_t ios_fgr_now_ns( void )
+{
+    struct timespec ts;
+
+    clock_gettime( CLOCK_MONOTONIC, &ts );
+    return (uint64_t)ts.tv_sec * 1000000000ull + (uint64_t)ts.tv_nsec;
+}
+
+/* The presenter's frame counter, or 0 with *known = 0 when this build has no winemetal. */
+static uint64_t ios_fgr_presents( int *known )
+{
+    *known = madeira_get_present_count != NULL;
+    return *known ? madeira_get_present_count() : 0;
+}
+
+/* A run of identical Mach-path deliveries just began (n = 1): remember when, and how many frames had been presented. */
+static void ios_fgr_run_begin( uint64_t *t0, uint64_t *p0 )
+{
+    int known;
+
+    *t0 = ios_fgr_now_ns();
+    *p0 = ios_fgr_presents( &known );
+}
+
+/* The run reached the 2000 mark. Returns 1 when it is NOT a storm (and begins a new run), 0 when the guard must end the
+ * process as before. A storm is dense (2000 deliveries within IOS_FGR_DENSE_NS) or makes the presenter stand still; a sparse run
+ * during which frames kept coming is a game that is alive. */
+static int ios_fgr_run_alive( uint32_t *n, uint64_t *t0, uint64_t *p0, uint64_t pc, uint64_t addr )
+{
+    static volatile int said;
+    uint64_t now = ios_fgr_now_ns(), dt = now - *t0, frames = 0;
+    int known, dense = dt < IOS_FGR_DENSE_NS, alive;
+    uint64_t pres = ios_fgr_presents( &known );
+
+    if (known) frames = pres - *p0;
+    alive = !dense && (!known || frames >= IOS_FGR_FRAMES);
+    if (said < 6)
+    {
+        char fr[48];
+
+        said++;
+        if (known) snprintf( fr, sizeof(fr), "%llu frame(s) presented meanwhile", (unsigned long long)frames );
+        else snprintf( fr, sizeof(fr), "no frame counter in this build" );
+        dprintf( 2, "[redeliv] MADEIRA_FAULT_GUARD_RATE pc=0x%llx addr=0x%llx: %u identical deliveries in %llu ms (%llu/s), %s: %s\n",
+                 (unsigned long long)pc, (unsigned long long)addr, (unsigned)*n, (unsigned long long)(dt / 1000000ull),
+                 dt ? (unsigned long long)((uint64_t)*n * 1000000000ull / dt) : 0ull, fr,
+                 alive ? "not a storm, the process is alive and the run starts over" : "a real storm, ending the process as before" );
+    }
+    if (alive)
+    {
+        *n = 1;
+        *t0 = now;
+        *p0 = pres;
+    }
+    return alive;
+}
+
+/* The 256 mark of a run prints one line, the first few times only, with the switch (the run restarts at 2000). */
+static int ios_fgr_say_256( void )
+{
+    static volatile int said;
+
+    return __sync_add_and_fetch( &said, 1 ) <= 4;
+}
+
+/* BSD path: one slot per thread (hashed by pthread_self; a collision restarts the run, which only makes the guard slower to
+ * fire, never faster). */
+struct ios_fgr_bsd_slot { uintptr_t thread, pc; int n; uint64_t t0; };
+static struct ios_fgr_bsd_slot ios_fgr_bsd[64];
+
+static struct ios_fgr_bsd_slot *ios_fgr_bsd_slot_get( void )
+{
+    uintptr_t t = (uintptr_t)pthread_self();
+    struct ios_fgr_bsd_slot *s = &ios_fgr_bsd[(int)(((uint64_t)t * 0x9E3779B97F4A7C15ull) >> 58)];
+
+    if (s->thread != t)
+    {
+        s->thread = t;
+        s->pc = 0;
+        s->n = 0;
+        s->t0 = 0;
+    }
+    return s;
+}
+
+/* madeira-bcd (build 591): env.MADEIRA_ANON_CAS_FLUSH = 1, off by default (see the anonymous-alias CAS branch of the Mach handler).
+ * ios_anon_cas_* are read by the [spin] report in server_ios.c: how many CAS faults on an anonymous alias there were (emulated here,
+ * or handed to FEX), the last address and when, so a spin that begins right after one can be tied to it. */
+static int ios_anon_cas_flush = -1;
+volatile unsigned long long ios_anon_cas_last_addr, ios_anon_cas_last_ms;
+volatile unsigned ios_anon_cas_emulated, ios_anon_cas_handed;
+
+static int ios_anon_cas_flush_on( void )
+{
+    int v = __atomic_load_n( &ios_anon_cas_flush, __ATOMIC_RELAXED );
+
+    if (v < 0)
+    {
+        const char *e = getenv( "MADEIRA_ANON_CAS_FLUSH" );   /* env.MADEIRA_ANON_CAS_FLUSH = 1 */
+        v = (e && e[0] && e[0] != '0') ? 1 : 0;
+        __atomic_store_n( &ios_anon_cas_flush, v, __ATOMIC_RELAXED );
+    }
+    return v;
+}
+
+static void ios_anon_cas_note( unsigned long long addr, int handed )
+{
+    if (handed) __sync_add_and_fetch( &ios_anon_cas_handed, 1 );
+    else __sync_add_and_fetch( &ios_anon_cas_emulated, 1 );
+    ios_anon_cas_last_addr = addr;
+    ios_anon_cas_last_ms = ios_fgr_now_ns() / 1000000ull;
+}
+#endif
+
 /***********************************************************************
  * signal context platform-specific definitions
  */
@@ -1629,6 +1771,87 @@ done:
 /* ajan7-arkham: [wow-null32], a 32-bit guest's use of the NULL page: registers, stack and the thread's TLS cells with module+RVA
  * (see ios_wow_null_diag.h). Failure path only, capped. Uses the helpers of ios_av_args_diag.h. */
 #include "ios_wow_null_diag.h"
+
+/* build 580 (NFS Underground 2 7F9ZRF): a 32-byte STP Q that crosses a 16 KB page boundary is stored page by page
+ * (see ios_store_split.h). The two callbacks below are the production lookups; the host test compiles the header
+ * against fake ones. Only the anonymous-alias branch of the Q-pair emulation uses them. */
+#include "ios_store_split.h"
+extern uintptr_t ios_jit_anon_alias_lookup(uintptr_t fault_addr);
+
+/* A part is aliased when the alias run that holds its first byte also holds its last; otherwise the guest address
+ * itself is offered as a direct part, and ios_store_split_direct_write decides whether it is writable. */
+static uintptr_t ios_store_split_resolve_anon( void *ctx, uintptr_t guest, unsigned len, int *direct )
+{
+    uintptr_t rw = ios_jit_anon_alias_lookup( guest );
+    (void)ctx;
+    if (rw)
+    {
+        if (ios_jit_anon_alias_lookup( guest + len - 1 ) != rw + len - 1) return 0;
+        *direct = 0;
+        return rw;
+    }
+    *direct = 1;
+    return guest;
+}
+
+/* mach_vm_write reports a page that cannot be written instead of faulting (this runs on the Mach exception
+ * thread) and checks the whole range before it writes any of it. */
+static int ios_store_split_direct_write( void *ctx, uintptr_t guest, const void *src, unsigned len )
+{
+    (void)ctx;
+    return mach_vm_write( mach_task_self(), (mach_vm_address_t)guest, (vm_offset_t)(uintptr_t)src, len ) == KERN_SUCCESS;
+}
+
+/* madeira-bcd (build 591): [stp-split] read-back, log only. Need for Speed Underground 2 (RT2RHK, 5H4043, 4M13T0; one tester, three runs)
+ * stops on an INT3 in SPEED2.EXE (0x4405A9, after an Enter key) right after the first [stp-split] line of build 580, and the logs
+ * cannot tell a split store that left wrong bytes from a game that breaks on its own. Prints the 32 source bytes and what the memory
+ * holds afterwards, read through the guest addresses (the RX view of the alias part and the plain page) and through the alias pointers
+ * the store went to: all three must be equal, else the split path is wrong. Reads only (mach_vm_read_overwrite on the guest
+ * addresses, plain loads from the alias the store has just written). */
+static void ios_hex_bytes( char *out, const uint8_t *p, unsigned n )
+{
+    static const char d[] = "0123456789abcdef";
+    unsigned i;
+
+    for (i = 0; i < n; i++) { out[2 * i] = d[p[i] >> 4]; out[2 * i + 1] = d[p[i] & 15]; }
+    out[2 * n] = 0;
+}
+
+static void ios_stp_split_readback( const ios_store_part *sp, int sn, const uint8_t *src )
+{
+    char hs[65], hg[65], ha[65];
+    uint8_t via_guest[32], via_alias[32];
+    int i, g_ok = 1, g_diff = -1, a_diff = -1;
+    unsigned b;
+
+    memset( via_guest, 0, sizeof(via_guest) );
+    memset( via_alias, 0, sizeof(via_alias) );
+    for (i = 0; i < sn && i < 2; i++)
+    {
+        mach_vm_size_t got = 0;
+
+        if (mach_vm_read_overwrite( mach_task_self(), (mach_vm_address_t)sp[i].guest, sp[i].len,
+                                    (mach_vm_address_t)(uintptr_t)(via_guest + sp[i].off), &got ) != KERN_SUCCESS || got != sp[i].len)
+            g_ok = 0;
+        if (sp[i].direct) memcpy( via_alias + sp[i].off, via_guest + sp[i].off, sp[i].len );
+        else memcpy( via_alias + sp[i].off, (const void *)sp[i].dst, sp[i].len );
+    }
+    for (b = 0; b < 32; b++)
+    {
+        if (g_diff < 0 && via_guest[b] != src[b]) g_diff = (int)b;
+        if (a_diff < 0 && via_alias[b] != src[b]) a_diff = (int)b;
+    }
+    ios_hex_bytes( hs, src, 32 );
+    ios_hex_bytes( hg, via_guest, 32 );
+    ios_hex_bytes( ha, via_alias, 32 );
+    dprintf( STDERR_FILENO, "[stp-split]   source bytes  %s\n", hs );
+    dprintf( STDERR_FILENO, "[stp-split]   guest read    %s %s\n", hg,
+             !g_ok ? "(a part could not be read)" : g_diff < 0 ? "= the source" : "DIFFERENT from the source" );
+    dprintf( STDERR_FILENO, "[stp-split]   alias read    %s %s\n", ha, a_diff < 0 ? "= the source" : "DIFFERENT from the source" );
+    if (g_ok && g_diff >= 0)
+        dprintf( STDERR_FILENO, "[stp-split]   first byte that differs through the guest address: %d (parts: %u@%s + %u@%s)\n", g_diff,
+                 sp[0].len, sp[0].direct ? "direct" : "alias", sn > 1 ? sp[1].len : 0u, sn > 1 ? (sp[1].direct ? "direct" : "alias") : "-" );
+}
 
 /* ajan2-tani (2026-10-21): FAILURE-PATH DIAGNOSTICS for guest control flow that dies in the JIT.
  *
@@ -3907,6 +4130,7 @@ static void *ios_mach_exception_thread( void *arg )
                 {
                     uint32_t insn; ios_fault_read_insn( (uint64_t)(uintptr_t)fault_pc, &insn );  /* ml982 */
                     int emulated = 0;
+                    int anon_cas_handoff = 0;   /* madeira-bcd (build 591): MADEIRA_ANON_CAS_FLUSH, see below */
                     /* STP (SIMD&FP, signed offset, 128-bit Q): 10 101 1 1 0 0 0 imm7 Rt2 Rn Rt
                      *   pattern bits 31-22: 10 1011 1000  → top10 = 0x2B8 (= bits 31..22)
                      *   So mask 0xFFC00000 = top10. Match 0x2B8 << 22 = 0xAE000000? Hmm.
@@ -3961,7 +4185,9 @@ static void *ios_mach_exception_thread( void *arg )
                         uintptr_t rw_end = in_jit ? ((in_low && !ios_jit_low_contains( (uintptr_t)fault_addr + 31 ))
                                                      ? 0 : (uintptr_t)(rw + ((fault_addr + 31) - rx)))
                                                   : (uintptr_t)ios_jit_anon_alias_lookup( fault_addr + 31 );
-                        if (!rw_end || rw_end != (uintptr_t)rw_addr + 31)
+                        const int stp_whole = rw_end && rw_end == (uintptr_t)rw_addr + 31;
+                        int stp_split = 0;
+                        if (!stp_whole)
                         {
                             static int stp_span_n;
                             if (stp_span_n < 4)
@@ -3970,16 +4196,59 @@ static void *ios_mach_exception_thread( void *arg )
                                     "(insn=0x%08x addr=0x%llx rw=0x%llx rw_end=0x%llx)\n",
                                     ++stp_span_n, insn, (unsigned long long)fault_addr,
                                     (unsigned long long)rw_addr, (unsigned long long)rw_end);
+                            /* build 580 (NFS Underground 2 7F9ZRF): the refusal above never completed the store, so
+                             * it faulted again 2000 times until the redelivery guard ended the process. Only for an
+                             * anonymous alias (not the JIT pool), and only the refused case: take the store page by
+                             * page (ios_store_split.h). A part in a page with an alias goes through that alias; a
+                             * part in a page without one is written only if the page is writable (mach_vm_write
+                             * checks, and nothing at all is written when it is not), so a page that cannot be
+                             * written is refused as before. */
+                            if (!in_jit)
+                            {
+                                ios_store_part sp[2];
+                                uint8_t sbytes[32];
+                                int sn;
+                                memcpy(sbytes, &neon_state.__v[rt], 16);
+                                memcpy(sbytes + 16, &neon_state.__v[rt2], 16);
+                                sn = ios_store_split_plan( (uintptr_t)fault_addr, 32, ios_store_split_resolve_anon, NULL, sp );
+                                if (sn && ios_store_split_commit( sp, sn, sbytes, ios_store_split_direct_write, NULL ))
+                                {
+                                    static int stp_split_n;
+                                    stp_split = 1;
+                                    if (stp_split_n < 8)
+                                    {
+                                        dprintf(STDERR_FILENO,
+                                            "[stp-split] build580 #%d insn=0x%08x addr=0x%llx parts=%d "
+                                            "(%u@%s + %u@%s) - the 32B store crossed a 16 KB page, stored page by page\n",
+                                            ++stp_split_n, insn, (unsigned long long)fault_addr, sn,
+                                            sp[0].len, sp[0].direct ? "direct" : "alias",
+                                            sn > 1 ? sp[1].len : 0u, sn > 1 ? (sp[1].direct ? "direct" : "alias") : "-");
+                                        if (stp_split_n <= 4) ios_stp_split_readback( sp, sn, sbytes );   /* build 591: log only */
+                                    }
+                                }
+                                else
+                                {
+                                    static int stp_split_fail_n;
+                                    if (stp_split_fail_n < 4)
+                                        dprintf(STDERR_FILENO,
+                                            "[stp-split] build580 #%d insn=0x%08x addr=0x%llx REFUSED: %s\n",
+                                            ++stp_split_fail_n, insn, (unsigned long long)fault_addr,
+                                            sn ? "the page without an alias is not writable" : "a part has no usable alias");
+                                }
+                            }
                         }
-                        else
+                        if (stp_whole || stp_split)
                         {
                             uint64_t base_old = (mode == 3) ? (uint64_t)fault_addr - (uint64_t)off
                                                             : (uint64_t)fault_addr;
                             uint64_t base_new = base_old;
                             int wb = (mode == 1 || mode == 3);
 
-                            memcpy((void *)rw_addr, &neon_state.__v[rt], 16);
-                            memcpy((void *)(rw_addr + 16), &neon_state.__v[rt2], 16);
+                            if (!stp_split)
+                            {
+                                memcpy((void *)rw_addr, &neon_state.__v[rt], 16);
+                                memcpy((void *)(rw_addr + 16), &neon_state.__v[rt2], 16);
+                            }
 
                             if (wb)
                             {
@@ -4709,11 +4978,64 @@ static void *ios_mach_exception_thread( void *arg )
                                         (unsigned long long)rw_addr, cas_width);
                         }
                     }
+                    /* build 580 (Jetboard Joust 5QQ3XX/5WG4FG/N4F8JR, CoreCLR with RWX code pages):
+                     * CASAL X8,X0,[X27] (0xc8e8ff60) is FEX's translation of the x86 `lock cmpxchg`
+                     * the runtime uses to patch its own code in an RWX allocation. The page's alias
+                     * resolved (rw_addr) but no case above decoded a CAS for the anonymous alias
+                     * (the SWP comment above deliberately left the family out until it appeared), so
+                     * the process fell into [store-undecoded] and died with the unhandled fault. The
+                     * same genuinely atomic emulation as the pool case, reached ONLY here: an
+                     * anon-alias store that nothing above emulated, i.e. one that ended in
+                     * [store-undecoded] before. Full width, naturally aligned, and the last byte
+                     * must lie in the same alias run as the first, so the atomic cannot touch
+                     * memory the lookup did not vouch for. */
+                    if (!emulated && !in_jit &&
+                        (insn & 0xbfa07c00u) == 0x88a07c00u)
+                    {
+                        unsigned cas_width = (insn & 0x40000000u) ? 8 : 4;
+                        /* madeira-bcd (build 591): env.MADEIRA_ANON_CAS_FLUSH = 1, off by default. The emulation below completes
+                         * the CAS but FEX is never told that code changed. CoreCLR patches a stub it has already run (Jetboard Joust,
+                         * GHVYNG, T9CQD7, RTSYP6, CTR7BV on build 580: ONE emulated CAS, then the main thread calls the same routine
+                         * 11 million times a second and never presents); on build 579 the same CAS reached FEX, whose handler dropped
+                         * the translation of the page and did the compare-and-swap itself through the alias ("Handled self-modifying
+                         * code" + "[smc-atomic] ml657 ... handled", sixteen times in 5QQ3XX, and the runtime went on to load clrjit.dll).
+                         * Nothing in ntdll can invalidate FEX's blocks (the PE side calls FEX, never the Mach thread), so with the
+                         * switch the CAS is not emulated here: the fault goes on to the guest as it did before build 580, for the
+                         * same stores (an anonymous alias, natural alignment, the whole word in one alias run) and for no others. */
+                        if (ios_anon_cas_flush_on() && !((uintptr_t)fault_addr & (cas_width - 1)) &&
+                            ios_jit_anon_alias_lookup( fault_addr + cas_width - 1 ) == rw_addr + cas_width - 1)
+                        {
+                            static unsigned cas_flush_logs;
+                            anon_cas_handoff = 1;
+                            ios_anon_cas_note( (unsigned long long)fault_addr, 1 );
+                            if (cas_flush_logs++ < 16)
+                                dprintf(STDERR_FILENO,
+                                        "[anon-cas] build591 MADEIRA_ANON_CAS_FLUSH insn=%08x pc=%llx addr=%llx rw=%llx width=%u "
+                                        "handed to FEX (it drops the translation of the page and performs the CAS)\n",
+                                        insn, (unsigned long long)fault_pc,
+                                        (unsigned long long)fault_addr,
+                                        (unsigned long long)rw_addr, cas_width);
+                        }
+                        if (!anon_cas_handoff && !((uintptr_t)fault_addr & (cas_width - 1)) &&
+                            ios_jit_anon_alias_lookup( fault_addr + cas_width - 1 ) == rw_addr + cas_width - 1 &&
+                            ios_mach_emulate_cas(insn, rw_addr, state.__x))
+                        {
+                            static unsigned cas_anon_logs;
+                            emulated = 1;
+                            ios_anon_cas_note( (unsigned long long)fault_addr, 0 );
+                            if (cas_anon_logs++ < 16)
+                                dprintf(STDERR_FILENO,
+                                        "[anon-cas] build580 insn=%08x pc=%llx addr=%llx rw=%llx width=%u\n",
+                                        insn, (unsigned long long)fault_pc,
+                                        (unsigned long long)fault_addr,
+                                        (unsigned long long)rw_addr, cas_width);
+                        }
+                    }
                     /* ml350 DISCRIMINATOR: alias EXISTS but the instruction is not
                      * in this decode list — every such miss previously cost a full
                      * run to name (ml349's STRB-reg took one). Print the insn so
                      * the next gap is a one-line diagnosis. Capped. */
-                    if (!emulated)
+                    if (!emulated && !anon_cas_handoff)
                     {
                         static int undecoded_n;
                         if (undecoded_n < 8)
@@ -8134,6 +8456,43 @@ static void setup_exception( ucontext_t *sigcontext, EXCEPTION_RECORD *rec )
 
 
 #ifdef WINE_IOS
+/* madeira-bcd (build 591): [smc-loop], log only, once per process: the 256th identical delivery of a run (the point where
+ * "[redeliv] 256 ... storm forming" prints) says what stands at the fault. A 32-bit packed game (Pro Evolution Soccer 2013,
+ * DAN35T: "Handled self-modifying code: pc: 16B038E5C fault: 710455C01C" 2,000 times, then the guard) and Warcraft II BNE had no
+ * line that said which instruction keeps writing, what the page is (host protection, an alias or not) and whether the code is the
+ * pool's. Reads only (a fault-safe Mach read and a region query); nothing is written, stopped or protected. */
+static void ios_smc_loop_diag( uint64_t thread, uint64_t pc, uint64_t fault_addr, uint32_t code )
+{
+    extern void *ios_jit_rx_base_global;
+    extern size_t ios_jit_pool_size_global;
+    static volatile int said;
+    mach_vm_address_t ra = (mach_vm_address_t)fault_addr;
+    mach_vm_size_t rs = 0;
+    vm_region_basic_info_data_64_t ri;
+    mach_msg_type_number_t rc = VM_REGION_BASIC_INFO_COUNT_64;
+    mach_port_t ro = MACH_PORT_NULL;
+    uint32_t insn = 0;
+    uintptr_t rw;
+    uint64_t rx = (uint64_t)(uintptr_t)ios_jit_rx_base_global;
+    int in_region;
+
+    if (__sync_add_and_fetch( &said, 1 ) > 1) return;
+    (void)ios_fault_read_insn( pc, &insn );
+    in_region = fault_addr && mach_vm_region( mach_task_self(), &ra, &rs, VM_REGION_BASIC_INFO_64, (vm_region_info_t)&ri, &rc, &ro ) == KERN_SUCCESS &&
+                ra <= (mach_vm_address_t)fault_addr;
+    rw = fault_addr ? ios_jit_anon_alias_lookup( (uintptr_t)fault_addr ) : 0;
+    dprintf( 2, "[smc-loop] build591 mach thread 0x%llx: 256 identical deliveries of code %08x, host pc 0x%llx (insn 0x%08x%s), "
+                "address 0x%llx; page: %s; anonymous RWX alias: %s\n",
+             (unsigned long long)thread, (unsigned)code, (unsigned long long)pc, (unsigned)insn,
+             rx && pc >= rx && pc < rx + ios_jit_pool_size_global ? ", in the JIT pool" : "",
+             (unsigned long long)fault_addr,
+             in_region ? "see next line" : "no region", rw ? "yes" : "no" );
+    if (in_region)
+        dprintf( 2, "[smc-loop]   host region 0x%llx+0x%llx prot=%d max=%d shared=%d%s\n", (unsigned long long)ra, (unsigned long long)rs,
+                 ri.protection, ri.max_protection, ri.shared,
+                 rw ? "" : " (no alias: this page is written directly or not at all)" );
+}
+
 /***********************************************************************
  *           ios_mach_deliver_guest_exception  (ml369, #63)
  *
@@ -8838,7 +9197,7 @@ dispatch:
          * ~35 s and this guard killed a healthy game. A real storm refaults the
          * same instruction back to back on one thread, so the slot is chosen by
          * thread and any other fault on that thread restarts the run. */
-        static struct { uint64_t thread, key; uint32_t n; } redeliv[16];
+        static struct { uint64_t thread, key; uint32_t n; uint64_t t0, p0; } redeliv[16];   /* t0, p0: MADEIRA_FAULT_GUARD_RATE */
         static volatile int ios_redeliv_terminating;
         uint64_t rkey = ((uint64_t)thread << 48) ^ pc ^ ((uint64_t)fault_addr << 1);
         int rslot = (int)(((uint64_t)thread * 0x9E3779B97F4A7C15ull) >> 60);
@@ -8847,11 +9206,18 @@ dispatch:
             redeliv[rslot].thread = (uint64_t)thread;
             redeliv[rslot].key = rkey;
             redeliv[rslot].n = 1;
+            if (ios_fault_guard_rate_on()) ios_fgr_run_begin( &redeliv[rslot].t0, &redeliv[rslot].p0 );   /* madeira-bcd: MADEIRA_FAULT_GUARD_RATE */
         }
         else if (++redeliv[rslot].n == 256)
-            dprintf( 2, "[redeliv] 256 identical redeliveries pc=0x%llx addr=0x%llx — storm forming rev=ml461\n",
-                     (unsigned long long)pc, (unsigned long long)fault_addr );
-        else if (redeliv[rslot].n >= 2000 && !ios_redeliv_terminating)
+        {
+            if (!ios_fault_guard_rate_on() || ios_fgr_say_256())
+                dprintf( 2, "[redeliv] 256 identical redeliveries pc=0x%llx addr=0x%llx — storm forming rev=ml461\n",
+                         (unsigned long long)pc, (unsigned long long)fault_addr );
+            ios_smc_loop_diag( thread, pc, fault_addr, rec.ExceptionCode );   /* madeira-bcd (build 591): one-shot [smc-loop], log only */
+        }
+        else if (redeliv[rslot].n >= 2000 && !ios_redeliv_terminating &&
+                 !(ios_fault_guard_rate_on() &&
+                   ios_fgr_run_alive( &redeliv[rslot].n, &redeliv[rslot].t0, &redeliv[rslot].p0, pc, fault_addr )))   /* madeira-bcd: MADEIRA_FAULT_GUARD_RATE */
         {
             /* ml463: was `== 2000` + exit(76) — one shot, and exit() on iOS is
              * the wine_ios_exit shim which LONGJMPS instead of terminating (the
@@ -11284,14 +11650,38 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
         static uintptr_t last_fault_pc = 0;
         static int fault_repeat_count = 0;
         uintptr_t this_pc = PC_sig(context);
-        if (this_pc == last_fault_pc)
+        /* madeira-bcd (build 591): env.MADEIRA_FAULT_GUARD_RATE = 1 -- the run is counted per thread (the statics above are shared by
+         * all threads: PlateUp's five repeats came from five different threads) and only counts as a storm when its five repeats lie
+         * within IOS_FGR_BSD_RUN_NS of the first. Unset, the pointers are the statics and nothing else changes. */
+        uintptr_t *lastp = &last_fault_pc;
+        int *cntp = &fault_repeat_count;
+        struct ios_fgr_bsd_slot *fgr_slot = NULL;
+        uint64_t fgr_now = 0;
+        if (ios_fault_guard_rate_on())
         {
-            fault_repeat_count++;
+            fgr_slot = ios_fgr_bsd_slot_get();
+            lastp = &fgr_slot->pc;
+            cntp = &fgr_slot->n;
+            fgr_now = ios_fgr_now_ns();
+            if (this_pc == *lastp && *cntp > 0 && fgr_now - fgr_slot->t0 > IOS_FGR_BSD_RUN_NS)
+            {
+                static volatile int slow_said;
+                if (__sync_add_and_fetch( &slow_said, 1 ) <= 3)
+                    dprintf( 2, "[segv-loop] MADEIRA_FAULT_GUARD_RATE pc=%p addr=%p: %d repeats took %llu ms, not a storm; "
+                                "the run starts over and nothing is skipped\n",
+                             (void*)this_pc, siginfo->si_addr, *cntp, (unsigned long long)((fgr_now - fgr_slot->t0) / 1000000ull) );
+                *lastp = 0;
+                *cntp = 0;
+            }
+        }
+        if (this_pc == *lastp)
+        {
+            (*cntp)++;
             static unsigned long loop_storm;
-            if (fault_repeat_count == 3 && ios_sig_storm_gate( &loop_storm ))
+            if (*cntp == 3 && ios_sig_storm_gate( &loop_storm ))
             {
                 ERR("SEGV LOOP DETECTED: pc=%p addr=%p repeated %d times, dumping TEB+PEB\n",
-                    (void*)this_pc, siginfo->si_addr, fault_repeat_count);
+                    (void*)this_pc, siginfo->si_addr, *cntp);
                 /* Dump TEB */
                 if (ios_teb_for_signals)
                 {
@@ -11336,23 +11726,24 @@ static void segv_handler( int signal, siginfo_t *siginfo, void *sigcontext )
                     }
                 }
             }
-            if (fault_repeat_count >= 5)
+            if (*cntp >= 5)
             {
                 ERR("SEGV LOOP FATAL: pc=%p addr=%p after %d repeats, forcing thread exit\n",
-                    (void*)this_pc, siginfo->si_addr, fault_repeat_count);
+                    (void*)this_pc, siginfo->si_addr, *cntp);
                 /* Skip the faulting instruction and set return value to indicate failure */
                 PC_sig(context) = PC_sig(context) + 4;
                 REGn_sig(0, context) = 0xDEAD0001;
                 ios_fixup_x18_for_return( context );
-                last_fault_pc = 0;
-                fault_repeat_count = 0;
+                *lastp = 0;
+                *cntp = 0;
                 return;
             }
         }
         else
         {
-            last_fault_pc = this_pc;
-            fault_repeat_count = 1;
+            *lastp = this_pc;
+            *cntp = 1;
+            if (fgr_slot) fgr_slot->t0 = fgr_now;
         }
     }
 #endif
@@ -13683,6 +14074,8 @@ static void bus_handler( int signal, siginfo_t *siginfo, void *sigcontext )
                         }
                     }
                 }
+                /* madeira-bcd (build 591): [wow-null32] for the BSD path too (Devil May Cry GKQD2V; log only, see ios_wow_null_diag.h) */
+                ios_wow_null_diag_bus( &((ucontext_t *)sigcontext)->uc_mcontext->__ss, (uintptr_t)NtCurrentTeb(), (uintptr_t)siginfo->si_addr );
                 goto bus_fatal;
             }
             /* Darwin also reports data-abort permission faults as SIGBUS with

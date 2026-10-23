@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "exe-window-fixed-base-large"
+ ],
+ "next": [
+  "exe-window-mb = 592"
+ ],
+ "note": "Resident Evil Requiem (Steam 3764200, Dock) build 580, iPad17,3: re9.exe is a 575 MiB program with relocations stripped; 579 tried exe-window-mb = 512 (YQRQ86) and the 580 rule stayed away from 512 MiB and more, so the search ended stuck. The window is the image plus 17 MiB up to 16: 592",
+ "outcome": "crashed",
+ "stage": 2,
+ "status": "trying"
+}

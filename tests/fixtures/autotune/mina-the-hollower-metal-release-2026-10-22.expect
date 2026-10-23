@@ -1,0 +1,16 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true,
+  "userSaid": "closed-by-itself"
+ },
+ "matched": [
+  "metal-texture-double-release",
+  "swap-8gb-memory-kill"
+ ],
+ "next": [],
+ "note": "Mina the Hollower (D3D12) build 580, iPhone 15 Pro: an iOS thread dies in objc_release under Metal's completion queue (a texture BCD's winemetal had freed); the app is gone, the run reads killed, and the swap rules must not be the answer: an open bug, no setting",
+ "outcome": "killed",
+ "stage": 3,
+ "status": "known"
+}

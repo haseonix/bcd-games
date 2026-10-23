@@ -1,0 +1,10 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [],
+ "next": [],
+ "note": "FINAL FANTASY TACTICS - The Ivalice Chronicles (Steam through BCD Dock), build 579, iPad17,3 (Send Log 7QVF78): auto-tune had added swap-mb = 3072; swap-mode = 2; swap-min-mb = 1 after a memory kill (trying swap-16gb-memory-kill); this session lasted 19 s and its log ends with '[hwinput] keyboard focus: elsewhere (app inactive)': the user switched away. It matched no rule, and as 'exited-early' it would have been judged against the memory-kill baseline and the swap lines sent back. With a log that ends on the user leaving (focus elsewhere because the app is inactive or the pointer left the game view) and no rule matched, the session is 'inconclusive': the same lines run again.",
+ "outcome": "inconclusive",
+ "stage": 2,
+ "status": "baseline"
+}

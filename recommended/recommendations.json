@@ -1,7 +1,7 @@
 {
   "format": 1,
-  "version": 5,
-  "generated": "2026-10-21",
+  "version": 7,
+  "generated": "2026-10-23",
   "rules": [
     {
       "id": "rdr2-steam",
@@ -435,7 +435,7 @@
     {
       "id": "horizon-zero-dawn",
       "title": "Horizon Zero Dawn",
-      "version": 16,
+      "version": 17,
       "match": {
         "steamAppIDs": [1151640],
         "steamFolders": ["horizon zero dawn"],
@@ -465,7 +465,8 @@
         "env.MADEIRA_WGI_HOST_PADS = 1",
         "env.MADEIRA_LOCK_ORPHAN = stamped",
         "env.MADEIRA_SRV_FGETPATH = 1",
-        "env.WINEDEBUG = fixme-input"
+        "env.WINEDEBUG = fixme-input",
+        {"line": "env.MADEIRA_MFC_DOCK = 1", "minBuild": 591}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "fastSync": true, "display": "fit"},
       "notes": [
@@ -558,7 +559,15 @@
         "that froze the game for 1.5-2 s every ~10 s in its first minutes are",
         "off (quiet-log); the server names the shader-cache files it opens with",
         "one call instead of realpath, which kept it busy on a performance core",
-        "in the menu (MADEIRA_SRV_FGETPATH)."
+        "in the menu (MADEIRA_SRV_FGETPATH).",
+        "Version 17 (2026-10-23): env.MADEIRA_MFC_DOCK = 1 (build 591). The same game started through Madeira Dock fails at once: an iPad17,3",
+        "(Send Log TH3BJ8, build 580, 2026-10-22) \"[dll-missing] ... L\\\"mfc140.dll\\\" status=c0000135\" (L30641), \"import_dll Library mfc140.dll",
+        "(which is needed by ...\\Horizon Zero Dawn\\HorizonZeroDawn.exe) not found\" (L30642), \"loader_init ... Importing dlls ... failed, status",
+        "c0000135\" (L31875), \"[dock-game-end]\" (L33392). A Dock session runs Wine's explorer.exe from the aarch64 bundle, so the Microsoft VC++",
+        "overlay, which also links mfc140.dll and mfc140u.dll, is never applied to it. The switch links the two MFC DLLs into such a session",
+        "only, where this game cannot get past its imports today (the Dock logs of Horizon Zero Dawn Remastered, which imports no MFC, are",
+        "not this game); a start that already has the overlay is not changed by it. Not tried on a",
+        "device yet."
       ]
     },
     {
@@ -1230,7 +1239,7 @@
     {
       "id": "star-wars-galactic-racer",
       "title": "STAR WARS Galactic Racer",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [4078430],
         "steamFolders": ["star wars galactic racer"],
@@ -1242,12 +1251,21 @@
         "# BCD's recommended settings for STAR WARS Galactic Racer.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "exe-window-mb = 496", "minBuild": 575}
+        {"line": "exe-window-mb = 496", "minBuild": 575},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "display": "fit"},
       "notes": [
         "STAR WARS Galactic Racer (Steam 4078430), build 569, iPhone17,2 (Send Logs 3HWREK, XDCPK7): its 480 MB program",
-        "(relocations stripped) did not fit the 128 MB window at 0x140000000 (c0000018). exe-window-mb = 496 from 575 (16 MB over the image)."
+        "(relocations stripped) did not fit the 128 MB window at 0x140000000 (c0000018). exe-window-mb = 496 from 575 (16 MB over the image).",
+        "Version 2 (2026-10-22): env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576). With the window widened (\"[exe-window] executable window",
+        "widened to [0x140000000,+496MB) for this game\", Send Log DV68F6, build 578, L80) the 480 MiB program loads at its base and gets no",
+        "JIT-pool copy: \"[jit-pool] EXHAUSTED (image 0x140000000+0x1df9c000)\" (DV68F6 L11176; TP6PMV, build 574, L10704), \"no JIT-pool copy for",
+        "executable section .tls\", \"wine: failed to start ... c0000017\", and the launcher's \"CreateProcess() returned 8\"; the pool was 304 MB on",
+        "that phone, and auto-tune's pool-split = 1 (DV68F6 game settings L69) left it one region (\"[pool-split] ... the pool stays one region\",",
+        "L86). The line runs the pure x64 program from its loaded image, which makes no copy (as Stellar Blade Demo's list: P9384Q, the same",
+        "kind of program, \"mapped without a pool copy\" at L8957 and went on to its own code). What follows the load is unknown. Not tried on a",
+        "device yet."
       ]
     },
     {
@@ -1310,7 +1328,7 @@
     {
       "id": "no-rest-for-the-wicked",
       "title": "No Rest for the Wicked",
-      "version": 2,
+      "version": 3,
       "match": {
         "steamAppIDs": [1371980],
         "steamFolders": ["norestforthewicked"],
@@ -1323,7 +1341,8 @@
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_FEX_BAND_KEEP_MB = 6144", "minBuild": 576},
-        {"line": "dxmt = d3d11.mipClampBC=1", "minBuild": 577}
+        {"line": "dxmt = d3d11.mipClampBC=1", "minBuild": 577},
+        {"line": "env.MADEIRA_WINTYPES = 1", "minBuild": 575}
       ],
       "switches": {"avx": false, "nvidia": false, "wineVCRT": false, "display": "fit"},
       "notes": [
@@ -1341,7 +1360,12 @@
         "hold most of the 1.71 GB of block-compressed data (0.68 GB before the burst), and this GPU takes BC as it is.",
         "dxmt = d3d11.mipClampBC=1 (build 577) drops the top level of each of them, three quarters of their bytes:",
         "about 1.2 GB less at the end of that log. God of War's list uses the same option (its 4.0 GB of textures became",
-        "1.05 GB in a 2026-09-29 run). Not tried on a device yet."
+        "1.05 GB in a 2026-09-29 run). Not tried on a device yet.",
+        "Version 3 (2026-10-22): env.MADEIRA_WINTYPES = 1 (build 575). Auto-tune added it to this game (Send Log 3HSD2T, build 578, L30:",
+        "\"trying wintypes-dll-optin\", a rule that fires on an \"import_dll Library api-ms-win-core-winrt-robuffer-l1-1-0.dll ... not found\"",
+        "of the session before) and kept it (D6F1RA, build 578, L28; X6AVFR and 2PJS96, build 579). With it Wine's own wintypes.dll is linked",
+        "(\"MADEIRA_WINTYPES=1: wintypes.dll -> wintypes-optin.dll\", X6AVFR L227) and the game plays 83 to 107 s, 2,264 to 5,625 frames, to its",
+        "own stop (an object header with an odd low bit, \"[badrip]\"), which no line here fixes. The list gives the first start the line."
       ]
     },
     {
@@ -1401,7 +1425,7 @@
       {
       "id": "beamng-drive",
       "title": "BeamNG.drive",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [284160],
         "steamFolders": ["beamng.drive"],
@@ -1413,7 +1437,8 @@
         "# BCD's recommended settings for BeamNG.drive.",
         "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
         "env.MADEIRA_EC_HOOK_TRACE = 0",
-        {"line": "env.MADEIRA_X64_MACHINE = 1", "minBuild": 577}
+        {"line": "env.MADEIRA_X64_MACHINE = 1", "minBuild": 577},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
       ],
       "notes": [
         "BeamNG.drive (Steam 284160), builds 574 and 576, iPhone16,2 on iOS 27.2 (Send Log VV1FQ4, PEVMEQ, DZ6BN4,",
@@ -1426,7 +1451,14 @@
         "the launcher asks is not in any log; the next log shows \"[x64-machine] IsWow64Process2\" lines if it asks that one.",
         "The launcher's own link \"Current mode: native ARM (click to change)\" switches it by hand and is remembered.",
         "Not fixed by this line: on an iOS 26 device (63 GB address map) the x64 program stops in Chromium's allocator",
-        "(SRWY27); the whole-app crash that followed the launcher's exit (req_cancel_async) is addressed in build 577 (host-tested only)."
+        "(SRWY27); the whole-app crash that followed the launcher's exit (req_cancel_async) is addressed in build 577 (host-tested only).",
+        "Version 2 (2026-10-22): env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576). With X64_MACHINE the launcher starts Bin64\\BeamNG.drive.x64.exe",
+        "(build 579, iPhone16,2 and iPad16,3; Send Logs 01DSNK, 8JCCFM), and the 265 MiB libcef.dll it loads finds no room in the JIT pool:",
+        "\"[jit-pool] EXHAUSTED (image 0x71e0330000+0x1092c000)\" (01DSNK L11225, 8JCCFM L11296), \"load_dll libcef.dll status=c0000017\", the",
+        "launcher's \"Importing dlls for BeamNG.drive.x64.exe failed, status c0000135\" and the exit 8 to 10 s in; 01DSNK had auto-tune's",
+        "pool-split = 1 as well (a 265 MiB image is under that rule's 300 MiB bar). With auto-tune's NOCOPY line libcef.dll loads (\"[x64-image]",
+        "... libcef.dll ... mapped without a pool copy\", 0DXQ7T L11719, K7QJF3 L11919, iPad16,3). The game then stops in Chromium's allocator",
+        "(a 32 GB reservation, then a breakpoint, exit 0x80000003), which no line here fixes. Not tried on a device yet."
         ]
       },
       {
@@ -1668,7 +1700,7 @@
     {
       "id": "gta4-steam",
       "title": "Grand Theft Auto IV: The Complete Edition (Steam)",
-      "version": 1,
+      "version": 2,
       "match": {
         "steamAppIDs": [12210],
         "steamFolders": ["grand theft auto iv"],
@@ -1683,6 +1715,7 @@
         "env.MADEIRA_EC_HOOK_TRACE = 0",
         {"line": "env.MADEIRA_DOCK_GAME_SCM = 1", "minBuild": 576},
         {"line": "env.MADEIRA_FEX_AVX = 0", "minBuild": 576},
+        {"line": "env.MADEIRA_SC_PA_POOLS = 2", "minBuild": 576},
         {"line": "env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler", "minBuild": 576},
         {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
       ],
@@ -1705,10 +1738,22 @@
         "affected, the line is for the Launcher's 64-bit files); DOCK_KEEP_ALIVE = Launcher.exe;GTAIV.exe (PlayGTAIV.exe is",
         "the stub that waits for the Launcher, as PlayGTAV.exe: when the Launcher restarts itself the stub exits and the",
         "Dock ended GTA V's session; CARRIED OVER, no log of this game shows the session ending that way yet).",
-        "Not carried over: GTA V's engine lines (D3D12, DXGI source, adapter, pool-split and the Social Club pool layout),",
-        "which no log of this game asks for. GTAIV.exe never started in any of these logs, so what follows the Launcher is",
+        "Not carried over: GTA V's engine lines (D3D12, DXGI source, adapter and pool-split), which no log of this game asks for",
+        "(the Social Club pool layout came with version 2, below). GTAIV.exe never started in any of these logs, so what follows the Launcher is",
         "unknown. The owner's GTA IV (JA13M8, build 578, iPad16,5) is a local entry, C:\\Grand Theft Auto IV\\GTAIV.exe: no Dock,",
-        "no Launcher, no service; this rule needs a Steam library or App ID and does not match it. Not tried on a device yet."
+        "no Launcher, no service; this rule needs a Steam library or App ID and does not match it. Not tried on a device yet.",
+        "Version 2 (2026-10-23): env.MADEIRA_SC_PA_POOLS = 2 (build 576, GTA V's and RDR2's Social Club layout 2). Two logs of build 580 on",
+        "iPhone18,2 (512 GB map; Send Logs J1J40D and 3JTHRV): the Launcher comes up but its Social Club browser never works: \"[sc-cef]",
+        "SocialClubHelper.exe asks for PartitionAlloc's glued 32 GB pools at a 32 GB boundary; without env.MADEIRA_SC_PA_POOLS=1 there is none to",
+        "give (FEX's arena covers 0x7c00000000) -- its chrome_elf.dll will fail as before\" (J1J40D L24559, 3JTHRV L24271), SocialClubHelper.exe",
+        "exits 0x80000003 and the Launcher logs \"Browser subprocess no longer running, entering error state\" (J1J40D L24890, 3JTHRV L24612),",
+        "respawning it every 5 s; in 3JTHRV the respawns fill the JIT pool (L55028 \"EXHAUSTED\", xtajit64.dll c0000017 L55035) and the",
+        "Launcher's \"Error\" window follows (L39673). GTA V's and RDR2's lists carry the line and do not show that message. On a map that",
+        "cannot hold layout 2 the switch changes nothing: with a 63 GB map (GTA V log G2G7WA) \"[sc-cef] layout 2: [0x7000000000,+4GB) is not",
+        "free\" (L65), \"needs the JIT pool's RW alias at 0x7900000000 ... layout 1\" (L281), \"could not take [0x7c00000000,0x8000000000) ...",
+        "the FEX arena stays where it was\" (L379); with a 454 GB map (4X7N94) \"the RW alias could not be mapped at 0x7900000000 ... hold",
+        "released, usual placement\" (L84) and the same two messages (L289, L399). The Launcher never reached the game, so what follows is",
+        "unknown. Not tried on a device yet."
       ]
     },
     {
@@ -1783,6 +1828,838 @@
         "does not know the name. What follows the GC start is unknown; the next stop may be the CLR's write-barrier assert",
         "(Quaver's), for which auto-tune has its rule dotnet-wx-off. The rule has no programs: Bootstrap.exe is too generic a",
         "name, so a copy outside Steam is not matched. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "resident-evil-2",
+      "title": "Resident Evil 2",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [883710],
+        "steamFolders": ["resident evil 2  biohazard re2"],
+        "programs": [{"name": "re2.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Resident Evil 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_WG_64BIT = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod", "minBuild": 580}
+      ],
+      "notes": [
+        "Resident Evil 2 (Steam 883710), build 579, iPad16,3 (M4, 8 GB, iPadOS 27, LiveContainer; Discord, 2026-10-21): the game",
+        "ends right after its first cutscene, as Leon and as Claire; from a save made after that cutscene it plays. The log:",
+        "\"[dll-missing] ... C:\\windows\\system32\\mfasfsrcsnk.dll status=c0000135\", \"couldn't load in-process dll\",",
+        "\"no class object {41457294-644c-4298-a28a-bd69f2c0cf3b}\" (Wine's ASF byte stream handler), then",
+        "\"stream_handler_BeginCreateObject Unimplemented flags 0x11\" (the generic fallback) and an access violation reading",
+        "address 0 at re2.exe+0x25c9861 (`mov rcx,[rsi+8]`): the game plays the video through a Media Foundation source reader, gets",
+        "no source and does not check. Build 580 ships the opt-in DLLs mfasfsrcsnk (Wine's ASF handler, made to use the FFmpeg",
+        "demuxer in winedmo.dll), wmvdecod and wmadmod (the WMV and WMA decoder MFTs), and BCD's winegstreamer unix side decodes",
+        "Windows Media Video (wmv1/2/3, VC-1) for a 64-bit game that has env.MADEIRA_WG_64BIT = 1. Only this game lists them.",
+        "The videos' codec is not seen yet (WMV3 or VC-1 are the likely ones); the next log's [winedmo] and [wmv] lines say how far",
+        "it got. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "resident-evil-7",
+      "title": "Resident Evil 7 biohazard",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [418370],
+        "steamFolders": ["resident evil 7 biohazard"],
+        "programs": [{"name": "re7.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Resident Evil 7 biohazard.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_WG_64BIT = 1", "minBuild": 580},
+        {"line": "env.MADEIRA_OPTIN_DLLS = mfasfsrcsnk,wmvdecod,wmadmod", "minBuild": 580}
+      ],
+      "notes": [
+        "Resident Evil 7 biohazard (Steam 418370), build 576, iPhone18,1 (11.7 GB, iOS 27.0.1; Send Log 5MXS1S, 2026-10-21): the same",
+        "chain as Resident Evil 2 (Steam 883710, build 579, the rule above): \"[dll-missing] ... mfasfsrcsnk.dll status=c0000135\", the",
+        "generic handler's \"stream_handler_BeginCreateObject Unimplemented flags 0x11\", and 13 s into the game an access violation",
+        "reading address 0 at re7.exe+0x2a6cf01 (`mov rcx,[rsi+8]`, the same instruction): the game plays a video through a Media",
+        "Foundation source reader, gets no source and does not check. The same two lines from build 580. The videos' codec is not seen",
+        "yet; the next log's [winedmo] and [wmv] lines say how far it got. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "blazblue-entropy-effect",
+      "title": "BlazBlue Entropy Effect",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2273430],
+        "steamFolders": ["blazblueentropyeffect"],
+        "programs": [{"name": "blazblueentropyeffect.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for BlazBlue Entropy Effect.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "BlazBlue Entropy Effect (Steam 2273430, Unity IL2CPP), build 579, iPhone17,2 (Send Logs CZEQFN and SC95X8, one session sent twice,",
+        "2026-10-22; game settings: the standard line only): the JIT pool was 560 MB (\"ml1036: no hole fits a 896MB pool - SHRINKING to",
+        "560MB\", L82) and UnityPlayer.dll (30 MB, L8735) and GameAssembly.dll (93 MB, L10221) had taken their copies of it when the 24 MB",
+        "steamclient64.dll, which steam_api64.dll loads into the game, found no room: \"[jit-pool] EXHAUSTED (image 0x73fe6e0000+0x18bb000)\"",
+        "(L16009), \"no JIT-pool copy for executable section .text\", c0000017, then the game's \"SteamAPI_Init(): Sys_LoadModule failed to",
+        "load: ...steamclient64.dll\" (OutputDebugString, L16020). env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576) runs a pure x64 DLL from its",
+        "loaded image and makes no copy (as Marvel's Spider-Man: Miles Morales' list and Marvel's Spider-Man Remastered's do; auto-tune's rule",
+        "x64-image-nocopy matches this log). What follows is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "dark-souls-iii",
+      "title": "DARK SOULS III",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [374320],
+        "steamFolders": ["dark souls iii"],
+        "programs": [{"name": "darksoulsiii.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for DARK SOULS III.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "DARK SOULS III (Steam 374320), build 579, iPad17,3 (11.4 GB, a 7-day profile with increased memory; Send Log A3V7SV, 2026-10-21; game",
+        "settings: the standard line only): DarkSoulsIII.exe runs from a JIT-pool copy of its image and writes into its own code. The first",
+        "fault is \"[store-noalias] #1 ... addr=0x140010122 ... region 0x140010000+0x4000 prot=1 max=3 (prot without W = exec-downgraded page",
+        "that never got dual-mapped)\" (L10891) and \"[mach_exc] UNHANDLED #1\" (L10897); \"[wr-strip-declined] 0x140010122 vprot=0x25 ...",
+        "SEC_IMAGE WRITECOPY\" repeats 36 times (L11024 on); more than 200 unhandled faults follow (#200 at L11934) and the game ends with an",
+        "access violation, c0000005 (L16020), 28 s in. This is the symptom of auto-tune's rule x64-image-smc-nocopy (Mad Max; Dark Souls II ran",
+        "379 s with env.MADEIRA_X64_IMAGE_NOCOPY = 1 and 34 s without, Send Logs DN5QSB, E6G3RQ against 72R0CG, P9C7DG), which did not match",
+        "here because the log ended before the redelivery guard's \"256 identical redeliveries\" line. The line (build 576) runs the pure x64",
+        "program from its loaded image, where the emulator's trap for rewritten code works. What follows is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "marvels-spider-man-remastered",
+      "title": "Marvel's Spider-Man Remastered",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1817070],
+        "steamFolders": ["marvel's spider-man remastered"],
+        "programs": [{"name": "spider-man.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Marvel's Spider-Man Remastered.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Marvel's Spider-Man Remastered (Steam 1817070), build 579, iPhone19,3 (11.5 GB; Send Log T3EXJB, 2026-10-21): the previous session",
+        "ended on the JIT pool (auto-tune's header, L24: \"matched x64-image-nocopy,pool-split-exhausted\") and this one ran with",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1 (L79): the game got to the Direct3D 12 device, swapchain and descriptor heaps (L21967-21971). That is",
+        "the whole list, as for Marvel's Spider-Man: Miles Morales, which carries the same line since build 548. The game then stops on",
+        "Metal's \"MTLTextureDescriptor has width of zero. ... height of zero\" (L21972, exception 80000101 at L21982) at its first texture: its",
+        "window layer is 0x0 (\"[swap-win] #1 ... window layer (0,0 0x0 pt) hidden=1\", L21961). Nothing in this log shows the lines of Miles",
+        "Morales' list that are not NOCOPY (mip0-full is for a MipLevels 0 texture, quiet-log for a draw dump, nvidia for a vendor-id check):",
+        "none of them is in this list. The zero-size texture is not fixed by any line. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "raidou-remastered",
+      "title": "RAIDOU Remastered: The Mystery of the Soulless Army",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2288350],
+        "steamFolders": ["raidou tmotsa"],
+        "programs": [{"name": "raidou tmotsa.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for RAIDOU Remastered: The Mystery of the Soulless Army.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "RAIDOU Remastered: The Mystery of the Soulless Army (Steam 2288350, Unity IL2CPP), build 579, iPhone18,1 (Send Logs B07FN7 and",
+        "DCXTB5, 2026-10-21): without a copy-free image the 385 MiB GameAssembly.dll finds no room in the JIT pool: \"[jit-pool] EXHAUSTED",
+        "(image 0x71d8ab0000+0x180d1000)\" (B07FN7 L10427), \"no JIT-pool copy for executable section .srdata\", the game's window \"Failed to",
+        "load il2cpp\". With env.MADEIRA_X64_IMAGE_NOCOPY = 1 (DCXTB5: game settings L60) \"[x64-image] ... GameAssembly.dll ... mapped",
+        "without a pool copy\" (L10331) and the game runs 21 s before a read of address 0 and a jump to 0x22a087b30 that no module holds",
+        "(\"AV EXEC of 22A087B30\", L11338). Auto-tune reverted the line after that run (L12450), which is why the next log (B07FN7) lacks it;",
+        "the line is what gets the game past its load. The wild jump is unexplained. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "yakuza-like-a-dragon",
+      "title": "Yakuza: Like a Dragon",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1235140],
+        "steamFolders": ["yakuza like a dragon"],
+        "programs": [{"name": "yakuzalikeadragon.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Yakuza: Like a Dragon.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "exe-window-mb = 416", "minBuild": 575},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Yakuza: Like a Dragon (Steam 1235140), iPhone18,1 (11.7 GB; Send Logs F4V6BQ = 2YY2MW, build 578, and 7Z2V68, build 579, 2026-10-21):",
+        "the launcher startup.exe starts YakuzaLikeADragon.exe, a 397 MiB program (0x18c91000 bytes) with its relocations stripped",
+        "(\"charact=0x23\") that must load at 0x140000000, and the window there is 128 MB (\"ml1040: executable window [0x140000000,+128MB)",
+        "held since image load\"). Both builds: \"preferred base 0x140000000+0x18c91000 REFUSED status=0xc0000018\" (F4V6BQ L9170, 7Z2V68 L9204).",
+        "Build 578 ends there (\"failed to create main module ... c0000018\", L9231); build 579 places the image elsewhere and then finds no",
+        "room for its copy in the 528 MB JIT pool (\"[jit-pool] EXHAUSTED (image 0x152c30000+0x18c91000)\", \"no JIT-pool copy for executable",
+        "section .arch\", c0000017; 7Z2V68 L9206-9208). exe-window-mb = 416 (build 575) keeps the image and 19 MiB over it in the window, the",
+        "size the other fixed-base lists use (Hogwarts Legacy 448 for 445 MB, STAR WARS Galactic Racer 496 for 480 MB; auto-tune's own try is",
+        "512), and env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576) runs the pure x64 program from its loaded image, which makes no copy (as",
+        "Stellar Blade Demo). The launcher keeps spinning after the game ends, so the session stays open (the Dock end rules, not this list).",
+        "What follows the load is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "batman-arkham-city-goty",
+      "title": "Batman: Arkham City GOTY",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [200260],
+        "steamFolders": ["batman arkham city goty"],
+        "programs": [{"name": "batmanac.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Batman: Arkham City GOTY.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.FEX_X87REDUCEDPRECISION = 0", "minBuild": 580},
+        {"line": "env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1", "minBuild": 580}
+      ],
+      "notes": [
+        "Batman: Arkham City GOTY (Steam 200260, a 32-bit Unreal Engine 3 game), builds 574 to 579, iPad14,8 and iPad16,5 (Send Logs 7FC71A,",
+        "build 578, and A8KA6C, build 579, 2026-10-21; earlier PTKASZ, C7DGSN): two stops, one line each.",
+        "  - env.FEX_X87REDUCEDPRECISION = 0: BCD runs 32-bit games with the emulator's fast x87 mode, where the 8-byte lock-free list head the",
+        "    game reads with FILD/FISTP qword goes through a double and loses its low bits. 7FC71A (build 578): \"[x87-int64] #1 ... verdict: LOST",
+        "    ... (try env.FEX_X87REDUCEDPRECISION = 0)\" (L11254-11256). A8KA6C (build 579) runs with the line (game settings L69, auto-tune's) and",
+        "    gets past that stop: BatmanAC.exe runs and starts its launcher BmLauncher.exe (a .NET Framework program on Wine Mono).",
+        "  - env.MADEIRA_TLS_CLEAR_OWN_PROCESS = 1 (build 579): that launcher's thread faults at 0x720000010c (A8KA6C L12994, \"[wow-null32] ...",
+        "    EBX=0\", L13000): Mono's thread slot is empty. A few lines before, \"[tls-cross-clear] ... TlsFree(32) by tid 00a8 (peb 0x7900310000)",
+        "    CLEARED the live cell of tid 010c / 0104 (peb 0x7200310000, 32-bit)\" (L12834-12838): the game's TlsFree cleared the same index in the",
+        "    threads of the launcher it had started, which Windows never does (it also cleared two 64-bit threads of Valve's client, L9860-9861).",
+        "    The switch clears only the calling program's threads.",
+        "Both lines name environment variables that build 580's policy knows (earlier builds' policy rejects a list that carries them), so",
+        "both carry minBuild 580 although the engine side of the second one is in 579. The game plays nowhere yet. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "metal-gear-solid-peace-walker",
+      "title": "METAL GEAR SOLID: Peace Walker - Master Collection Version",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2492660],
+        "steamFolders": ["mgs_pw"]
+      },
+      "config": [
+        "# BCD's recommended settings for METAL GEAR SOLID: Peace Walker - Master Collection Version.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_WINTYPES = 1", "minBuild": 575}
+      ],
+      "notes": [
+        "METAL GEAR SOLID: Peace Walker - Master Collection Version (Steam 2492660, Unity IL2CPP), build 579, iPhone15,4 (Send Logs RWF4GR,",
+        "B05CYJ, TQQM87 = KR5772, 2026-10-22): the first start ends with \"import_dll Library api-ms-win-core-winrt-robuffer-l1-1-0.dll (which",
+        "is needed by ...\\MGS_PW\\launcher\\GameAssembly.dll) not found\" (RWF4GR L12505) and the game's \"Fatal error\" window; auto-tune then",
+        "adds env.MADEIRA_WINTYPES = 1 (B05CYJ L32: \"trying wintypes-dll-optin\"), Wine's own wintypes.dll for this game (\"[WineProc]",
+        "MADEIRA_WINTYPES=1: wintypes.dll -> wintypes-optin.dll\", B05CYJ L217), and the game plays: B05CYJ presents 22,348 frames in 390 s,",
+        "TQQM87 6,432 in 120 s. The list gives the first start the line (build 575 and later link Wine's copy for a game with it). The rule",
+        "has no program name: the game's program is launcher.exe, too common a name. Steam installs only."
+      ]
+    },
+    {
+      "id": "lonely-mountains-snow-riders",
+      "title": "Lonely Mountains: Snow Riders",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2545360],
+        "steamFolders": ["lmsr"],
+        "programs": [{"name": "lmsr_windows64_steam.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Lonely Mountains: Snow Riders.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_WINTYPES = 1", "minBuild": 575}
+      ],
+      "notes": [
+        "Lonely Mountains: Snow Riders (Steam 2545360, Unity IL2CPP), build 579, iPhone17,2 (Send Logs 5HFHMR and DQQ2DV, 2026-10-21): auto-tune",
+        "added env.MADEIRA_WINTYPES = 1 at the first start of each (5HFHMR L30: \"trying wintypes-dll-optin\"; the rule fires on an",
+        "\"import_dll Library api-ms-win-core-winrt-robuffer-l1-1-0.dll ... not found\" of the session before), Wine's wintypes.dll loads",
+        "(\"mixed-arch fallback: L\\\"wintypes.dll\\\" -> ...sysx64\\\\wintypes.dll\", 5HFHMR L10651) and the game runs 14,000 more log lines",
+        "to its own stop, an access violation through an odd object-header word (\"[badrip]\", L25376), which no line here fixes. The list",
+        "gives the first start the line. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "trails-in-the-sky-1st-chapter",
+      "title": "Trails in the Sky 1st Chapter",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [3375780],
+        "steamFolders": ["trails in the sky 1st chapter"],
+        "programs": [{"name": "sora_1st.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Trails in the Sky 1st Chapter.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_VDCFG_PATH = 1", "minBuild": 580}
+      ],
+      "notes": [
+        "Trails in the Sky 1st Chapter (Steam 3375780), iPhone18,1 (Send Logs 24VADD, build 578, X56ZXZ and YTMNEK, build 573, and PBP9YD, build",
+        "579, 2026-10-21): about 2 s into every start the game reads address 0x10 at sora_1st.exe+0x5215E0 (a swapchain wrapper it never made)",
+        "after QueryDisplayConfig answered \"success, 0 paths 0 modes\" for the virtual monitor that GetDisplayConfigBufferSizes counts, and",
+        "sized its window one pixel. PBP9YD: auto-tune added env.MADEIRA_VDCFG_PATH = 1 (L31: \"trying vdcfg-virtual-path\"), the line lists the",
+        "virtual monitor's path (\"MADEIRA_VDCFG_PATH=1: QueryDisplayConfig lists the virtual monitor's path ... -> 0, 1 paths 2 modes\", L11138-11143)",
+        "and the game ran 143 s (stage 5, exit 0, 4.8 GB at most) without the read. The list gives the first start the line. The name is",
+        "new to the download policy of build 580, hence minBuild 580 (build 579 has the switch, not the policy)."
+      ]
+    },
+    {
+      "id": "subnautica-2",
+      "title": "Subnautica 2",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1962700],
+        "steamFolders": ["subnautica2"],
+        "programs": [{"name": "subnautica2-win64-shipping.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Subnautica 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Subnautica 2 (Steam 1962700, Unreal Engine 5), iPhone18,2 (11.7 GB, 8,192 MB process limit), Send Logs R01CY6, 6DQD1G (build 579) and",
+        "BKHJ2S (build 576), 2026-10-21; all three tester sessions had bcd.cfg swap-mb=2048 only, which also kept auto-tune from adding a",
+        "swap tier (its lines contain swap-mb):",
+        "  - swap-mb = 6144, swap-mode = 2, swap-min-mb = 1: the memory limit ends the game. R01CY6 grows to \"[footprint] phys=8179 MB (peak",
+        "    8179)\" (L39419, the last footprint line, 13 MB under the limit) and the log stops with no fatal line; 6DQD1G reaches 8135 MB (fast",
+        "    reading, L45958) and its log ends 2,000 lines later, also with no fatal line; BKHJ2S (build 576) was at 7,597 MB when its log ended.",
+        "    These are the lines auto-tune's 12 GB tier adds after a memory kill (rule swap-12gb-memory-kill: 6144 MB is the first step, as in",
+        "    Horizon Forbidden West's list for the owner's 12 GB phone).",
+        "  - env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576): auto-tune added it in every session (BKHJ2S L35: \"trying x64-image-nocopy\", the pool",
+        "    failure of the session before); the line is in the game settings of all three logs and none shows the pool failure again.",
+        "The lines apply to every device (a list cannot key lines to a memory tier); all three logs are 12 GB phones. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "rdr1-steam",
+      "title": "Red Dead Redemption (Steam)",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [2668510],
+        "steamFolders": ["red dead redemption"],
+        "programs": [{"name": "playrdr.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Red Dead Redemption (Steam).",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_DOCK_GAME_SCM = 1", "minBuild": 576},
+        {"line": "env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler", "minBuild": 576},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Red Dead Redemption (Steam 2668510), build 579, iPad17,3 (M5, 15.4 GB; Send Log CM53SJ, 2026-10-21): PlayRDR.exe starts Rockstar's",
+        "Launcher like Grand Theft Auto IV does, so this list is that list (gta4-steam) where the log shows what the line fixes:",
+        "  - env.MADEIRA_DOCK_GAME_SCM = 1: the session before had the Launcher's \"Unable to open SC manager! (1722)\" and auto-tune added the",
+        "    line (header L37); with it \"[dock-report] game-scm=2\" (L8699) and the 1722 is gone.",
+        "  - env.MADEIRA_X64_IMAGE_NOCOPY = 1: the Launcher's Social Club browser cannot load: \"[jit-pool] EXHAUSTED (image 0x71d37b0000+0xefbe000)\"",
+        "    (239 MiB, libcef.dll, 14 times from L25800), \"Browser subprocess no longer running\" (L26008), the Launcher's \"Error\" window (L39484),",
+        "    in a pool that was already split (pool-split = 1 was in this session, L58, and did not help). The line (build 576) makes no copy.",
+        "  - env.MADEIRA_SPAWN_BLOCK = RockstarErrorHandler: the Launcher's crash handler is spawned here too (L10903) and takes copies of its",
+        "    image and of ntdll in the pool; blocking it is the line GTA IV, GTA San Andreas DE and GTA V use.",
+        "Left out from GTA IV's list: env.MADEIRA_FEX_AVX = 0 (a pin that only keeps auto-tune's AVX line out of the Launcher; this log has no",
+        "c000001d and the rule already stays away from Rockstar Launcher sessions). The Launcher never reached the game, so what follows is",
+        "unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "resident-evil-requiem",
+      "title": "Resident Evil Requiem",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [3764200],
+        "steamFolders": ["resident evil requiem biohazard requiem"],
+        "programs": [{"name": "re9.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Resident Evil Requiem.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "exe-window-mb = 592", "minBuild": 575},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Resident Evil Requiem (Steam 3764200, RE Engine, Madeira Dock), iPad17,3 (12 GB, 512 GB map, iPadOS 27.0.1; Send Logs YQRQ86, build",
+        "579, and P0GY6V, build 580, 2026-10-22): re9.exe is a program with its relocations stripped, 0x23f12000 bytes = 575.07 MiB, that",
+        "must load at 0x140000000 (\"ml985: map_image_view size=0x23f12000 base=0x140000000 ... charact=0x23\", YQRQ86 L8459); the window there",
+        "is 128 MB and the load ends with \"preferred base 0x140000000+0x23f12000 REFUSED status=0xc0000018\" (L8460), \"wine: failed to create",
+        "main module ... status c0000018\" (L8513) and \"[dock-game-end] re9.exe ended with status 0xc0000018\" (L9604).",
+        "Build 579's auto-tune tried exe-window-mb = 512 (YQRQ86 L35, \"executable window widened to [0x140000000,+512MB)\" L78); 512 MB is 63",
+        "MiB short of the image, so the failure came back unchanged (L9800: \"matched exe-window-fixed-base; status stuck\"). Since build 580",
+        "that rule stays away from an image of 512 MiB or more (P0GY6V L9792: \"matched ; status stuck\"; its game settings, L62, carry only",
+        "the NOCOPY line).",
+        "  - exe-window-mb = 592 (build 575): the image plus 17 MiB, the way the other fixed-base lists are sized. The free run above",
+        "    0x140000000 ends at the main thread's stack: 0x16ef54000 in YQRQ86 (\"ml1135: the placeholder ended at the mapping\", L77) = 751",
+        "    MiB, 0x16f630000 in P0GY6V (L74) = 758 MiB, so 592 fits. The window takes the front of the pool's hole above it; the pool then",
+        "    lies in a hole below the window, 480 MB in YQRQ86's map (L79-80, the same size it had with the 512 MB window) and about 429 MB",
+        "    in P0GY6V's (L75; 624 MB without the window, L93), and may need auto-tune's pool-split.",
+        "  - env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576): auto-tune's own line, kept in both logs; the pure x64 program runs from its loaded",
+        "    image and makes no 575 MiB copy in the pool.",
+        "What follows the load is unknown (RE Engine, Direct3D 12, a 12 GB iPad). Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "life-is-strange-remastered",
+      "title": "Life is Strange Remastered",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1265920],
+        "steamFolders": ["lis - remastered"],
+        "programs": [{"name": "lis-win64-shipping.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Life is Strange Remastered.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Life is Strange Remastered (Steam 1265920, Unreal Engine 4, Madeira Dock), iPhone18,2 (iOS 27.0, 512 GB map; Send Logs 3QG0TN and",
+        "ACYW27, the same session, build 580, 2026-10-22): LiS-Win64-Shipping.exe (L9131) loads the WebBrowser plugin's libcef.dll",
+        "(Engine\\Binaries\\ThirdParty\\CEF3\\Win64, 95 MiB): \"[jit-pool] EXHAUSTED (image 0x71e52b0000+0x5ef8000): want=0x5efc000 ... freelist=0",
+        "- FAILING the load\" (L17658-17659), \"no JIT-pool copy for executable section .text -- the load fails with STATUS_NO_MEMORY\"",
+        "(L17660), \"NtMapViewOfSection status=c0000017\" (L17661), \"load_dll libcef.dll status=c0000017\" (L17662); the game goes on after the",
+        "delay-load exception c06d007e (L17665) and then waits at presents=1 for 236 s (L18961-27189). The tester left and the log ends while",
+        "the session runs, so auto-tune never scored it (it proposes this line after a scored failure with the pool refusal).",
+        "env.MADEIRA_X64_IMAGE_NOCOPY = 1 (build 576) loads a pure x64 DLL from its mapped image and makes no pool copy: the line",
+        "BeamNG.drive's libcef.dll and the Rockstar Launcher's got. Whether the game plays afterwards (presents=1 may have a second cause) is",
+        "unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "life-is-strange-2",
+      "title": "Life is Strange 2",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [532210],
+        "steamFolders": ["life is strange 2"],
+        "programs": [{"name": "lis2-win64-shipping.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Life is Strange 2.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "exe-window-mb = 400", "minBuild": 575},
+        {"line": "env.MADEIRA_X64_IMAGE_NOCOPY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Life is Strange 2 (Steam 532210, Unreal Engine 4, Madeira Dock), iPhone18,2 (iOS 27.0, 512 GB map; Send Logs 4KHB7C and JNJ5M5, the",
+        "same file, build 580, 2026-10-22): LIS2-Win64-Shipping.exe is a program with its relocations stripped, 0x17b2f000 bytes = 379 MiB,",
+        "that must load at 0x140000000 (\"ml985: map_image_view size=0x17b2f000 base=0x140000000 ... charact=0x23\", L8669); the window there",
+        "is 128 MB (L66), the load ends with \"preferred base 0x140000000+0x17b2f000 REFUSED status=0xc0000018\" (L8671) and \"wine: failed to",
+        "create main module ... status c0000018\" (L9003). The image was copied into the 592 MB pool first (L8968:",
+        "\"used=0x21524000/0x25000000\").",
+        "Same class as Yakuza: Like a Dragon (same two lines, which got that game through its load stage). exe-window-mb = 400 (build 575) is",
+        "the image plus 20 MiB; the free run above 0x140000000 ends at 0x16d1b8000 (\"ml1135: the placeholder ended at the mapping\", L68) =",
+        "721 MiB, so it fits. The window takes the front of the pool's hole (0x148000000+593MB, L69), leaving about 320 MB above it, and the",
+        "other holes are 232-295 MB: expect a smaller pool (and auto-tune's pool-split if it matters). env.MADEIRA_X64_IMAGE_NOCOPY = 1",
+        "(build 576) runs the pure x64 program from its loaded image, which makes no 379 MiB copy. Auto-tune's exe-window-fixed-base would",
+        "try 512 on a later start; the second Play of this session was held by session-once (L10289), so no verdict was recorded. What",
+        "follows the load is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "project-zomboid",
+      "title": "Project Zomboid",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [108600],
+        "steamFolders": ["projectzomboid"],
+        "programs": [{"name": "projectzomboid64.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Project Zomboid.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env._JAVA_OPTIONS = -XX:-UseZGC", "minBuild": 591}
+      ],
+      "notes": [
+        "Project Zomboid (Steam 108600, Java), iPhone15,4 (Send Log GCN1GC, build 580, 2026-10-22): ProjectZomboid64.exe is a Java launcher",
+        "(jvm.dll, L8645). The JVM asks for a 31,962 MB placeholder reservation (size=0x7cda00000, type=0x42000) at the hint 0x40000000000 (4",
+        "TiB): \"[jumbo#1] ... hint=0x40000000000 -> 0x0 st=0xc0000018\" (L9482), \"[nt-fail] #2 ... status=c0000018\" (L9484), then the same ask",
+        "at 0x4001fe00000, 0x4003fc00000 ... up to 8 TiB with shrinking sizes (12,230 refused reservations, \"[jumbo#12230]\" L46754), and",
+        "exits 1 about 14 s later (\"NtTerminateProcess ... exit_code=0x1\", L47590). BCD's address map ends at 512 GB, so every one of those",
+        "hints is above it. A JVM running ZGC reserves its heap at a fixed base of 4 TiB and up and cannot be moved; the JVM's arguments are",
+        "not in the log, the 4 TiB first hint is the evidence (likely).",
+        "env._JAVA_OPTIONS = -XX:-UseZGC (build 591; a download may set that name only with exactly this value): the JVM reads _JAVA_OPTIONS",
+        "after the command line, so it turns ZGC off and the default collector reserves its heap low. Only this game's list carries it. Not",
+        "tried on a device yet (the JVM's own choice of collector afterwards is not shown by any log)."
+      ]
+    },
+    {
+      "id": "spiderheck",
+      "title": "SpiderHeck",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1329500],
+        "steamFolders": ["spiderheck"],
+        "programs": [{"name": "spiderheckapp.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for SpiderHeck.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_FAULT_GUARD_RATE = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "SpiderHeck (Steam 1329500, Unity Mono, Direct3D 11, Madeira Dock), iPad13,8 (M1; Send Log ZHVF9Y, build 580, 2026-10-22): Mono's",
+        "null checks (cmp dword [rax],0 and the like) raise c0000005 on purpose and the game turns each into a NullReferenceException. One",
+        "site faults back to back, 1,744 times in 40 s (44 a second) while the game keeps presenting (92 fps in the last second, L45770), and",
+        "the redelivery guard ends the process: \"[redeliv] 256 identical redeliveries\" L22364, \"[redeliv] 2000 identical redeliveries",
+        "pc=0x16632804c addr=0x0\" L45909, \"[redeliv] terminating process\" L45914. A real storm runs at tens of thousands a second.",
+        "env.MADEIRA_FAULT_GUARD_RATE = 1 (build 591) makes the fault-storm guards count a real storm only (rate and progress aware); off,",
+        "the guards are what they were, so the line is the game's alone. The same guards ended ROUNDS (A1CX12) and PlateUp! (21DKZW) on this",
+        "iPad. The faulting loop itself may come from the game's failing HTTPS requests (\"Curl error 60: Cert verify failed\", L16272), which",
+        "the line does not change. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "rounds",
+      "title": "ROUNDS",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1557740],
+        "steamFolders": ["rounds"],
+        "programs": [{"name": "rounds.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for ROUNDS.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_FAULT_GUARD_RATE = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "ROUNDS (Steam 1557740, Unity Mono, Direct3D 11, Madeira Dock), iPad13,8 (M1; Send Log A1CX12, build 580, 2026-10-22): the game runs",
+        "at 56-60 fps while one site (host pc 0x16659c694, guest mov rax,[rax+0x28]) faults 4,000 times in a few seconds: \"[redeliv] 256",
+        "identical redeliveries\" L24507 (15:32:24.7), \"[redeliv] 2000 identical redeliveries\" L35766 (15:32:28.5), 460 a second, while",
+        "\"PRESENT_GAP #1344 -> #1536\" (L24361 -> L33377) shows the frames still counting; \"terminating process\" follows. A running game is",
+        "ended by the guard.",
+        "env.MADEIRA_FAULT_GUARD_RATE = 1 (build 591): the guard counts a real storm only (rate and progress aware); off, nothing changes.",
+        "The throwing loop's root may be the failing HTTPS (\"Curl error 60 ... UnityTls error code: 7\", L16812), which the line does not",
+        "change. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "plateup",
+      "title": "PlateUp!",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1599600],
+        "steamFolders": ["plateup"],
+        "programs": [{"name": "plateup.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for PlateUp!.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_FAULT_GUARD_RATE = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "PlateUp! (Steam 1599600, Unity Mono, Madeira Dock), iPad13,8 (M1; Send Log 21DKZW, build 580, 2026-10-22): the same null-check traps",
+        "(guest 83 38 00 66 66 90, \"UNHANDLED #1\" L15378). The Mach side declines because x18 is 0, so the faults take the BSD path, whose",
+        "\"SEGV LOOP FATAL\" guard keeps one global pc and repeat count: five repeats of the same pc, here from different threads, skip the",
+        "instruction and set x0 = 0xDEAD0001 (L18877, L19137, L19432 ...). The game then reads that value as a pointer (\"[av-detail] #19",
+        "p0=READ p1=0xdead0011\", L18879), exits with 0xc0000005 (L25258) and \"[dock-game-end] ... after 29 s\" (L25249).",
+        "env.MADEIRA_FAULT_GUARD_RATE = 1 (build 591): the guards count a real storm only and never write a fake return value for a",
+        "managed-code null check; off, nothing changes. Likely (the 0xDEAD0001 provenance is exact; the end could also have another trigger).",
+        "Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "final-fantasy-tactics-ivalice-chronicles",
+      "title": "FINAL FANTASY TACTICS - The Ivalice Chronicles",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1004640],
+        "steamFolders": ["final fantasy tactics - the ivalice chronicles"],
+        "programs": [{"name": "fft_enhanced.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for FINAL FANTASY TACTICS - The Ivalice Chronicles.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_USER_VA_GB = 32", "minBuild": 591}
+      ],
+      "notes": [
+        "FINAL FANTASY TACTICS - The Ivalice Chronicles (Steam 1004640, Madeira Dock), iPad17,3 (15 GB, 512 GB map; Send Logs DR8613, build",
+        "580, and 7QVF78, build 579, 2026-10-21): FFT_enhanced.exe asks for 256 GiB plus 64 MiB of address space in one piece and quits by",
+        "itself with exit code 0: \"[mmap-place] NO GAP FITS size=0x4004010000 ... largest gap 32768 MB\" (DR8613 L9474), \"[jumbo] kernel-pick",
+        "reserve failed (0xc0000017) for size=0x4003ffffff\" (L9475), \"[nt-fail] #2 NtAllocateVirtualMemory status=c0000017",
+        "proc=fft_enhanced.exe size=0x4003ffffff type=0x2000 prot=0x1\" (L9525), \"NtTerminateProcess(handle=0x0, exit_code=0x0)\" (L9600);",
+        "7QVF78 L9678 and L9752 are the same stop (it had been filed as the user leaving). BCD says it has 524,287 MB of virtual memory",
+        "(ml990, L306) but its own gap map offers 42 GB usable, the largest hole 32 GiB (L9480).",
+        "env.MADEIRA_USER_VA_GB = 32 (build 591) caps the address space BCD advertises to the game at 32 GiB. The 256 GiB ask is exactly half",
+        "of the 512 GiB advertised (a pool of half the address limit, 256 GiB plus 64 MiB of alignment), so a 32 GiB advertisement should",
+        "bring the ask to 16 GiB, which fits the 32 GiB hole. If one device log shows the ask still at 32 GiB or more, the number goes down",
+        "to 16. Likely for the mechanism; if the 256 GiB is a constant of the game's allocator the cap does nothing. Not tried on a device",
+        "yet."
+      ]
+    },
+    {
+      "id": "age-of-empires-ii-hd",
+      "title": "Age of Empires II HD (Steam)",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [221380],
+        "steamFolders": ["age2hd"]
+      },
+      "config": [
+        "# BCD's recommended settings for Age of Empires II HD (Steam).",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_MFC_DOCK = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "Age of Empires II (2013), the Age2HD folder (Steam 221380, Madeira Dock), iPhone18,2 (Send Logs B2NWDX, MXMRJ3 and GYYAAC, build",
+        "580, 2026-10-22): Age2HD\\Launcher.exe imports MFC and the Dock session has none: \"import_dll Library mfc140u.dll (which is needed by",
+        "...\\Age2HD\\Launcher.exe) not found\" (B2NWDX L8734; MXMRJ3 and GYYAAC L8546), \"Importing dlls ... failed, status c0000135\" (B2NWDX",
+        "L8747), \"[dock-game-end] launcher.exe ended with status 0xc0000135\" (L8797). A Dock session runs Wine's explorer.exe from the",
+        "aarch64 bundle, so the Microsoft VC++ overlay, which is also what links mfc140.dll and mfc140u.dll, is never applied to it.",
+        "env.MADEIRA_MFC_DOCK = 1 (build 591) links mfc140.dll and mfc140u.dll into a Dock session too, from the VC++ runtime download the",
+        "app keeps; it acts only in a session that has no VC++ overlay, where this game's import fails today. Not tried on a device yet",
+        "(whether these testers had the VC++ download is not in the Dock logs)."
+      ]
+    },
+    {
+      "id": "fallout-new-vegas",
+      "title": "Fallout: New Vegas",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [22380],
+        "steamFolders": ["fallout new vegas"],
+        "programs": [{"name": "falloutnv.exe", "steam": true}, {"name": "falloutnvlauncher.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Fallout: New Vegas.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "Fallout: New Vegas (Steam 22380, Madeira Dock), iPhone16,2 (iOS 26.6.1, 63 GB map, full memory rights; Send Log GA6QN2, build 580,",
+        "2026-10-22): FalloutNVLauncher.exe runs and shows its error box, \"Fallout: New Vegas does not appear to be installed and the",
+        "installer could not be found ...\" (\"[msgbox-origin]\" L16037); it looks for the registry values (Bethesda Softworks\\FalloutNV,",
+        "Installed Path) that Steam's install script writes in a Registry section of installscript.vdf. The Dock runs only the script's Run",
+        "Process entries (\"[dock-installers] app=22380 scripts=1 programs=2 done=2\", L45-47); presents=0 for 60 s and the tester left after",
+        "about 4.5 minutes.",
+        "env.MADEIRA_DOCK_SCRIPT_REGISTRY = 1 (build 591) applies the script's Registry values that the prefix lacks before a Dock start; it",
+        "writes a value only where the key is absent, so a prefix that already has them is untouched. Likely (the message is the launcher's",
+        "registry check; the reads themselves are not logged). Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "digimon-story-cyber-sleuth",
+      "title": "Digimon Story Cyber Sleuth: Complete Edition",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1042550],
+        "steamFolders": ["digimon story cyber sleuth complete edition"],
+        "programs": [{"name": "digimon story cs.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Digimon Story Cyber Sleuth: Complete Edition.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_OPTIN_DLLS = oledlg", "minBuild": 591}
+      ],
+      "notes": [
+        "Digimon Story Cyber Sleuth: Complete Edition (Steam 1042550, Madeira Dock), iPad13,16 (Send Log PGET5A, build 579, 2026-10-22): the",
+        "game's program imports oledlg.dll and the 64-bit DLL set has none: \"[dll-missing] #1 oledlg.dll status=c0000135\" (L9132),",
+        "\"import_dll Library oledlg.dll (which is needed by ...\\app_digister\\Digimon Story CS.exe) not found\" (L9133), \"loader_init:",
+        "Importing dlls ... failed, status c0000135\" (L9272), \"[dock-game-end] ... 0xc0000135 after 0 s\" (L9426). Other imports of the",
+        "program may be missing too (the loader stops at the first).",
+        "env.MADEIRA_OPTIN_DLLS = oledlg (build 591): Wine's own oledlg.dll, linked for this game only (the opt-in mechanism of dxva2, evr,",
+        "sfc, tbs). Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "final-fantasy-xv-demo",
+      "title": "FINAL FANTASY XV WINDOWS EDITION PLAYABLE DEMO",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [671210],
+        "steamFolders": ["final fantasy xv playable demo"],
+        "programs": [{"name": "ffxv_s.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for FINAL FANTASY XV WINDOWS EDITION PLAYABLE DEMO.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_OPTIN_DLLS = fwpuclnt", "minBuild": 591}
+      ],
+      "notes": [
+        "FINAL FANTASY XV WINDOWS EDITION PLAYABLE DEMO (Steam 671210, Madeira Dock), iPad17,1 (Send Logs DM9SAF and CDC7AK, the same",
+        "session, build 579, 2026-10-22): ffxv_s.exe imports fwpuclnt.dll (the Windows Filtering Platform client) and the 64-bit DLL set has",
+        "none: \"import_dll Library fwpuclnt.dll (which is needed by ...\\ffxv_s.exe) not found\" (DM9SAF L8827), \"loader_init ... status",
+        "c0000135\" (L9048), \"[dock-game-end] ... 0xc0000135 after 0 s\" (L9203).",
+        "env.MADEIRA_OPTIN_DLLS = fwpuclnt (build 591): Wine's own fwpuclnt.dll, linked for this game only. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "borderlands-3",
+      "title": "Borderlands 3",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [397540],
+        "steamFolders": ["borderlands 3"],
+        "programs": [{"name": "borderlands3.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Borderlands 3.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_OPTIN_DLLS = sensapi", "minBuild": 591}
+      ],
+      "notes": [
+        "Borderlands 3 (Steam 397540, Unreal Engine 4, Madeira Dock), iPad17,1 (Send Log VFM84T, build 580, 2026-10-22): the game got through",
+        "SteamAPI_Init; the Vivox SDK then fails to load for want of SensApi.dll (\"[dll-missing] #4 SensApi.dll status=c0000135\" L13655,",
+        "\"import_dll Library SensApi.dll (which is needed by ...\\Engine\\Binaries\\ThirdParty\\Vivox\\Win64\\vivoxsdk.dll) not found\" L13656), UE4",
+        "raises the delay-load exception c06d007e (L13678), the crash reporter shows \"The UE4-OakGame Game has crashed and will close\" and",
+        "the process ends with exit 3 (L14821).",
+        "env.MADEIRA_OPTIN_DLLS = sensapi (build 591): Wine's own sensapi.dll, linked for this game only. Whether anything else stops the",
+        "game afterwards is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "zenless-zone-zero",
+      "title": "Zenless Zone Zero",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [4162040],
+        "steamFolders": ["zenless zone zero"],
+        "programs": [{"name": "hyp.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Zenless Zone Zero.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_OPTIN_DLLS = dxva2", "minBuild": 575}
+      ],
+      "notes": [
+        "Zenless Zone Zero (Steam 4162040, the HoYoPlay launcher HYP.exe, Madeira Dock), iPhone17,2 (Send Log JNRQFD, build 579, 2026-10-22):",
+        "libcef.dll loads (L9206), then \"import_dll Library dxva2.dll (which is needed by ...\\libcef.dll) not found\" (L9522), QCefView.dll",
+        "and HYGui.dll fail in turn, \"loader_init ... status c0000135\" (L9636) and \"[dock-game-end] ... 0xc0000135\" (L9796). Auto-tune's rule",
+        "dxva2-dll-optin matches this log exactly; the log ends before it printed its verdict.",
+        "env.MADEIRA_OPTIN_DLLS = dxva2 (build 575): the line Fort Solis and Dragon Ball: Sparking! ZERO already carry. What follows (the Qt",
+        "and CEF launcher, then the game) is unknown. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "jetboard-joust",
+      "title": "Jetboard Joust",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [1181600],
+        "steamFolders": ["jetboardjoust"],
+        "programs": [{"name": "jetboardjoust.exe", "steam": true}]
+      },
+      "config": [
+        "# BCD's recommended settings for Jetboard Joust.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_ANON_CAS_FLUSH = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "Jetboard Joust (Steam 1181600, MonoGame on CoreCLR, Madeira Dock), iPad16,3 (Send Logs GHVYNG, T9CQD7, RTSYP6 and CTR7BV, build 580,",
+        "2026-10-22): the build 580 emulation of the CLR's lock cmpxchg on its own RWX page works (\"[anon-cas] build580 ...\" GHVYNG L10535,",
+        "T9CQD7 L10202, RTSYP6 L10267, CTR7BV L10188), but the game never presents (\"detach-wait: presents=0\", GHVYNG L11630) and the CoreCLR",
+        "main thread burns one core at 11-12 million calls a second into kernelbase.dll+0x6c248 (\"[spin] ml1140 look 1\", L10726). FEX had",
+        "registered the page as translated code before the CAS (\"Add SMC interval: 7193A44000 - 7193A45000\", L10286) and keeps its old",
+        "translation after the emulated store, so the stub keeps calling the prestub (likely: the mechanism is proven in code, the causal",
+        "link is inferred from the timing).",
+        "env.MADEIRA_ANON_CAS_FLUSH = 1 (build 591) drops FEX's translation of the written range after the emulated CAS; off, nothing",
+        "changes. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "sword-and-fairy-3",
+      "title": "Sword and Fairy 3 (PAL3.exe)",
+      "version": 1,
+      "match": {
+        "programs": [{"name": "pal3.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Sword and Fairy 3 (PAL3.exe).",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_NLS_EXTRA = 1", "minBuild": 591}
+      ],
+      "notes": [
+        "Sword and Fairy 3 (PAL3.exe, 32-bit, a local copy), iPhone17,3 (Send Log 6FW5J5, build 580, 2026-10-22): the program reaches",
+        "Direct3D 9 and asks four times for the Simplified Chinese ANSI code page (\"[nls-getptr] type=11 id=936\", L1863-1869); BCD's NLS",
+        "folder holds only c_1252, c_437, c_20127 and c_28591, so the request is refused, and a read of the NULL page follows (\"[wow-null32]",
+        "... guest address 0x0\", L1879, in PAL3.exe+0x15510f and PAL3patch.dll). 0.8 s after the start the process ends itself with",
+        "exit_code=0xc0000005 (L2030). Likely (the request and the fault are 8 lines apart, no other error precedes it); the same hole exists",
+        "for any game of the Japanese, Korean, Traditional Chinese or Central European code pages.",
+        "env.MADEIRA_NLS_EXTRA = 1 (build 591) makes the extra code-page tables (c_932 ... c_1258) visible; the tables are only opened when a",
+        "program asks for that code page. The rule matches the program's name (PAL3.exe) wherever it is. Not tried on a device yet."
+      ]
+    },
+    {
+      "id": "dead-as-disco",
+      "title": "Dead as Disco",
+      "version": 1,
+      "match": {
+        "steamAppIDs": [3404260],
+        "programs": [{"name": "pagoda.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for Dead as Disco.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_OPTIN_DLLS = tbs", "minBuild": 580},
+        {"line": "env.MADEIRA_VCRT_ARM64_KEY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "Dead as Disco (Steam 3404260), build 580, iPhone, BCD Dock (bcd-games issue #13, 2026-10-23): the Unreal start-up program",
+        "Pagoda.exe asks for tbs.dll and then for Microsoft Visual C++ 2015-2022 Redistributable (arm64). With env.MADEIRA_OPTIN_DLLS = tbs",
+        "and env.MADEIRA_VCRT_ARM64_KEY = 14.44.35211.0 it starts Pagoda/Binaries/Win64/PagodaSteam-Win64-Shipping.exe (the reporter's",
+        "test); with = 1 on build 580 (marker 14.42.34433.0) it refused. From build 592, = 1 writes 14.44.35211.0 or the session",
+        "runtime's newer version. The game then stopped later at a separate FSR DLL / JIT-pool limit (not covered here)."
+      ]
+    },
+    {
+      "id": "tung",
+      "title": "TUNG",
+      "version": 1,
+      "match": {
+        "steamFolders": ["tung"],
+        "programs": [{"name": "tung.exe"}]
+      },
+      "config": [
+        "# BCD's recommended settings for TUNG.",
+        "# Reset to Recommended, at the bottom of the game's settings, brings them back.",
+        "env.MADEIRA_EC_HOOK_TRACE = 0",
+        {"line": "env.MADEIRA_VCRT_ARM64_KEY = 1", "minBuild": 576}
+      ],
+      "notes": [
+        "TUNG (Steam, BCD Dock), build 574, Send Logs HGRG79, Z65ZRM: the Unreal start-up program TUNG.exe shows \"The following",
+        "component(s) are required to run this program: Microsoft Visual C++ 2015-2022 Redistributable (arm64)\" and exits, as",
+        "Denshattack and the FINAL FANTASY RESONANCE demo did. env.MADEIRA_VCRT_ARM64_KEY = 1 writes that entry for the session",
+        "(14.44.35211.0 from build 592). Not tried on a device yet."
       ]
     },
     {

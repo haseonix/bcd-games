@@ -1,0 +1,13 @@
+{
+ "dialogs": [],
+ "end": {
+  "killed": true,
+  "userSaid": "closed-by-itself"
+ },
+ "matched": [],
+ "next": [],
+ "note": "Albino Lullaby (Steam 355860, Dock) build 580, iPhone 12 GB: the first 14,000 lines of 41D565 (before the NULL write in mf.dll), as a run the app did not come back from and the tester called closed by itself; the footprint is 1.3 GB of the 8.2 GB limit, so swap-12gb-memory-kill and swap-12gb-more must not match (the swap lines were tried for a non-memory crash)",
+ "outcome": "killed",
+ "stage": 3,
+ "status": "stuck"
+}

@@ -1,0 +1,119 @@
+[17:23:30.310] [INFO] Checking entitlements...
+[17:23:30.311] [INFO] [build] v0.1.580 (580)
+[17:23:30.311] [INFO] [device] model=iPhone17,3 idiom=phone os=iOS Version 27.0.1 (Build 24A446) ram=7682MB available=6126MB cores=6
+[17:23:30.312] [INFO] [device] address-map=[0x104a94000,0x8000000000) 512GB increased-memory=1 extended-va=0
+[17:23:30.327] [INFO] [device] gpu="Apple A18 GPU" family=apple9 argument-buffers=tier2 mesh=1 bc=1 atomics64=1 cpu-lse=1 cpu-lrcpc=1 direct3d=ok x64=ok
+[17:23:33.864] [INFO] Requesting JIT with Built-in StikJIT...
+[17:23:38.533] [INFO] [bcd] library launch PAL3.exe: avx=0 wine-vcrt=1 nvidia=0 game-config=1 metalfx=off
+[17:23:38.558] [INFO] Running full Wine sequence...
+[17:23:38.558] [INFO] [device] launch: cs-flags=0x32003005 get-task-allow=1 cs-debugged=1 debugger-attached=1 traced=1 address-map=[0x104a94000,0x8000000000) 512GB available=6117MB low-power=0 thermal=nominal
+[17:23:38.566] [INFO] Allocating 896MB JIT pool (BRK will suspend process)...
+[17:23:38.566] [INFO] Allocating 896MB JIT pool via debugger...
+[17:23:38.567] [INFO] [jit-pool] path: debugger (attached at the pool request; it makes every region)
+[17:23:38.567] [INFO] [jit-debugger] attached=1 at the pool request
+[17:23:38.571] [ERR] ml1036: no hole fits a 896MB pool — SHRINKING to 560MB (the alternative is a pool in the guest window or on top of 0x140000000, both of which are fatal)
+[17:23:39.349] [INFO] RX pool at 0x148000000
+[17:23:39.367] [INFO] Detaching debugger...
+[phase] wine-start             t+  0.844s rev=ml526
+[wine-mono] ml1275 neither this build nor a download has Wine Mono -- a .NET Framework game then exits 0xffffffff with "Wine Mono is not installed"; Settings > .NET Framework downloads it
+[cage] holdback reserved 0x7200000000+0x1ffff0000 rev=ml433
+[wow-window] reserved B=0x7100000000..0x7200000000 (slot 0) guard=borrowed
+[Wine init_process] reply_pipe=40, sending init_first_thread...
+[17:23:39.737] [Wine init_process] reply_pipe=40, sending init_first_thread...
+ml992: os_proc_available_memory=5543 MB + phys_footprint=600 MB = 6144 MB (hw.memsize says 7682 MB)
+[wow-rwx] ml1279 MADEIRA_WOW_RWX_PLAIN=(unset) -> 32-bit guest RWX memory is plain read/write in a window once Wine Mono is mapped there
+[copy-verify] ntdll.dll: OK, 29 .text pages executable (copy @0x148004000)
+0024:err:seh:init_syscall_frame page0: trying debugger (BRK #0xf00d, x16=3)...
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+[copy-verify] wow64.dll: OK, 5 .text pages executable (copy @0x14811c000)
+0024:err:module:load_dll [dll-missing] rev=ml336 #1 L"\\??\\C:\\windows\\system32\\wow64cpu.dll" status=c0000135 -- if the webhelper dies right after this, it is the delay-load Chromium kills the process over
+[copy-verify] libwow64fex.dll: OK, 119 .text pages executable (copy @0x148191000)
+[copy-verify] ucrtbase.dll: OK, 39 .text pages executable (copy @0x148554000)
+[copy-verify] KERNEL32.dll: OK, 12 .text pages executable (copy @0x148678000)
+[copy-verify] kernelbase.dll: OK, 30 .text pages executable (copy @0x148720000)
+[footprint] rev=ml358 phys=615 MB (peak 615) internal=613 MB compressed=0 MB external=63 MB reusable=1 MB (cycle=1)
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[copy-verify] wow64win.dll: OK, 8 .text pages executable (copy @0x1488a0000)
+[copy-verify] win32u.dll: OK, 9 .text pages executable (copy @0x148924000)
+D 24 Load module PAL3.exe (pal3.exe-e9a183552d271fd8): 7100400000
+D 24 Load module ntdll.dll (ntdll.dll-3903196a83f3f4fd): 71FFF40000
+D 24 Load module kernel32.dll (kernel32.dll-3a7c334be1ee0075): 717BED0000
+D 24 Load module kernelbase.dll (kernelbase.dll-1bada4728a9612d3): 717BC40000
+[nls-getptr] type=11 id=1252 peb=0x717ffd0000
+[nls-getptr] type=11 id=437 peb=0x717ffd0000
+D 24 Load module USER32.DLL (user32.dll-7d7be97280e239db): 717BA80000
+D 24 Load module gdi32.dll (gdi32.dll-c59f4f8a5a827c8c): 717B9F0000
+D 24 Load module PAL3.DLL (pal3.dll-f650f2ad6fda66e0): 7102400000
+D 24 Load module PAL3patch.dll (pal3patch.dll-2bbae00c42784fa3): 7102410000
+[nls-getptr] type=11 id=20127 peb=0x717ffd0000
+[gdi-shared] session table 0x7023370000 (1572864 bytes, section-backed, name=L"\\KernelObjects\\__wine_ios_gdi_shared")
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+[nls-getptr] type=11 id=10000 peb=0x717ffd0000
+D 24 Load module imm32.dll (imm32.dll-d32574d787f762fb): 717B200000
+[free-delay] #1 release of 0x7102ba0000+0x100000 held for 2000 ms (1 in flight)
+[free-delay] #2 release of 0x7102cc0000+0x200000 held for 2000 ms (2 in flight)
+[free-delay] #3 release of 0x7102fe0000+0x400000 held for 2000 ms (3 in flight)
+D 24 Load module uxtheme.dll (uxtheme.dll-4e1489634460e1fd): 717B1C0000
+[free-delay] #4 release of 0x7103430000+0x800000 held for 2000 ms (4 in flight)
+[free-delay] #5 release of 0x7103c50000+0xfd0000 held for 2000 ms (5 in flight)
+D 24 Load module PAL3unpack.dll (pal3unpack.dll-7f30f23f9f59a972): 7104C20000
+[free-delay] #6 release of 0x7104c30000+0x22f000 held for 2000 ms (6 in flight)
+D 24 Load module SHCORE.DLL (shcore.dll-3f5d19270cc53126): 717B1D0000
+[free-delay] #7 release of 0x7104e80000+0xfd0000 held for 2000 ms (7 in flight)
+[free-delay] #8 release of 0x7105e50000+0xfd0000 held for 2000 ms (8 in flight)
+[nls-getptr] type=11 id=936 peb=0x717ffd0000
+[nls-getptr] type=11 id=936 peb=0x717ffd0000
+[nls-getptr] type=11 id=936 peb=0x717ffd0000
+[nls-getptr] type=11 id=936 peb=0x717ffd0000
+[store-noalias] #1 rev=ml348 addr=0x7100000000 insn=0x38bfc314 pc=0x16a2c2c88 NO pool/anon alias | region 0x7100000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #1 p0=READ p1=0x7100000000 hostpc=0x16a2c2c88 hinsn=0x38bfc314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=1 rip=0x0 pc=0x16a2c2c88 addr=0x7100000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7100000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #1 pc=0x16a2c2c88 addr=0x7100000000 x18=0x717ffc0000 type=1 lr=0x16affc14c sp=0x703891f350 x16=0x148069e94 x17=0x703891f2b0
+[guest-code] rev=ml333 pool_rip=0x7bc55817 (PE 0x7bc55817) -- NO pool copy for this address (identity translate)
+[fault-host] 16a2c2b88: 24234310 41316710 10371066 10373312 37112212 21243610 12103710 10665422
+[fault-host] 16a2c2ba8: 66121037 21314331 39371031 43455024 71241121 23234310 24068916 42241132
+[fault-host] 16a2c2bc8: 35102431 23103120 088a5644 27331042 34103310 34104343 10664131 22121633
+[fault-host] 16a2c2be8: 16216641 36106227 28106216 00810223 00021801 d503201f 00000570 10ffffe0
+[fault-host] 16a2c2c08: f9000380 f90f639f 51001108 b8284a66 52800006 528d9d14 72a03134 8b344278
+[fault-host] 16a2c2c28: b8bfc314 d503201f ca06029b 6b06029a 51002108 8b284278 29002b0b 54000141
+[mach_exc] insn_stream PC-12..PC+8: d503201f 5280000b 8b2a4278 [38bfc314] b3401e84 ca06009b 53081c80
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+[store-noalias] #2 rev=ml348 addr=0x7100000000 insn=0x38bfc314 pc=0x16a2c2c88 NO pool/anon alias | region 0x7100000000+0x110000 prot=0 max=7 (prot without W = exec-downgraded page that never got dual-mapped)
+[av-detail] ml613 #2 p0=READ p1=0x7100000000 hostpc=0x16a2c2c88 hinsn=0x38bfc314 rcx=0x0 r8=0x0 [rcx+8]=<unreadable>0x0 p1_is_rcx8=0 | carve=idx=1 base=0x169ffc000 size=0x1000000 state=live p1_in_carve=0 regs=0 rev=ml613
+[fault_rip] cnt=2 rip=0x0 pc=0x16a2c2c88 addr=0x7100000000 kr=2(PROTECTION_FAILURE) entryprot=0 nowprot=0 region=0x7100000000+0x110000 rev=ml555
+[mach_exc] UNHANDLED #2 pc=0x16a2c2c88 addr=0x7100000000 x18=0x717ffc0000 type=1 lr=0x16affc14c sp=0x703891f350 x16=0x148069e94 x17=0x703891f2b0
+[guest-code] rev=ml333 pool_rip=0x7bc55817 (PE 0x7bc55817) -- NO pool copy for this address (identity translate)
+[fault-host] 16a2c2be8: 16216641 36106227 28106216 00810223 00021801 d503201f 00000570 10ffffe0
+[fault-host] 16a2c2c08: f9000380 f90f639f 51001108 b8284a66 52800006 528d9d14 72a03134 8b344278
+[fault-host] 16a2c2c28: b8bfc314 d503201f ca06029b 6b06029a 51002108 8b284278 29002b0b 54000141
+[fault-host] 16a2c2c48: 52950eb4 72a00ab4 51001108 b8284a74 10000040 940000e9 10fffd00 f9000380
+[fault-host] 16a2c2c68: f90f639f 528a6314 72a03134 8b344278 b8bfc30a d503201f 5280000b 8b2a4278
+[fault-host] 16a2c2c88: 38bfc314 b3401e84 ca06009b 53081c80 00000000 00000000 00000000 00000000
+[mach_exc] insn_stream PC-12..PC+8: d503201f 5280000b 8b2a4278 [38bfc314] b3401e84 ca06009b 53081c80
+[mach_exc] sym pc=?`?+0x0 lr=?`?+0x0
+[x86_seg] State.gs_cached=0x0 TEB=0x717ffc0000 TEB[0x58]=0x0 *(gs_cached+0x58)=0x0
+0024:err:seh:bus_handler BUS->AV: unreadable target addr=0x7100000000 pc=0x16a2c2c88 rw=1 rev=ml420
+wine: Unhandled page fault on write access to 00000000 at address 0055A87D (thread 0024), starting debugger...
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0x0, exit_code=0xc0000005) syscalls=0 unix_calls=744
+0024:err:process:NtTerminateProcess NtTerminateProcess(handle=0xffffffffffffffff, exit_code=0xc0000005) syscalls=0 unix_calls=762
+[Wine ntdll/server] process_exit_wrapper(-1073741819)
+[WineProc] Wine exited with code -1073741819 (caught by longjmp)
+[WineProc] stopping wineserver...
+[17:23:40.557] [INFO] [exit-report] status=0xc0000005
+[frontend] returned to library
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=678 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=2)
+[17:23:42.177] [INFO] Detaching debugger...
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=678 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=3)
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=678 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=4)
+[footprint] rev=ml358 phys=679 MB (peak 679) internal=678 MB compressed=0 MB external=68 MB reusable=1 MB (cycle=5)
+[footprint] rev=ml358 phys=678 MB (peak 679) internal=676 MB compressed=0 MB external=68 MB reusable=2 MB (cycle=6)
+[freeze] alive t+30s beats=1 gaps=0 iter=119 gen=1 threads=11 resident=152MB dbg=DEBUGGED rev=ml525
+[freeze] alive t+60s beats=2 gaps=0 iter=238 gen=1 threads=13 resident=168MB dbg=DEBUGGED rev=ml525
+[footprint] rev=ml358 phys=688 MB (peak 689) internal=89 MB compressed=597 MB external=80 MB reusable=0 MB (cycle=36)
+[footprint] rev=ml358 phys=693 MB (peak 693) internal=94 MB compressed=597 MB external=81 MB reusable=0 MB (cycle=37)
+[footprint] rev=ml358 phys=692 MB (peak 693) internal=93 MB compressed=597 MB external=81 MB reusable=0 MB (cycle=38)
+[footprint] rev=ml358 phys=692 MB (peak 693) internal=93 MB compressed=597 MB external=81 MB reusable=0 MB (cycle=39)
+[footprint] rev=ml358 phys=692 MB (peak 693) internal=93 MB compressed=597 MB external=81 MB reusable=0 MB (cycle=40)
+[footprint] rev=ml358 phys=692 MB (peak 693) internal=93 MB compressed=597 MB external=81 MB reusable=0 MB (cycle=41)

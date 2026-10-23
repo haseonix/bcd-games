@@ -15,7 +15,7 @@ Needs Wine's headers: WINE_SRC points at a checkout (default ./wine).
    as off unless set (the function returns before touching the registry).
 3. The function (server_ios.c between the vcrt-arm64-test marks, with ios_hidpad_key) compiled against a
    fake registry with Wine 11's parent rule: unset/empty/0 write nothing and log nothing; 1 writes the
-   template's 14.42.34433.0 into both views, volatile; a version string writes that version; a bad
+   downloaded runtime's 14.44.35211.0 (issue #13; was the template's 14.42.34433.0) into both views, volatile; a version string writes that version; a bad
    value writes nothing and says so; a key already there is left alone; a repeated run adds nothing.
 """
 from pathlib import Path
@@ -62,6 +62,19 @@ check("template x64 marker: Bld 0x8681, Installed 1, 14.42, Version 14.42.34433.
 smt = func(loader, "static void start_main_thread(void)")
 i_hw, i_vc, i_files = smt.find("ios_hw_registry_publish();"), smt.find("ios_vcrt_arm64_key_publish();"), smt.find("init_files();")
 check("start_main_thread: ios_hw_registry_publish -> ios_vcrt_arm64_key_publish -> init_files", 0 <= i_hw < i_vc < i_files)
+
+# bcd-games issue #13 (2026-10-23): "1" means 14.44.35211.0 in the engine, and the app replaces "1" with the session runtime's
+# version only when that is newer; both sides must name the same fixed version, and the app must leave other values alone.
+_bridge = (root / "app/Madeira/WineProcessBridge.m").read_text()
+_srv = (root / "build/ntdll-unix/server_ios.c").read_text()
+check("engine: \"1\" writes 14.44.35211.0", "unsigned int v[4] = { 14, 44, 35211, 0 }" in _srv)
+_fn = _bridge[_bridge.find("static void madeira_vcrt_arm64_version("):]
+_fn = _fn[:_fn.find("\n}\n") + 3]
+check("app: madeira_vcrt_arm64_version acts only on \"1\", compares with the same 14.44.35211.0, reads VS_FIXEDFILEINFO",
+      'if (!sw || strcmp(sw, "1")) return;' in _fn and "fixed[4] = { 14, 44, 35211, 0 }" in _fn and "0xFEEF04BDu" in _fn
+      and _fn.count("setenv(") == 1 and "newer" in _fn)
+check("app: called in the session setup, after the MFC Dock link",
+      0 < _bridge.find("madeira_mfc_dock(fm,") < _bridge.find("madeira_vcrt_arm64_version(bundlePath,"))
 check("the call is iOS-only, declared next to it, and the only one",
       re.search(r"#ifdef WINE_IOS\n(?:\s*/\*.*?\*/\n)?\s*\{\n\s*extern void ios_vcrt_arm64_key_publish\(void\);\n"
                 r"\s*ios_vcrt_arm64_key_publish\(\);\n\s*\}\n#endif", smt, re.S) is not None
@@ -273,7 +286,7 @@ static void reset( void )
 }
 #define K64  "\\Registry\\Machine\\Software\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\arm64"
 #define K32  "\\Registry\\Machine\\Software\\Wow6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\arm64"
-#define DEF  "Bld=dword:34433;Installed=dword:1;Major=dword:14;Minor=dword:42;Rbld=dword:0;Version=sz:14.42.34433.0;"
+#define DEF  "Bld=dword:35211;Installed=dword:1;Major=dword:14;Minor=dword:44;Rbld=dword:0;Version=sz:14.44.35211.0;"
 
 int main( void )
 {
@@ -288,7 +301,7 @@ int main( void )
         assert( !creates && !sets && !log_lines && !open_handles && !find( K64 ) && !find( K32 ) );
     }
 
-    /* 1: the template's version in both views, volatile, one log line */
+    /* 1: 14.44.35211.0 (issue #13) in both views, volatile, one log line */
     reset();
     setenv( "MADEIRA_VCRT_ARM64_KEY", "1", 1 );
     ios_vcrt_arm64_key_publish();
@@ -298,7 +311,7 @@ int main( void )
     assert( !find( K64 )->parent->is_volatile && !find( K32 )->parent->is_volatile );   /* Runtimes stays as the prefix has it */
     assert( !strcmp( vals( "\\Registry\\Machine\\Software\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64" ), "" ) );
     assert( strstr( last_log, "[vcrt-arm64] madeira-bcd: HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\arm64 "
-                              "(volatile) Installed=1 Version 14.42.34433.0: 2 of 2 view(s) written, 0 already there and "
+                              "(volatile) Installed=1 Version 14.44.35211.0: 2 of 2 view(s) written, 0 already there and "
                               "left alone, 0 could not be made; MADEIRA_VCRT_ARM64_KEY unset or 0 turns it off" ) );
     printf( "on: %u keys, %u values, line: %s\n", creates, sets, last_log );
 

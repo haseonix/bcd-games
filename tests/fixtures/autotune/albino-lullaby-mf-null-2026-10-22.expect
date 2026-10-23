@@ -1,0 +1,14 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "mf-null-video-off"
+ ],
+ "next": [
+  "env.MADEIRA_WG_VIDEO = 0"
+ ],
+ "note": "Albino Lullaby (Steam 355860, Dock) build 580: the 32-bit game plays its intro MP4 and a thread writes the NULL page inside mf.dll (mf.dll+0x18ac3); MADEIRA_WG_VIDEO = 0 is an attempt, not a proven fix",
+ "outcome": "crashed",
+ "stage": 4,
+ "status": "trying"
+}

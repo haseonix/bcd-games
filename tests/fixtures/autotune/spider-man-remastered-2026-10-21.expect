@@ -1,0 +1,12 @@
+{
+ "dialogs": [],
+ "end": {},
+ "matched": [
+  "d3d12-zero-extent-texture"
+ ],
+ "next": [],
+ "note": "",
+ "outcome": "crashed",
+ "stage": 3,
+ "status": "known"
+}
